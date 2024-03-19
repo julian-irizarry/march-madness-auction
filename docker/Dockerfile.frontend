@@ -1,0 +1,22 @@
+# Use an official Node.js runtime as a parent image
+FROM node:14
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY ../frontend/package*.json ./
+
+# Install any needed packages
+RUN npm install
+
+# Bundle app source
+COPY ../frontend/ .
+
+# Build your app
+RUN npm run build
+
+# Install serve and serve your React app
+RUN npm install -g serve
+CMD ["serve", "-s", "build"]
+
