@@ -6,6 +6,7 @@ services:
       dockerfile: docker/Dockerfile.frontend
     volumes:
       - ./frontend/:/app
+      - /app/node_modules
     ports:
       - "3000:3000"
     command: ["/bin/bash", "/app/start_frontend_server.sh"]
