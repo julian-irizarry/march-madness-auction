@@ -4,12 +4,18 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.frontend
+    volumes:
+      - ./frontend/:/app
     ports:
       - "3000:3000"
+    command: ["/bin/bash", "/app/start_frontend_server.sh"]
   backend:
     build:
       context: .
       dockerfile: docker/Dockerfile.backend
-    ports:
+    volumes:
+      - ./backend/:/app
+    ports: 
       - "8000:8000"
+    command: ["/bin/bash", "/app/start_backend_server.sh"]
 

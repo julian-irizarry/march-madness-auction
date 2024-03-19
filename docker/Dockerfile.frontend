@@ -13,10 +13,10 @@ RUN npm install
 # Bundle app source
 COPY ../frontend/ .
 
-# Build your app
-RUN npm run build
-
-# Install serve and serve your React app
-RUN npm install -g serve
-CMD ["serve", "-s", "build"]
+# # Build your app
+# RUN npm run build
+#
+# # Install serve and serve your React app
+# RUN npm install -g serve
+# CMD ["serve", "-s", "build"]
 
