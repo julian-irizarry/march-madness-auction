@@ -1,54 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import Button from '@mui/joy/Button'; // Importing Button from MUI Joy
+import Input from '@mui/joy/Input'; // Corrected import for Input
 
 function App() {
-  const [number, setNumber] = useState('');
-  const [receivedNumber, setReceivedNumber] = useState('');
+  const [bid, setBid] = useState('');
+  const [currentHighestBid, setCurrentHighestBid] = useState(0);
 
-  // Function to handle form submission
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    const bidNumber = parseInt(bid, 10);
+    if (isNaN(bidNumber) || bidNumber <= currentHighestBid) {
+      alert('Your bid must be a number and higher than the current highest bid.');
+      return;
+    }
     try {
       await fetch('http://localhost:8000/number/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ number }),
+        body: JSON.stringify({ number: bidNumber }),
       });
-      setNumber(''); // Clear the input field after submission
+      setBid(''); // Clear the input field after submission
     } catch (error) {
-      console.error('Error posting number:', error);
+      console.error('Error posting bid:', error);
     }
   };
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:8000/ws');
     ws.onmessage = (event) => {
-      setReceivedNumber(event.data);
+      const receivedBid = parseInt(event.data, 10);
+      setCurrentHighestBid(receivedBid);
+      if (!isNaN(receivedBid)) {
+        setCurrentHighestBid(receivedBid); // Update state with the received bid
+      }
     };
-    return () => {
-      ws.close();
-    };
+    return () => ws.close(); // Cleanup WebSocket connection on component unmount
   }, []);
 
   return (
     <div className="App">
       <header className="App-header">
         <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            value={number}
-            onChange={(e) => setNumber(e.target.value)}
-            placeholder="Enter a number"
+          {/* Updated Input component */}
+          <Input 
+            type="number" // Specify type here for numeric input
+            value={bid}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBid(e.target.value)}
+            placeholder="Enter your bid" 
           />
-          <button type="submit">Submit</button>
+          {/* Button for submitting the form */}
+          <Button type="submit">Place Bid</Button>
         </form>
-        <p>Received number: {receivedNumber}</p>
+        <p>Current highest bid: {currentHighestBid}</p>
       </header>
     </div>
   );
 }
 
 export default App;
-

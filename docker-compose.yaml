@@ -1,6 +1,7 @@
 version: '3'
 services:
   frontend:
+    image: frontend:1.0
     build:
       context: .
       dockerfile: docker/Dockerfile.frontend
@@ -11,6 +12,7 @@ services:
       - "3000:3000"
     command: ["/bin/bash", "/app/start_frontend_server.sh"]
   backend:
+    image: backend:1.0
     build:
       context: .
       dockerfile: docker/Dockerfile.backend
