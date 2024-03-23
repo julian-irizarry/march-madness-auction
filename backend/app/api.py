@@ -53,10 +53,13 @@ async def create_game(create_model: CreateModel) -> dict:
 
 @app.post("/join-game/")
 async def join_game(join_model: JoinModel):
-    if join_model.id in participants.keys():
-        participants[join_model.id].append(join_model.player)
-    else:
+    if join_model.id not in participants.keys():
         raise HTTPException(500, detail=f"Invalid Game ID: {join_model.id}")
+    
+    if join_model.player in participants[join_model.id]:
+        raise HTTPException(500, detail=f"Username Already Taken: {join_model.player}")
+    
+    participants[join_model.id].append(join_model.player)
 
 @app.post("/number/")
 async def post_number(number_model: NumberModel):
