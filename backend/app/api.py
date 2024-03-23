@@ -8,6 +8,9 @@ import random
 class NumberModel(BaseModel):
     number: int
 
+class CreateModel(BaseModel):
+    player: str
+
 class JoinModel(BaseModel):
     id: str
     player: str
@@ -42,10 +45,10 @@ async def read_root() -> dict:
     return {"message": "Welcome to your todo list."}
 
 @app.post("/create-game/")
-async def create_game() -> dict:
+async def create_game(create_model: CreateModel) -> dict:
     N = 6 # number of characters for random game ID
     new_game_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=N))
-    participants[new_game_id] = []
+    participants[new_game_id] = [create_model.player]
     return {"id": new_game_id}
 
 @app.post("/join-game/")

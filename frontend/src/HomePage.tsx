@@ -8,10 +8,16 @@ import './fonts.css'; // Assuming fonts.css is in the src directory
 
 function HomePage() {
   const navigate = useNavigate();
+  const [isCreator, setIsCreator] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [playerName, setPlayerName] = useState('');
   const [joinGameId, setJoinGameId] = useState('');
   const [joinGameError, setJoinGameError] = useState('');
+
+  const handleCreateGameClick = () => {
+    setIsCreator(true);
+    setIsDialogOpen(true); // Open the join game dialog
+  };
 
   const handleCreateGame = async (event: React.FormEvent) => {
     try {
@@ -20,13 +26,13 @@ function HomePage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ player: playerName }),
       });
       
       if (response.ok) {
         const data = await response.json();
         const createdGameId = data.id;
-        navigate('/lobby', { state: { gameId: createdGameId, isCreator: true, playerName: "" } });
+        navigate('/lobby', { state: { gameId: createdGameId, isCreator: true, playerName: playerName } });
       } else {
         console.error('Failed to create game:', response.statusText);
       }
@@ -34,7 +40,9 @@ function HomePage() {
       console.error('Error creating game:', error);
     }
   };
+
   const handleJoinGameClick = () => {
+    setIsCreator(false);
     setIsDialogOpen(true); // Open the join game dialog
   };
 
@@ -71,7 +79,7 @@ function HomePage() {
     <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', minHeight: '100vh' }}>
       <Grid container spacing={2} sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
         <Grid item>
-          <Button onClick={handleCreateGame}>Create Game</Button>
+          <Button onClick={handleCreateGameClick}>Create Game</Button>
         </Grid>
         <Grid item>
           <img src={imageSrc} alt="Central Game" style={{ maxWidth: '450px', margin: '20px 0' }} />
@@ -89,7 +97,7 @@ function HomePage() {
         <DialogTitle sx={{
           textAlign: 'center', 
           fontFamily: 'doubleFeature', 
-        }}><b>JOIN GAME</b></DialogTitle>
+        }}><b>{ isCreator ? "CREATE GAME" : "JOIN GAME"}</b></DialogTitle>
         <DialogContent>
 
           {
@@ -107,22 +115,29 @@ function HomePage() {
             onChange={(e) => setPlayerName(e.target.value)}
             margin="dense"
           />
-          <TextField
-            fullWidth
-            label="Game ID"
-            InputLabelProps={{
-              style: { 
-                fontFamily: 'doubleFeature'
-              },
-            }}
-            value={joinGameId}
-            onChange={(e) => setJoinGameId(e.target.value)}
-            margin="dense"
-          />
+
+          { isCreator ? <></> :
+            <TextField
+              fullWidth
+              label="Game ID"
+              InputLabelProps={{
+                style: { 
+                  fontFamily: 'doubleFeature'
+                },
+              }}
+              value={joinGameId}
+              onChange={(e) => setJoinGameId(e.target.value)}
+              margin="dense"
+            />
+          }
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center' }}>
           <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button onClick={handleJoinGame}>Join</Button>
+
+          { isCreator ?
+            <Button onClick={handleCreateGame}>Create</Button>
+            : <Button onClick={handleJoinGame}>Join</Button>
+          }
         </DialogActions>
       </Dialog>
     </Grid>
