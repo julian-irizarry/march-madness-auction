@@ -1,11 +1,21 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/joy/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
-import imageSrc from './march_madness_logo.png';
+import imageSrc from './march_madness_logo.png'; // Ensure the path is correct
+import './fonts.css'; // Assuming fonts.css is in the src directory
+
 
 function HomePage() {
   const navigate = useNavigate();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [playerName, setPlayerName] = useState('');
+  const [joinGameId, setJoinGameId] = useState('');
 
   const handleCreateGame = async (event: React.FormEvent) => {
     try {
@@ -28,35 +38,71 @@ function HomePage() {
       console.error('Error creating game:', error);
     }
   };
+  const handleJoinGameClick = () => {
+    setIsDialogOpen(true); // Open the join game dialog
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false); // Close the dialog
+  };
 
   const handleJoinGame = () => {
-    navigate('/lobby', { state: { isCreator: false } });
+    navigate('/lobby', { state: { gameId: joinGameId, isCreator: false, playerName } });
+    setIsDialogOpen(false); // Close the dialog after handling the join
   };
 
   return (
     <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', minHeight: '100vh' }}>
-      {/* Group the buttons and image together for alignment */}
       <Grid container spacing={2} sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
-        {/* Create Game Button */}
         <Grid item>
           <Button onClick={handleCreateGame}>Create Game</Button>
         </Grid>
-
-        {/* Central Image */}
         <Grid item>
           <img src={imageSrc} alt="Central Game" style={{ maxWidth: '450px', margin: '20px 0' }} />
         </Grid>
-
-        {/* Join Game Button */}
         <Grid item>
-          <Button onClick={handleJoinGame}>Join Game</Button>
+          <Button onClick={handleJoinGameClick}>Join Game</Button>
         </Grid>
       </Grid>
-
-      {/* View Game Button, centered beneath the image */}
       <Grid item>
         <Button>View Game</Button> {/* Implement as needed */}
       </Grid>
+
+      {/* Dialog for Join Game */}
+      <Dialog maxWidth="lg" open={isDialogOpen} onClose={handleCloseDialog}>
+        <DialogTitle sx={{
+          textAlign: 'center', 
+          fontFamily: 'doubleFeature', 
+        }}><b>JOIN GAME</b></DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label="Your Name"
+            InputLabelProps={{
+              style: { fontFamily: 'doubleFeature' },
+            }}
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
+            margin="dense"
+          />
+          <TextField
+            fullWidth
+            label="Game ID"
+            InputLabelProps={{
+              style: { 
+                fontFamily: 'doubleFeature'
+              },
+            }}
+            value={joinGameId}
+            onChange={(e) => setJoinGameId(e.target.value)}
+            margin="dense"
+          />
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center' }}>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button onClick={handleJoinGame}>Join</Button>
+        </DialogActions>
+      </Dialog>
     </Grid>
   );
 }

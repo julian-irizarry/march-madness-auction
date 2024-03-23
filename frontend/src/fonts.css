@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'terrorFont';
+  src: url('../public/bloody_terror.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'doubleFeature';
+  src: url('../public/doublefeature.ttf') format('truetype');
+}
