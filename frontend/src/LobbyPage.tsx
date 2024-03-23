@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Typography, List, ListItem } from '@mui/joy';
+import { Button, Typography, List, ListItem, ListDivider, Card, Chip } from '@mui/joy';
 import { Grid } from '@mui/material';
 import { useLocation } from 'react-router-dom';
+
+import imageSrc from './march_madness_logo.png'; // Ensure the path is correct
 
 interface Participants {
   [gameId: string]: string[];
@@ -23,41 +25,66 @@ function LobbyPage() {
   }, []);
 
   return (
-    <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', minHeight: '100vh' }}>
+    <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', minHeight: '100vh' }}>
 
-      <Grid item xs={12}>
-        <Typography level="h1">Lobby</Typography>
+      {/* Left side */}
+      <Grid item xs={4}>
+        <Grid container spacing={2} direction="column" alignItems="center">
+          <Grid item>
+            <Typography level="h4" justifyContent="center"> {playerName ? `Welcome ${playerName}!` : ""} You are {isCreator ? 'the game creator' : 'a participant'}.</Typography>
+          </Grid>
 
-        {gameId ?
-          <Typography level="h4" color="primary">Game ID: {gameId}</Typography> 
-          : <></>
-        }
-        <Typography level="h4"> {playerName ? `Welcome ${playerName}!` : ""} You are {isCreator ? 'the game creator' : 'a participant'}.</Typography> 
+          <Grid item>
+            <Typography level="h4" justifyContent="center">Participants:</Typography>
+          </Grid>
+
+          <Grid item>
+            <List variant="outlined" sx={{ minWidth: 240, borderRadius: 'sm' }}>
+              {gameId in participants && participants[gameId].length > 0 ?
+                participants[gameId].map((participant, i) => (
+                  <React.Fragment key={i}>
+                    <ListItem>
+                      <Chip> {participant} </Chip>
+                    </ListItem>
+                  </React.Fragment>
+                ))
+                : <Typography>No participants</Typography>
+              }
+            </List>
+          </Grid>
+        </Grid>
       </Grid>
 
-      <Grid item xs={6}>
-        {isCreator ? 
-          <Button>Start Game</Button> 
-          : <></>
-        }
-      </Grid>
+      {/* Right side */}
+      <Grid item xs={8}>
+        <Grid container spacing={2} direction="column" alignItems="center">
+          <Grid item>
+            <img src={imageSrc} alt="Central Game" style={{ maxWidth: '350px', margin: '20px 0' }} />
+          </Grid>
 
-      <Grid item xs={6}>
-        <Typography level="h4">Participants:</Typography>
+          <Grid container item spacing={2} sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }} >
+            <Grid item>
+              <Typography level="h4">Your Room Code:</Typography>
+            </Grid>
 
-        <List>
-          {gameId in participants && participants[gameId].length > 0? 
-            participants[gameId].map((participant, i) => (
-              <ListItem key={i}>
-                <Typography>{participant}</Typography>
-              </ListItem>
-            ))
-            : <Typography>No participants</Typography> 
-          }
-        </List>
+            <Grid item>
+              <Card variant="outlined">
+                <Typography level="h4" color="primary">{gameId}</Typography> 
+              </Card>
+            </Grid>
+          </Grid>
+
+          <Grid item>
+            {
+              isCreator ? <Button>Start Game</Button>
+              : <Typography level="h4">Waiting for the host to start the game...</Typography>
+            }
+          </Grid>
+        </Grid>
       </Grid>
 
     </Grid>
+
   );
 }
 
