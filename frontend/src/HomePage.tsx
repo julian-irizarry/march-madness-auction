@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/joy/Button';
 import Grid from '@mui/material/Grid';
@@ -14,7 +14,7 @@ function HomePage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({}), // No need to send gameId here
+        body: JSON.stringify({}),
       });
       
       if (response.ok) {

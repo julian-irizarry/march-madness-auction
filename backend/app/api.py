@@ -28,6 +28,9 @@ app.add_middleware(
 # Placeholder for storing the latest number
 latest_number = None
 
+# Placeholder for storing participants per game id
+participants = {}
+
 # A list to keep track of connected WebSocket clients
 connected_clients: List[WebSocket] = []
 
@@ -39,6 +42,7 @@ async def read_root() -> dict:
 async def read_root() -> dict:
     N = 6 # number of characters for random game ID
     new_game_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=N))
+    participants[new_game_id] = [''.join(random.choices(string.ascii_uppercase + string.digits, k=N))] * 6
     return {"id": new_game_id}
 
 @app.post("/number/")
@@ -57,6 +61,12 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         # Keep the connection alive until it's closed by the client
         while True:
+            # Send the participants list to the client
+            await websocket.send_json({"participants": participants})
+            # randomly update participants to test update
+            for game_id in participants:
+                participants[game_id] = [''.join(random.choices(string.ascii_uppercase + string.digits, k=N))] * 6
+
             # You can modify this part to send messages to the client if needed
             await websocket.receive_text()
     except WebSocketDisconnect:
