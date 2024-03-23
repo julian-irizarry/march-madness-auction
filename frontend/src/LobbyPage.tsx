@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Typography, List, ListItem, ListDivider, Card, Chip } from '@mui/joy';
 import { Grid } from '@mui/material';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import imageSrc from './march_madness_logo.png';
 import { ReactComponent as CrownIcon } from './icons/crown.svg';
@@ -12,6 +12,8 @@ interface Participants {
 }
 
 function LobbyPage() {
+  const navigate = useNavigate();
+
   const location = useLocation();
   const { gameId, isCreator, playerName } = location.state || {};
   
@@ -26,6 +28,10 @@ function LobbyPage() {
     };
     return () => ws.close();
   }, []);
+
+  const handleStartGameClick = () => {
+    navigate('/game', {});
+  };
 
   return (
     <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', minHeight: '100vh' }}>
@@ -86,7 +92,7 @@ function LobbyPage() {
 
           <Grid item>
             {
-              isCreator ? <Button>Start Game</Button>
+              isCreator ? <Button onClick={handleStartGameClick}>Start Game</Button>
               : <Typography level="h4">Waiting for the host to start the game...</Typography>
             }
           </Grid>
