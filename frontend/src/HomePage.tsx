@@ -30,7 +30,7 @@ function HomePage() {
       if (response.ok) {
         const data = await response.json();
         const createdGameId = data.id;
-        navigate('/lobby', { state: { gameId: createdGameId, isCreator: true } });
+        navigate('/lobby', { state: { gameId: createdGameId, isCreator: true, playerName: "" } });
       } else {
         console.error('Failed to create game:', response.statusText);
       }
@@ -47,7 +47,7 @@ function HomePage() {
   };
 
   const handleJoinGame = () => {
-    navigate('/lobby', { state: { gameId: joinGameId, isCreator: false, playerName } });
+    navigate('/lobby', { state: { gameId: joinGameId, isCreator: false, playerName: playerName } });
     setIsDialogOpen(false); // Close the dialog after handling the join
   };
 

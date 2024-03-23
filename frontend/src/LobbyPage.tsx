@@ -9,7 +9,7 @@ interface Participants {
 
 function LobbyPage() {
   const location = useLocation();
-  const { gameId, isCreator } = location.state || {};
+  const { gameId, isCreator, playerName } = location.state || {};
   
   const [participants, setParticipants] = useState<Participants>({});
 
@@ -32,8 +32,7 @@ function LobbyPage() {
           <Typography level="h4" color="primary">Game ID: {gameId}</Typography> 
           : <></>
         }
-
-        <Typography level="h4">You are {isCreator ? 'the game creator' : 'a participant'}.</Typography> 
+        <Typography level="h4"> {playerName ? `Welcome ${playerName}!` : ""} You are {isCreator ? 'the game creator' : 'a participant'}.</Typography> 
       </Grid>
 
       <Grid item xs={6}>
