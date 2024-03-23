@@ -17,12 +17,27 @@ function HomePage() {
   const [playerName, setPlayerName] = useState('');
   const [joinGameId, setJoinGameId] = useState('');
 
-  const handleCreateGame = () => {
-    const gameId = Math.random().toString(36).substring(2, 8); // Generate a unique ID
-    // Navigate to lobby as the game creator
-    navigate('/lobby', { state: { gameId, isCreator: true } });
+  const handleCreateGame = async (event: React.FormEvent) => {
+    try {
+      const response = await fetch('http://localhost:8000/create-game/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}), // No need to send gameId here
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const createdGameId = data.id;
+        navigate('/lobby', { state: { gameId: createdGameId, isCreator: true } });
+      } else {
+        console.error('Failed to create game:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error creating game:', error);
+    }
   };
-
   const handleJoinGameClick = () => {
     setIsDialogOpen(true); // Open the join game dialog
   };

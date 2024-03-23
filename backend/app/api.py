@@ -2,6 +2,8 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from pydantic import BaseModel
+import string
+import random
 
 class NumberModel(BaseModel):
     number: int
@@ -32,6 +34,12 @@ connected_clients: List[WebSocket] = []
 @app.get("/", tags=["root"])
 async def read_root() -> dict:
     return {"message": "Welcome to your todo list."}
+
+@app.post("/create-game/")
+async def read_root() -> dict:
+    N = 6 # number of characters for random game ID
+    new_game_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=N))
+    return {"id": new_game_id}
 
 @app.post("/number/")
 async def post_number(number_model: NumberModel):
