@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/joy';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Alert } from '@mui/material';
-import imageSrc from './march_madness_logo.png'; // Ensure the path is correct
-import './fonts.css'; // Assuming fonts.css is in the src directory
+import imageSrc from './march_madness_logo.png';
+import './fonts.css';
 
 
 function HomePage() {

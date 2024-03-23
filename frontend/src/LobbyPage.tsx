@@ -3,7 +3,9 @@ import { Button, Typography, List, ListItem, ListDivider, Card, Chip } from '@mu
 import { Grid } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 
-import imageSrc from './march_madness_logo.png'; // Ensure the path is correct
+import imageSrc from './march_madness_logo.png';
+import CrownIcon from './crown.svg';
+
 
 interface Participants {
   [gameId: string]: string[];
@@ -45,6 +47,7 @@ function LobbyPage() {
                   <React.Fragment key={i}>
                     <ListItem>
                       <Chip> {participant} </Chip>
+                      {i === 0 ? <img src={CrownIcon} alt="Crown" style={{ maxWidth: '20px', marginRight: '5px' }} /> : null}
                     </ListItem>
                   </React.Fragment>
                 ))
