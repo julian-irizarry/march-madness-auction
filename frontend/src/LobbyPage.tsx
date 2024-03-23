@@ -4,8 +4,8 @@ import { Grid } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 
 import imageSrc from './march_madness_logo.png';
-import CrownIcon from './crown.svg';
-
+import { ReactComponent as CrownIcon } from './icons/crown.svg';
+import { ReactComponent as UserIcon } from './icons/user.svg';
 
 interface Participants {
   [gameId: string]: string[];
@@ -16,6 +16,7 @@ function LobbyPage() {
   const { gameId, isCreator, playerName } = location.state || {};
   
   const [participants, setParticipants] = useState<Participants>({});
+  const baseColor = "#FFD700";
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:8000/ws-participants');
@@ -41,16 +42,22 @@ function LobbyPage() {
           </Grid>
 
           <Grid item>
-            <List variant="outlined" sx={{ minWidth: 240, borderRadius: 'sm' }}>
+          <List variant="outlined" sx={{ minWidth: 240, borderRadius: 'sm' }}>
               {gameId in participants && participants[gameId].length > 0 ?
-                participants[gameId].map((participant, i) => (
-                  <React.Fragment key={i}>
-                    <ListItem>
-                      <Chip> {participant} </Chip>
-                      {i === 0 ? <img src={CrownIcon} alt="Crown" style={{ maxWidth: '20px', marginRight: '5px' }} /> : null}
-                    </ListItem>
-                  </React.Fragment>
-                ))
+                participants[gameId].map((participant, i) => {
+                  // Calculate hue based on index
+                  const hue = (i * 30) % 360; // Adjust 30 as needed to change the color spacing
+                  const participantColor = `hsl(${hue}, 70%, 50%)`; // Adjust saturation and lightness as needed
+                  
+                  return (
+                    <React.Fragment key={i}>
+                      <ListItem>
+                        {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={participantColor} width="20px" height="20px" />}
+                        <Chip> {participant} </Chip>
+                      </ListItem>
+                    </React.Fragment>
+                  );
+                })
                 : <Typography>No participants</Typography>
               }
             </List>
