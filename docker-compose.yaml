@@ -2,6 +2,8 @@ version: '3'
 services:
   frontend:
     image: frontend:1.0
+    environment:
+      - NODE_OPTIONS=--openssl-legacy-provider
     build:
       context: .
       dockerfile: docker/Dockerfile.frontend
