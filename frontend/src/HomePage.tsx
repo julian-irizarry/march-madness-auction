@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '@mui/joy/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import TextField from '@mui/material/TextField';
-import Grid from '@mui/material/Grid';
+import { Button } from '@mui/joy';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Alert } from '@mui/material';
 import imageSrc from './march_madness_logo.png'; // Ensure the path is correct
 import './fonts.css'; // Assuming fonts.css is in the src directory
 
@@ -16,6 +11,7 @@ function HomePage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [playerName, setPlayerName] = useState('');
   const [joinGameId, setJoinGameId] = useState('');
+  const [joinGameError, setJoinGameError] = useState('');
 
   const handleCreateGame = async (event: React.FormEvent) => {
     try {
@@ -46,9 +42,29 @@ function HomePage() {
     setIsDialogOpen(false); // Close the dialog
   };
 
-  const handleJoinGame = () => {
-    navigate('/lobby', { state: { gameId: joinGameId, isCreator: false, playerName: playerName } });
-    setIsDialogOpen(false); // Close the dialog after handling the join
+  const handleJoinGame = async (event: React.FormEvent) => {
+    setJoinGameError("");
+    try {
+      const response = await fetch('http://localhost:8000/join-game/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: joinGameId, player: playerName }),
+      });
+  
+      if (response.ok) {
+        navigate('/lobby', { state: { gameId: joinGameId, isCreator: false, playerName: playerName } });
+        setIsDialogOpen(false); // Close the dialog after handling the join
+      } else {
+        // Handle error response
+        const responseData = await response.json(); // Assuming the error message is returned as JSON
+        console.error('Error joining game:', responseData.detail);
+        setJoinGameError(responseData.detail);
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+    }
   };
 
   return (
@@ -75,6 +91,12 @@ function HomePage() {
           fontFamily: 'doubleFeature', 
         }}><b>JOIN GAME</b></DialogTitle>
         <DialogContent>
+
+          {
+            joinGameError ? <Alert severity="error">{joinGameError}</Alert>
+            : <></>
+          }
+
           <TextField
             fullWidth
             label="Your Name"

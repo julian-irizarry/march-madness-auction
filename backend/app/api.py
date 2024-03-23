@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from pydantic import BaseModel
@@ -8,6 +8,9 @@ import random
 class NumberModel(BaseModel):
     number: int
 
+class JoinModel(BaseModel):
+    id: str
+    player: str
 
 app = FastAPI()
 
@@ -29,7 +32,7 @@ app.add_middleware(
 latest_number = None
 
 # Placeholder for storing participants per game id
-participants = {}
+participants: dict[str, list[str]] = {}
 
 # A list to keep track of connected WebSocket clients
 connected_clients: List[WebSocket] = []
@@ -39,11 +42,18 @@ async def read_root() -> dict:
     return {"message": "Welcome to your todo list."}
 
 @app.post("/create-game/")
-async def read_root() -> dict:
+async def create_game() -> dict:
     N = 6 # number of characters for random game ID
     new_game_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=N))
     participants[new_game_id] = [''.join(random.choices(string.ascii_uppercase + string.digits, k=N))] * 6
     return {"id": new_game_id}
+
+@app.post("/join-game/")
+async def join_game(join_model: JoinModel):
+    if join_model.id in participants.keys():
+        participants[join_model.id].append(join_model.player)
+    else:
+        raise HTTPException(500, detail=f"Invalid Game ID: {join_model.id}")
 
 @app.post("/number/")
 async def post_number(number_model: NumberModel):
