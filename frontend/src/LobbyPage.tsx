@@ -20,7 +20,7 @@ function LobbyPage() {
 
         <Typography level="h4">You are {isCreator ? 'the game creator' : 'a participant'}.</Typography> 
       </Grid>
-      
+
       <Grid item xs={6}>
         {isCreator ? 
           <Button>Start Game</Button> 
