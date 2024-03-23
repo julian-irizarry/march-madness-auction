@@ -19,7 +19,7 @@ function HomePage() {
   return (
     <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', minHeight: '100vh' }}>
       {/* Group the buttons and image together for alignment */}
-      <Grid container spacing={2} sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+      <Grid container spacing={2} sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
         {/* Create Game Button */}
         <Grid item>
           <Button onClick={handleCreateGame}>Create Game</Button>
