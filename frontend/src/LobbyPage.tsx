@@ -46,7 +46,7 @@ function LobbyPage() {
         <Typography level="h4">Participants:</Typography>
 
         <List>
-          {gameId in participants ? 
+          {gameId in participants || participants[gameId].length == 0? 
             participants[gameId].map((participant, i) => (
               <ListItem>
                 <Typography>{participant}</Typography>

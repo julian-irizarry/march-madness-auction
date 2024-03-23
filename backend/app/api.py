@@ -45,7 +45,7 @@ async def read_root() -> dict:
 async def create_game() -> dict:
     N = 6 # number of characters for random game ID
     new_game_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=N))
-    participants[new_game_id] = [''.join(random.choices(string.ascii_uppercase + string.digits, k=N))] * 6
+    participants[new_game_id] = []
     return {"id": new_game_id}
 
 @app.post("/join-game/")
@@ -73,9 +73,6 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             # Send the participants list to the client
             await websocket.send_json({"participants": participants})
-            # randomly update participants to test update
-            for game_id in participants:
-                participants[game_id] = [''.join(random.choices(string.ascii_uppercase + string.digits, k=N))] * 6
 
             # You can modify this part to send messages to the client if needed
             await websocket.receive_text()
