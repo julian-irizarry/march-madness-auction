@@ -34,7 +34,7 @@ function App() {
   };
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8000/ws');
+    const ws = new WebSocket('ws://localhost:8000/ws-bid');
     ws.onmessage = (event) => {
       const receivedBid = parseInt(event.data, 10);
       if (!isNaN(receivedBid)) {

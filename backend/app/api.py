@@ -64,8 +64,21 @@ async def post_number(number_model: NumberModel):
         await client.send_text(str(latest_number))
     return {"number": latest_number}
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
+@app.websocket("/ws-bid")
+async def websocket_endpoint_bid(websocket: WebSocket):
+    await websocket.accept()
+    connected_clients.append(websocket)
+    try:
+        # Keep the connection alive until it's closed by the client
+        while True:
+            # You can modify this part to send messages to the client if needed
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        # Remove the client from the list of connected clients if they disconnect
+        connected_clients.remove(websocket)
+
+@app.websocket("/ws-participants")
+async def websocket_endpoint_participants(websocket: WebSocket):
     await websocket.accept()
     connected_clients.append(websocket)
     try:
@@ -73,9 +86,6 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             # Send the participants list to the client
             await websocket.send_json({"participants": participants})
-
-            # You can modify this part to send messages to the client if needed
-            await websocket.receive_text()
     except WebSocketDisconnect:
         # Remove the client from the list of connected clients if they disconnect
         connected_clients.remove(websocket)

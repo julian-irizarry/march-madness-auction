@@ -14,7 +14,7 @@ function LobbyPage() {
   const [participants, setParticipants] = useState<Participants>({});
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8000/ws');
+    const ws = new WebSocket('ws://localhost:8000/ws-participants');
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       setParticipants(data.participants);
@@ -46,9 +46,9 @@ function LobbyPage() {
         <Typography level="h4">Participants:</Typography>
 
         <List>
-          {gameId in participants || participants[gameId].length == 0? 
+          {gameId in participants && participants[gameId].length > 0? 
             participants[gameId].map((participant, i) => (
-              <ListItem>
+              <ListItem key={i}>
                 <Typography>{participant}</Typography>
               </ListItem>
             ))
