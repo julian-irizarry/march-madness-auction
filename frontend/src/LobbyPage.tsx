@@ -21,7 +21,7 @@ function LobbyPage() {
   const baseColor = "#FFD700";
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8000/ws-participants');
+    const ws = new WebSocket(`ws://localhost:8000/ws/${gameId}`);
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       setParticipants(data.participants);
