@@ -24,7 +24,7 @@ function LobbyPage() {
     const ws = new WebSocket(`ws://localhost:8000/ws/${gameId}`);
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      setParticipants(data.participants);
+      setParticipants(data);
     };
     return () => ws.close();
   }, []);

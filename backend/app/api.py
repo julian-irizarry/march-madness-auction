@@ -4,6 +4,7 @@ from typing import List
 from pydantic import BaseModel
 import string
 import random
+import asyncio
 
 class CreateModel(BaseModel):
     player: str
@@ -61,31 +62,44 @@ async def join_game(join_model: JoinModel):
 
     return {"detail": "Joined game successfully"}
 
+import asyncio
+
 @app.websocket("/ws/{game_id}")
 async def websocket_endpoint(websocket: WebSocket, game_id: str):
     await websocket.accept()
-    
-    # Check if the game_id is valid
     if game_id not in game_connections:
         await websocket.close(code=4000, reason="Invalid game ID")
         return
-    
     game_connections[game_id].append(websocket)
-    
-    try:
+
+    async def send_participant_updates():
         while True:
-            # Here, you can handle incoming messages if needed
-            # For example, listening for a 'startGame' event from the game creator
-            message: str = await websocket.receive_text()
-            if message == "startGame" and websocket in game_connections[game_id][:1]: # Simplistic check for the game creator
-                # Broadcast to all participants that the game is starting
+            await websocket.send_json({game_id: games[game_id].participants})
+            await asyncio.sleep(10)  # Adjust the sleep duration as needed
+
+    async def listen_for_messages():
+        while True:
+            message = await websocket.receive_text()
+            if message == "startGame" and websocket in game_connections[game_id][:1]:
                 for participant_ws in game_connections[game_id]:
                     await participant_ws.send_text("gameStarted")
-            # Regularly (or based on certain actions), send updated participant list
-            await websocket.send_json({"participants": games[game_id].participants})
-    except WebSocketDisconnect:
-        # Remove the client from the list of connected clients for the game if they disconnect
-        game_connections[game_id].remove(websocket)
+                break  # Exit the loop if the game starts
+
+    send_task = asyncio.create_task(send_participant_updates())
+    listen_task = asyncio.create_task(listen_for_messages())
+
+    # Wait for either task to complete
+    done, pending = await asyncio.wait(
+        [send_task, listen_task],
+        return_when=asyncio.FIRST_COMPLETED,
+    )
+
+    # Cancel any pending tasks if one task completes
+    for task in pending:
+        task.cancel()
+
+    # Cleanup after tasks complete
+    game_connections[game_id].remove(websocket)
 
 # @app.post("/number/")
 # async def post_number(number_model: NumberModel):
