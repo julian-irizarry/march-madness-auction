@@ -1,22 +1,21 @@
-import { Typography, Button, List, ListItem, Chip } from '@mui/joy';
+import { Typography, List, ListItem, Chip } from '@mui/joy';
 import { Grid } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
 
 import Bid from './bid';
-import imageSrc from './march_madness_logo.png';
 import { ReactComponent as CrownIcon } from './icons/crown.svg';
 import { ReactComponent as UserIcon } from './icons/user.svg';
 
 function GamePage() {
     const location = useLocation();
-    const { gameId, isCreator, playerName } = location.state || {};
+    const { gameId } = location.state || {};
 
     const [currentHighestBid, setCurrentHighestBid] = useState<number>(0);
     const [countdown, setCountdown] = useState(10);
     const [participants, setParticipants] = useState<string[]>([]);
     const [participantInfos, setParticipantsInfos] = useState<Record<string, any>>({});
-    const [team, setTeam] = useState("Texas");
+    const [team] = useState("Texas");
 
     const baseColor = "#FFD700";
 
@@ -46,7 +45,7 @@ function GamePage() {
         }
         };
         return () => ws.close();
-    }, []);
+    }, [gameId]);
 
     const secondsToHMS = (seconds: number) => {
         const hours = Math.floor(seconds / 3600);

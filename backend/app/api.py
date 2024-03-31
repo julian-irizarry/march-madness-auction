@@ -83,7 +83,7 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
     async def send_participant_updates():
         try:
             while True:
-                participants = {k: v.dict() for k, v in gameInfo.get_all_players(game_id).items()}
+                participants = {k: v.model_dump() for k, v in gameInfo.get_all_players(game_id).items()}
                 await websocket.send_json({"participants": participants})
                 await asyncio.sleep(10)  # Adjust the sleep duration as needed
         except WebSocketDisconnect:
