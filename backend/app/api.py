@@ -6,21 +6,8 @@ import string
 import random
 import asyncio
 
-class CreateModel(BaseModel):
-    player: str
-
-class JoinModel(BaseModel):
-    id: str
-    player: str
-
-class BidModel(BaseModel):
-    id: str
-    bid: float
-
-class GameInfo(BaseModel):
-    creator: str
-    participants: List[str] = []
-    bid: float = 1
+from types.types import JoinModel, GameInfo, BidModel, CreateModel
+from bid import GameTracker
 
 app = FastAPI()
 
@@ -37,12 +24,14 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-
 # Dictionary to store game information, including participants
 games: dict[str, GameInfo] = {}
 
 # Dictionary to keep track of WebSocket connections for each game
 game_connections: dict[str, List[WebSocket]] = {}
+
+# Track Player Teams and Balance. Will turn into a database maybe
+gameInfo: GameTracker = GameTracker()
 
 @app.post("/create-game/")
 async def create_game(create_model: CreateModel) -> dict:
@@ -50,6 +39,7 @@ async def create_game(create_model: CreateModel) -> dict:
     new_game_id: str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=N))
     games[new_game_id] = GameInfo(creator=create_model.player, participants=[create_model.player])
     game_connections[new_game_id] = []  # Initialize the list of WebSocket connections for this game
+    gameInfo.addPlayer(id=create_model.player, gameId=new_game_id)
     return {"id": new_game_id}
 
 @app.post("/join-game/")
@@ -59,6 +49,8 @@ async def join_game(join_model: JoinModel):
     if join_model.player in games[join_model.id].participants:
         raise HTTPException(status_code=400, detail="Player name already taken in this game")
     
+    gameInfo.addPlayer(join_model.player, gameId=join_model.id)
+
     games[join_model.id].participants.append(join_model.player)
     if join_model.id in game_connections:
         updated_participants = games[join_model.id].participants
@@ -66,21 +58,6 @@ async def join_game(join_model: JoinModel):
             await ws.send_json({join_model.id: updated_participants})
 
     return {"detail": "Joined game successfully"}
-
-@app.post("/bid/")
-async def bid(bid_model: BidModel):
-    if bid_model.id not in games:
-        raise HTTPException(status_code=404, detail="Game ID not found")
-    
-    games[bid_model.id].bid = bid_model.bid
-    if bid_model.id in game_connections:
-        updated_bid = games[bid_model.id].bid 
-        for ws in game_connections[bid_model.id]:
-            await ws.send_json({bid_model.id: updated_bid})
-
-    return {"detail": "Bid placed successfully"}
-
-import asyncio
 
 @app.websocket("/ws/{game_id}")
 async def websocket_endpoint(websocket: WebSocket, game_id: str):
@@ -103,7 +80,7 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
     async def send_bid_updates():
         try:
             while True:
-                await websocket.send_json({game_id: games[game_id].bid})
+                await websocket.send_json({game_id: games[game_id].currentBid})
                 await asyncio.sleep(10)  # Adjust the sleep duration as needed
         except WebSocketDisconnect:
             # Handle the WebSocket disconnection
@@ -140,24 +117,15 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
     # Cleanup after tasks complete
     game_connections[game_id].remove(websocket)
 
-# @app.post("/number/")
-# async def post_number(number_model: NumberModel):
-#     global latest_number
-#     latest_number = number_model.number
-#     # Broadcast the latest number to all connected clients
-#     for client in connected_clients:
-#         await client.send_text(str(latest_number))
-#     return {"number": latest_number}
+@app.post("/bid/")
+async def bid(bid_model: BidModel):
+    if bid_model.id not in games:
+        raise HTTPException(status_code=404, detail="Game ID not found")
+    
+    games[bid_model.id].currentBid = bid_model.bid
+    if bid_model.id in game_connections:
+        updated_bid = games[bid_model.id].currentBid 
+        for ws in game_connections[bid_model.id]:
+            await ws.send_json({bid_model.id: updated_bid})
 
-# @app.websocket("/ws-bid")
-# async def websocket_endpoint_bid(websocket: WebSocket):
-#     await websocket.accept()
-#     connected_clients.append(websocket)
-#     try:
-#         # Keep the connection alive until it's closed by the client
-#         while True:
-#             # You can modify this part to send messages to the client if needed
-#             await websocket.receive_text()
-#     except WebSocketDisconnect:
-#         # Remove the client from the list of connected clients if they disconnect
-#         connected_clients.remove(websocket)
+    return {"detail": "Bid placed successfully"}
