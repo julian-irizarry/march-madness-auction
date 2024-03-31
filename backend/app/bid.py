@@ -3,6 +3,9 @@ from .types.types import PlayerInfo
 class GameTracker():
     def __init__(self):
         self.games: dict[str, dict[str, PlayerInfo]] = {}
+
+    def addGame(self, gameId: str):
+        self.games[gameId] = {}
     
     def addPlayer(self, id: str, gameId: str):
         self.games[gameId][id] = PlayerInfo(gameId=gameId)

@@ -7,17 +7,13 @@ import imageSrc from './march_madness_logo.png';
 import { ReactComponent as CrownIcon } from './icons/crown.svg';
 import { ReactComponent as UserIcon } from './icons/user.svg';
 
-interface Participants {
-  [gameId: string]: string[];
-}
-
 function LobbyPage() {
   const navigate = useNavigate();
 
   const location = useLocation();
   const { gameId, isCreator, playerName } = location.state || {};
   
-  const [participants, setParticipants] = useState<Participants>({});
+  const [participants, setParticipants] = useState<string[]>([]);
   const baseColor = "#FFD700";
   const wsRef = useRef<WebSocket | null>(null); // Use useRef to hold the WebSocket connection
 
@@ -28,13 +24,13 @@ function LobbyPage() {
     ws.onmessage = (event) => {
       if (event.data === "gameStarted") {
         // Navigate to the game/bid page when the game starts
-        navigate('/game', { state: { gameId, playerName } });
+        navigate('/game', { state: { gameId, isCreator, playerName } });
       }
       else {
         const data = JSON.parse(event.data);
 
-        if (typeof data[gameId] != 'number') {
-          setParticipants(data);
+        if ("participants" in data) {
+          setParticipants(data["participants"]);
         }
       }
     };
@@ -64,8 +60,8 @@ function LobbyPage() {
 
           <Grid item>
           <List variant="outlined" sx={{ minWidth: 240, borderRadius: 'sm' }}>
-              {gameId in participants && participants[gameId].length > 0 ?
-                participants[gameId].map((participant, i) => {
+              {participants.length > 0 ?
+                participants.map((participant, i) => {
                   // Calculate hue based on index
                   const hue = (i * 30) % 360; // Adjust 30 as needed to change the color spacing
                   const participantColor = `hsl(${hue}, 70%, 50%)`; // Adjust saturation and lightness as needed
