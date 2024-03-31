@@ -1,7 +1,7 @@
 import requests
 import csv
 
-def getTeams(year: int, month: str, days: tuple[str, str])->list[list[str]]:
+def get_teams(year: int, month: str, days: tuple[str, str])->list[list[str]]:
     """
     Generate Team Name, Seed, and Region. Uses an api indexing the dates of the first rounds of 64 to fill csv.
 
@@ -34,7 +34,7 @@ def getTeams(year: int, month: str, days: tuple[str, str])->list[list[str]]:
             print(f"ERROR READING URL: {url}: {response.status_code}")
     return teams
 
-def generateBracketCSV(year: int, month: str, days: tuple[str, str]):
+def generate_bracket_csv(year: int, month: str, days: tuple[str, str]):
     """
     Generate a CSV of Team Name, Seed, and Region. Uses an api indexing the dates of the first rounds of 64 to fill csv.
 
@@ -68,4 +68,4 @@ def generateBracketCSV(year: int, month: str, days: tuple[str, str]):
                 print(f"ERROR READING URL: {url}: {response.status_code}")
 
 if __name__ == "__main__":
-    generateBracketCSV(year=2024, month='03', days=("21", "22"))
+    generate_bracket_csv(year=2024, month='03', days=("21", "22"))

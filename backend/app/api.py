@@ -41,8 +41,8 @@ async def create_game(create_model: CreateModel) -> dict:
     new_game_id: str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=GAME_ID_NUM_CHAR))
     games[new_game_id] = GameInfo(creator=create_model.player, participants=[create_model.player])
     game_connections[new_game_id] = []  # Initialize the list of WebSocket connections for this game
-    gameInfo.addGame(gameId=new_game_id)
-    gameInfo.addPlayer(id=create_model.player, gameId=new_game_id)
+    gameInfo.add_game(gameId=new_game_id)
+    gameInfo.add_player(id=create_model.player, gameId=new_game_id)
     return {"id": new_game_id}
 
 @app.post("/join-game/")
@@ -52,11 +52,11 @@ async def join_game(join_model: JoinModel):
     if join_model.player in games[join_model.id].participants:
         raise HTTPException(status_code=400, detail="Player name already taken in this game")
     
-    gameInfo.addPlayer(join_model.player, gameId=join_model.id)
+    gameInfo.add_player(join_model.player, gameId=join_model.id)
 
     games[join_model.id].participants.append(join_model.player)
     if join_model.id in game_connections:
-        participants = {k: v.dict() for k, v in gameInfo.getAllPlayers(join_model.id).items()}
+        participants = {k: v.dict() for k, v in gameInfo.get_all_players(join_model.id).items()}
         for ws in game_connections[join_model.id]:
             await ws.send_json({"participants": participants})
 
@@ -84,7 +84,7 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
     async def send_participant_updates():
         try:
             while True:
-                participants = {k: v.dict() for k, v in gameInfo.getAllPlayers(game_id).items()}
+                participants = {k: v.dict() for k, v in gameInfo.get_all_players(game_id).items()}
                 await websocket.send_json({"participants": participants})
                 await asyncio.sleep(10)  # Adjust the sleep duration as needed
         except WebSocketDisconnect:
