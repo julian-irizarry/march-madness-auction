@@ -6,6 +6,7 @@ import './App.css';
 
 interface BidProps {
   gameId: string
+  player: string
   currentHighestBid: number
   team: string
 }
@@ -32,7 +33,7 @@ function Bid(props: BidProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: props.gameId, bid: bidNumber, team: props.team }),
+        body: JSON.stringify({ gameId: props.gameId, player: props.player, bid: bidNumber, team: props.team }),
       });
     } catch (error) {
       console.error('Error posting bid:', error);

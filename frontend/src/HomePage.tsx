@@ -58,7 +58,7 @@ function HomePage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: joinGameId, player: playerName }),
+        body: JSON.stringify({ gameId: joinGameId, player: playerName }),
       });
   
       if (response.ok) {

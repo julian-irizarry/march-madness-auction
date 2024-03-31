@@ -9,13 +9,15 @@ import { ReactComponent as UserIcon } from './icons/user.svg';
 
 function GamePage() {
     const location = useLocation();
-    const { gameId } = location.state || {};
+    const { gameId, playerName } = location.state || {};
 
     const [currentHighestBid, setCurrentHighestBid] = useState<number>(0);
-    const [countdown, setCountdown] = useState(20);
+    const [countdown, setCountdown] = useState(5);
     const [participants, setParticipants] = useState<string[]>([]);
     const [participantInfos, setParticipantsInfos] = useState<Record<string, any>>({});
-    const [team] = useState("Texas");
+    const [team, setTeam] = useState<string>("");
+    const [purchaseMsg, setPurchaseMsg] = useState<string>("");
+    const [log, setLog] = useState<string[]>([]);
 
     const baseColor = "#FFD700";
 
@@ -30,9 +32,8 @@ function GamePage() {
         }
         else {
             const data = JSON.parse(event.data);
-
+            console.log("DATA", data);
             if ("participants" in data) {
-                console.log("DATA", data);
                 setParticipants(Object.keys(data["participants"]));
                 setParticipantsInfos(data["participants"]);
             }
@@ -41,6 +42,16 @@ function GamePage() {
             }
             else if ("countdown" in data) {
                 setCountdown(data["countdown"]);
+            }
+            else if ("team" in data) {
+                const team_name: string = data["team"][0] + "(" + data["team"][1] + ")"
+                setTeam(team_name);
+            }
+            else if ("purchase" in data) {
+                setPurchaseMsg(data["purchase"]);
+            }
+            else if ("log" in data) {
+                setLog(data["log"]);
             }
         }
         };
@@ -68,13 +79,19 @@ function GamePage() {
                         <Typography level="h1" justifyContent="center">Team: {team}</Typography>
                     </Grid>
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        {
+                            purchaseMsg ?  <Typography level="h4" justifyContent="center">{purchaseMsg}</Typography>
+                            : <></>
+                        }
+                    </Grid>
+                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         <Typography level="h4" justifyContent="center">Highest bid: ${currentHighestBid}</Typography>
                     </Grid>
                     <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         <Typography level="h4">{secondsToHMS(countdown)}</Typography>
                     </Grid>
                     <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <Bid gameId={gameId} currentHighestBid={currentHighestBid} team={team}/>
+                        <Bid gameId={gameId} player={playerName} currentHighestBid={currentHighestBid} team={team}/>
                     </Grid>
                 </Grid>
             </Grid>
