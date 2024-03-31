@@ -6,8 +6,8 @@ import string
 import random
 import asyncio
 
-from types.types import JoinModel, GameInfo, BidModel, CreateModel
-from bid import GameTracker
+from .types.types import JoinModel, GameInfo, BidModel, CreateModel
+from .bid import GameTracker
 
 app = FastAPI()
 

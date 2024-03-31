@@ -1,4 +1,4 @@
-from types.types import PlayerInfo
+from .types.types import PlayerInfo
 
 class GameTracker():
     def __init__(self):

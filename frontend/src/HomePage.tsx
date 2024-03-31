@@ -108,9 +108,9 @@ function HomePage() {
           <TextField
             fullWidth
             label="Your Name"
-            InputLabelProps={{
-              style: { fontFamily: 'doubleFeature' },
-            }}
+            // InputLabelProps={{
+            //   style: { fontFamily: 'doubleFeature' },
+            // }}
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
             margin="dense"
@@ -120,11 +120,11 @@ function HomePage() {
             <TextField
               fullWidth
               label="Game ID"
-              InputLabelProps={{
-                style: { 
-                  fontFamily: 'doubleFeature'
-                },
-              }}
+              // InputLabelProps={{
+              //   style: { 
+              //     fontFamily: 'doubleFeature'
+              //   },
+              // }}
               value={joinGameId}
               onChange={(e) => setJoinGameId(e.target.value)}
               margin="dense"
