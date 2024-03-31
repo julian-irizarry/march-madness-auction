@@ -32,7 +32,10 @@ function LobbyPage() {
       }
       else {
         const data = JSON.parse(event.data);
-        setParticipants(data);
+
+        if (typeof data[gameId] != 'number') {
+          setParticipants(data);
+        }
       }
     };
 

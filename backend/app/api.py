@@ -13,9 +13,14 @@ class JoinModel(BaseModel):
     id: str
     player: str
 
+class BidModel(BaseModel):
+    id: str
+    bid: float
+
 class GameInfo(BaseModel):
     creator: str
     participants: List[str] = []
+    bid: float = 1
 
 app = FastAPI()
 
@@ -62,6 +67,19 @@ async def join_game(join_model: JoinModel):
 
     return {"detail": "Joined game successfully"}
 
+@app.post("/bid/")
+async def bid(bid_model: BidModel):
+    if bid_model.id not in games:
+        raise HTTPException(status_code=404, detail="Game ID not found")
+    
+    games[bid_model.id].bid = bid_model.bid
+    if bid_model.id in game_connections:
+        updated_bid = games[bid_model.id].bid 
+        for ws in game_connections[bid_model.id]:
+            await ws.send_json({bid_model.id: updated_bid})
+
+    return {"detail": "Bid placed successfully"}
+
 import asyncio
 
 @app.websocket("/ws/{game_id}")
@@ -82,6 +100,16 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
             game_connections[game_id].remove(websocket)
             print(f"WebSocket disconnected: {websocket}")
 
+    async def send_bid_updates():
+        try:
+            while True:
+                await websocket.send_json({game_id: games[game_id].bid})
+                await asyncio.sleep(10)  # Adjust the sleep duration as needed
+        except WebSocketDisconnect:
+            # Handle the WebSocket disconnection
+            game_connections[game_id].remove(websocket)
+            print(f"WebSocket disconnected: {websocket}")
+
     async def listen_for_messages():
         try: 
             while True:
@@ -95,12 +123,13 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
             game_connections[game_id].remove(websocket)
             print(f"WebSocket disconnected: {websocket}")
 
-    send_task = asyncio.create_task(send_participant_updates())
+    send_participant_task = asyncio.create_task(send_participant_updates())
+    send_bid_task = asyncio.create_task(send_bid_updates())
     listen_task = asyncio.create_task(listen_for_messages())
 
     # Wait for either task to complete
     done, pending = await asyncio.wait(
-        [send_task, listen_task],
+        [send_participant_task, send_bid_task, listen_task],
         return_when=asyncio.FIRST_COMPLETED,
     )
 

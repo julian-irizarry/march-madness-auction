@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
+import React, { useState, useEffect, useRef } from 'react';
 import Button from '@mui/joy/Button';
 import Input from '@mui/joy/Input';
+import { useLocation } from 'react-router-dom';
+
+import './App.css';
 
 function App() {
+  const location = useLocation();
+  const { gameId, playerName } = location.state || {};
+
   const [bid, setBid] = useState('');
   const [currentHighestBid, setCurrentHighestBid] = useState(0);
 
@@ -21,27 +26,36 @@ function App() {
       return;
     }
     try {
-      await fetch('http://localhost:8000/number/', {
+      await fetch('http://localhost:8000/bid/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ number: bidNumber }),
+        body: JSON.stringify({ id: gameId, bid: bidNumber }),
       });
     } catch (error) {
       console.error('Error posting bid:', error);
     }
   };
 
+  const wsRef = useRef<WebSocket | null>(null); // Use useRef to hold the WebSocket connection
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8000/ws-bid');
+    const ws = new WebSocket(`ws://localhost:8000/ws/${gameId}`);
+    wsRef.current = ws;
+
     ws.onmessage = (event) => {
-      const receivedBid = parseInt(event.data, 10);
-      if (!isNaN(receivedBid)) {
-        setCurrentHighestBid(receivedBid);
+      if (event.data === "gameStarted") {
+        // ignore
+      }
+      else {
+        const data = JSON.parse(event.data);
+
+        if (typeof data[gameId] === 'number') {
+          setCurrentHighestBid(data[gameId]);
+        }
       }
     };
-    return () => ws.close(); // Cleanup WebSocket connection on component unmount
+    return () => ws.close();
   }, []);
 
   return (
