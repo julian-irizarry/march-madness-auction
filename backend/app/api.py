@@ -73,17 +73,27 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
     game_connections[game_id].append(websocket)
 
     async def send_participant_updates():
-        while True:
-            await websocket.send_json({game_id: games[game_id].participants})
-            await asyncio.sleep(10)  # Adjust the sleep duration as needed
+        try:
+            while True:
+                await websocket.send_json({game_id: games[game_id].participants})
+                await asyncio.sleep(10)  # Adjust the sleep duration as needed
+        except WebSocketDisconnect:
+            # Handle the WebSocket disconnection
+            game_connections[game_id].remove(websocket)
+            print(f"WebSocket disconnected: {websocket}")
 
     async def listen_for_messages():
-        while True:
-            message = await websocket.receive_text()
-            if message == "startGame" and websocket in game_connections[game_id][:1]:
-                for participant_ws in game_connections[game_id]:
-                    await participant_ws.send_text("gameStarted")
-                break  # Exit the loop if the game starts
+        try: 
+            while True:
+                message = await websocket.receive_text()
+                if message == "startGame" and websocket in game_connections[game_id][:1]:
+                    for participant_ws in game_connections[game_id]:
+                        await participant_ws.send_text("gameStarted")
+                    break  # Exit the loop if the game starts
+        except WebSocketDisconnect:
+            # Handle the WebSocket disconnection
+            game_connections[game_id].remove(websocket)
+            print(f"WebSocket disconnected: {websocket}")
 
     send_task = asyncio.create_task(send_participant_updates())
     listen_task = asyncio.create_task(listen_for_messages())

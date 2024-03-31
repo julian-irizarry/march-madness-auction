@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, Typography, List, ListItem, ListDivider, Card, Chip } from '@mui/joy';
 import { Grid } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -19,18 +19,31 @@ function LobbyPage() {
   
   const [participants, setParticipants] = useState<Participants>({});
   const baseColor = "#FFD700";
+  const wsRef = useRef<WebSocket | null>(null); // Use useRef to hold the WebSocket connection
 
   useEffect(() => {
     const ws = new WebSocket(`ws://localhost:8000/ws/${gameId}`);
+    wsRef.current = ws;
+
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       setParticipants(data);
     };
+
+    ws.onmessage = (event) => {
+      if (event.data === "gameStarted") {
+        // Navigate to the game/bid page when the game starts
+        navigate('/game', { state: { gameId, playerName } });
+      }
+    };
+
     return () => ws.close();
-  }, []);
+  }, [navigate, gameId, playerName, isCreator]);
 
   const handleStartGameClick = () => {
-    navigate('/game', {});
+    if (isCreator && wsRef.current) {
+      wsRef.current.send("startGame");
+    }
   };
 
   return (
