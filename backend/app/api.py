@@ -31,7 +31,7 @@ games: dict[str, GameInfo] = {}
 game_connections: dict[str, List[WebSocket]] = {}
 
 # Track Player Teams and Balance. Will turn into a database maybe
-gameInfo: GameTracker = GameTracker()
+gameInfo: GameTracker = GameTracker(year=2024, month="03", day=('21', '22'))
 
 # Dictionary to store countdown timer tasks
 countdown_tasks: dict[str, asyncio.Task] = {}
@@ -56,7 +56,7 @@ async def join_game(join_model: JoinModel):
 
     games[join_model.id].participants.append(join_model.player)
     if join_model.id in game_connections:
-        participants = {k: v.dict() for k, v in gameInfo.getAll(join_model.id).items()}
+        participants = {k: v.dict() for k, v in gameInfo.getAllPlayers(join_model.id).items()}
         for ws in game_connections[join_model.id]:
             await ws.send_json({"participants": participants})
 
@@ -84,7 +84,7 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
     async def send_participant_updates():
         try:
             while True:
-                participants = {k: v.dict() for k, v in gameInfo.getAll(game_id).items()}
+                participants = {k: v.dict() for k, v in gameInfo.getAllPlayers(game_id).items()}
                 await websocket.send_json({"participants": participants})
                 await asyncio.sleep(10)  # Adjust the sleep duration as needed
         except WebSocketDisconnect:
