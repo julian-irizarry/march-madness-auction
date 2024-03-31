@@ -12,7 +12,7 @@ function GamePage() {
     const { gameId } = location.state || {};
 
     const [currentHighestBid, setCurrentHighestBid] = useState<number>(0);
-    const [countdown, setCountdown] = useState(10);
+    const [countdown, setCountdown] = useState(20);
     const [participants, setParticipants] = useState<string[]>([]);
     const [participantInfos, setParticipantsInfos] = useState<Record<string, any>>({});
     const [team] = useState("Texas");

@@ -106,18 +106,8 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
             while True:
                 message = await websocket.receive_text()
                 if message == "startGame" and websocket in game_connections[game_id][:1]:
-                    # Reset the countdown
-                    games[game_id].countdown = INITIAL_COUNTDOWN
-                    
                     for participant_ws in game_connections[game_id]:
                         await participant_ws.send_text("gameStarted")
-
-                    # Ensure there's no running countdown task or cancel if there is one
-                    if game_id in countdown_tasks and not countdown_tasks[game_id].cancelled():
-                        countdown_tasks[game_id].cancel()
-                        
-                    countdown_tasks[game_id] = asyncio.create_task(start_countdown(game_id))
-
                     break  # Exit the loop if the game starts
         except WebSocketDisconnect:
             # Handle the WebSocket disconnection
