@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button, Input} from '@mui/joy';
+import { Grid } from '@mui/material';
 
 import './App.css';
 
@@ -40,17 +41,21 @@ function Bid(props: BidProps) {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+    <Grid container spacing={0.5} direction="row" alignItems="center">
+      <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
         <Input 
           type="number"
           value={bid}
           onChange={(e) => setBid(e.target.value)}
           placeholder="Enter bid"
-          startDecorator={'$'}
+          startDecorator="$"
           sx={{ width: 125 }}
         />
-        <Button type="submit">Place Bid</Button>
-      </form>
+      </Grid>
+      <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+        <Button onClick={handleSubmit}>Place Bid</Button>
+      </Grid>
+    </Grid>
     </>
   );
 }

@@ -58,20 +58,20 @@ function GamePage() {
     };
 
     return (
-        <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', minHeight: '100vh' }}>
+        <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', minHeight: '100vh' }}>
             {/* Left side */}
             <Grid item xs={8}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                        <Typography level="h4" justifyContent="center">Team: {team}</Typography>
+                <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        <Typography level="h1" justifyContent="center">Team: {team}</Typography>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         <Typography level="h4" justifyContent="center">Highest bid: ${currentHighestBid}</Typography>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         <Typography level="h4">{secondsToHMS(countdown)}</Typography>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         <Bid gameId={gameId} currentHighestBid={currentHighestBid} team={team}/>
                     </Grid>
                 </Grid>
@@ -79,11 +79,12 @@ function GamePage() {
 
             {/* Right side */}
             <Grid item xs={4}>
-                <Grid container spacing={2} direction="column" alignItems="center">
-                    <Grid item xs={12}>
+                <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         <Typography level="h4" justifyContent="center">Participant Overview:</Typography>
-
-                        <List variant="outlined" sx={{ minWidth: 240, borderRadius: 'sm' }}>
+                    </Grid>
+                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        <List variant="outlined" sx={{ minWidth: 100, maxWidth: 300, width: '100%', borderRadius: 'sm' }}>
                         {participants.length > 0 ?
                             participants.map((participant, i) => {
                             // Calculate hue based on index
