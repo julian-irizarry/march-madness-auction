@@ -31,7 +31,7 @@ games: dict[str, GameInfo] = {}
 game_connections: dict[str, List[WebSocket]] = {}
 
 # Track Player Teams and Balance. Will turn into a database maybe
-gameInfo: GameTracker = GameTracker()
+gameInfo: GameTracker = GameTracker(year=2024, month="03", day=('21', '22'))
 
 # Dictionary to store countdown timer tasks
 countdown_tasks: dict[str, asyncio.Task] = {}
