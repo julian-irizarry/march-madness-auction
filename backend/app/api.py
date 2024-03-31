@@ -56,14 +56,13 @@ async def join_game(join_model: JoinModel):
 
     games[join_model.id].participants.append(join_model.player)
     if join_model.id in game_connections:
-        updated_participants = games[join_model.id].participants
+        participants = {k: v.dict() for k, v in gameInfo.getAll(join_model.id).items()}
         for ws in game_connections[join_model.id]:
-            await ws.send_json({"participants": updated_participants})
+            await ws.send_json({"participants": participants})
 
     return {"detail": "Joined game successfully"}
 
 async def start_countdown(game_id: str):
-    print("STARTING COUNTDOWN")
     while games[game_id].countdown > 0:
         for ws in game_connections[game_id]:
             await ws.send_json({"countdown": games[game_id].countdown})
@@ -85,7 +84,8 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
     async def send_participant_updates():
         try:
             while True:
-                await websocket.send_json({"participants": games[game_id].participants})
+                participants = {k: v.dict() for k, v in gameInfo.getAll(game_id).items()}
+                await websocket.send_json({"participants": participants})
                 await asyncio.sleep(10)  # Adjust the sleep duration as needed
         except WebSocketDisconnect:
             # Handle the WebSocket disconnection

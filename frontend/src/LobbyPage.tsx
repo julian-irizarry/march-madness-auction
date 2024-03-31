@@ -30,7 +30,7 @@ function LobbyPage() {
         const data = JSON.parse(event.data);
 
         if ("participants" in data) {
-          setParticipants(data["participants"]);
+          setParticipants(Object.keys(data["participants"]));
         }
       }
     };

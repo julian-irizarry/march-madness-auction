@@ -17,5 +17,5 @@ class GameTracker():
     def getPlayerInfo(self, gameId: str, id: str) -> PlayerInfo:
         return self.games[gameId][id]
 
-    def getAll(self, gameId: str, id: str) -> dict[str,PlayerInfo]:
+    def getAll(self, gameId: str) -> dict[str,PlayerInfo]:
         return self.games[gameId]

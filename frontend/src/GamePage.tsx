@@ -15,6 +15,7 @@ function GamePage() {
     const [currentHighestBid, setCurrentHighestBid] = useState<number>(0);
     const [countdown, setCountdown] = useState(10);
     const [participants, setParticipants] = useState<string[]>([]);
+    const [participantInfos, setParticipantsInfos] = useState<Record<string, any>>({});
     const [team, setTeam] = useState("Texas");
 
     const baseColor = "#FFD700";
@@ -32,7 +33,9 @@ function GamePage() {
             const data = JSON.parse(event.data);
 
             if ("participants" in data) {
-                setParticipants(data["participants"]);
+                console.log("DATA", data);
+                setParticipants(Object.keys(data["participants"]));
+                setParticipantsInfos(data["participants"]);
             }
             else if ("bid" in data) {
                 setCurrentHighestBid(data["bid"]);
@@ -95,7 +98,17 @@ function GamePage() {
                                 <React.Fragment key={i}>
                                 <ListItem>
                                     {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={participantColor} width="20px" height="20px" />}
-                                    <Chip> {participant} </Chip>
+                                    <Chip>
+                                        <Typography style={{ color: participantColor }}>
+                                            {participant}
+                                        </Typography>
+                                        <Typography>
+                                            Balance: $ {participantInfos[participant]["balance"]}
+                                        </Typography>
+                                        <Typography>
+                                            Teams: {participantInfos[participant]["teams"]}
+                                        </Typography>
+                                    </Chip>
                                 </ListItem>
                                 </React.Fragment>
                             );
