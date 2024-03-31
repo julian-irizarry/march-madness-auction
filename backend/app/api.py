@@ -1,12 +1,11 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
-from pydantic import BaseModel
 import string
 import random
 import asyncio
 
-from .types.types import JoinModel, GameInfo, BidModel, CreateModel, GAME_ID_NUM_CHAR, INITIAL_COUNTDOWN, INITIAL_BID, INITIAL_BALANCE
+from .types.types import JoinModel, GameInfo, BidModel, CreateModel, GAME_ID_NUM_CHAR, INITIAL_COUNTDOWN
 from .bid import GameTracker
 
 app = FastAPI()
