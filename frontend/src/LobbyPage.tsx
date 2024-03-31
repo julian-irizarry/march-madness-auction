@@ -26,14 +26,13 @@ function LobbyPage() {
     wsRef.current = ws;
 
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setParticipants(data);
-    };
-
-    ws.onmessage = (event) => {
       if (event.data === "gameStarted") {
         // Navigate to the game/bid page when the game starts
         navigate('/game', { state: { gameId, playerName } });
+      }
+      else {
+        const data = JSON.parse(event.data);
+        setParticipants(data);
       }
     };
 

@@ -58,7 +58,7 @@ async def join_game(join_model: JoinModel):
     if join_model.id in game_connections:
         updated_participants = games[join_model.id].participants
         for ws in game_connections[join_model.id]:
-            await ws.send_json({"participants": updated_participants})
+            await ws.send_json({join_model.id: updated_participants})
 
     return {"detail": "Joined game successfully"}
 
