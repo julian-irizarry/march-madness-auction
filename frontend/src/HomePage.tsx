@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/joy';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Alert } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Alert, Paper } from '@mui/material';
+
 import imageSrc from './march_madness_logo_auction.png';
 import './fonts.css';
-
 
 function HomePage() {
   const navigate = useNavigate();
@@ -76,71 +76,83 @@ function HomePage() {
   };
 
   return (
-    <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', minHeight: '100vh' }}>
-      <Grid container spacing={2} sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
-        <Grid item>
-          <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleCreateGameClick}>Create Game</Button>
+    <div id="outer-container">
+      <Paper elevation={1} sx={{marginLeft: '200px', marginRight: '200px', marginTop: 'calc(100vh - 800px)', marginBottom: 'calc(100vh - 800px)', padding: '10px', backgroundColor: '#fcfcfc'}}>
+        <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', height: 'calc(100vh - 170px)', minHeight: '100%' }}>
+          <Grid container spacing={2} sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+
+            {/* Create game button */}
+            <Grid item>
+              <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleCreateGameClick}>Create Game</Button>
+            </Grid>
+
+            {/* March Madness logo */}
+            <Grid item>
+              <img src={imageSrc} alt="Central Game" style={{ maxWidth: '450px', margin: '20px 0' }} />
+            </Grid>
+
+            {/* Join game button */}
+            <Grid item>
+              <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleJoinGameClick}>Join Game</Button>
+            </Grid>
+          </Grid>
+
+          {/* View game button */}
+          <Grid item>
+            <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }}>View Game</Button> {/* Implement as needed */}
+          </Grid>
+
+          {/* Dialog for Join Game */}
+          <Dialog maxWidth="lg" open={isDialogOpen} onClose={handleCloseDialog}>
+            <DialogTitle sx={{
+              textAlign: 'center', 
+              fontFamily: 'doubleFeature', 
+            }}><b>{ isCreator ? "CREATE GAME" : "JOIN GAME"}</b></DialogTitle>
+            <DialogContent>
+
+              {
+                joinGameError ? <Alert severity="error">{joinGameError}</Alert>
+                : <></>
+              }
+
+              <TextField
+                fullWidth
+                label="Your Name"
+                // InputLabelProps={{
+                //   style: { fontFamily: 'doubleFeature' },
+                // }}
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                margin="dense"
+              />
+
+              { isCreator ? <></> :
+                <TextField
+                  fullWidth
+                  label="Game ID"
+                  // InputLabelProps={{
+                  //   style: { 
+                  //     fontFamily: 'doubleFeature'
+                  //   },
+                  // }}
+                  value={joinGameId}
+                  onChange={(e) => setJoinGameId(e.target.value)}
+                  margin="dense"
+                />
+              }
+            </DialogContent>
+            <DialogActions sx={{ justifyContent: 'center' }}>
+              <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleCloseDialog}>Cancel</Button>
+
+              { isCreator ?
+                <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleCreateGame}>Create</Button>
+                : <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleJoinGame}>Join</Button>
+              }
+            </DialogActions>
+          </Dialog>
         </Grid>
-        <Grid item>
-          <img src={imageSrc} alt="Central Game" style={{ maxWidth: '450px', margin: '20px 0' }} />
-        </Grid>
-        <Grid item>
-          <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleJoinGameClick}>Join Game</Button>
-        </Grid>
-      </Grid>
-      <Grid item>
-        <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }}>View Game</Button> {/* Implement as needed */}
-      </Grid>
-
-      {/* Dialog for Join Game */}
-      <Dialog maxWidth="lg" open={isDialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle sx={{
-          textAlign: 'center', 
-          fontFamily: 'doubleFeature', 
-        }}><b>{ isCreator ? "CREATE GAME" : "JOIN GAME"}</b></DialogTitle>
-        <DialogContent>
-
-          {
-            joinGameError ? <Alert severity="error">{joinGameError}</Alert>
-            : <></>
-          }
-
-          <TextField
-            fullWidth
-            label="Your Name"
-            // InputLabelProps={{
-            //   style: { fontFamily: 'doubleFeature' },
-            // }}
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-            margin="dense"
-          />
-
-          { isCreator ? <></> :
-            <TextField
-              fullWidth
-              label="Game ID"
-              // InputLabelProps={{
-              //   style: { 
-              //     fontFamily: 'doubleFeature'
-              //   },
-              // }}
-              value={joinGameId}
-              onChange={(e) => setJoinGameId(e.target.value)}
-              margin="dense"
-            />
-          }
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center' }}>
-          <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleCloseDialog}>Cancel</Button>
-
-          { isCreator ?
-            <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleCreateGame}>Create</Button>
-            : <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleJoinGame}>Join</Button>
-          }
-        </DialogActions>
-      </Dialog>
-    </Grid>
+      </Paper>
+    </div>
   );
 }
 

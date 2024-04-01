@@ -81,7 +81,7 @@ function GamePage() {
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                 <Typography justifyContent="center">
                                     <span style={{ fontFamily: 'threeDim2', fontSize: '60px', lineHeight: '45px' }}> {team[0]} </span>
-                                    <span style={{ fontSize: '30px' }}> ({team[1]}) </span>
+                                    <span style={{ fontSize: '40px', lineHeight: '45px'}}> ({team[1]}) </span>
                                 </Typography>
                             </Grid>
 

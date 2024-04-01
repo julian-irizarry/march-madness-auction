@@ -38,10 +38,12 @@
 }
 
 #outer-container {
-  /* background-color: var(--primary-color); */
-  /* background-image: url('./march_madness_logo.png'); */
-  /* background-size: 487px; */
-  /* background-repeat: repeat; */
+  /* background-color: var(--tertiary-color); */
+  background-image: url('./basketball_court5.png');
+  /* background-size: 487px;
+  background-repeat: repeat; */
+  background-size: cover;
+  background-repeat: no-repeat;
   min-height: 93vh;
   padding: 30px;
 }
@@ -49,6 +51,6 @@
 :root {
   --primary-color: #009CDE;
   --secondary-color: #045bb9;
-  --tertiary-color: #134c77;
+  --tertiary-color: #18293a;
   --off-white-color: #fdfdfd;
 }
