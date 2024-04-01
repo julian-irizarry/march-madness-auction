@@ -7,6 +7,8 @@ import Bid from './bid';
 import { ReactComponent as CrownIcon } from './icons/crown.svg';
 import { ReactComponent as UserIcon } from './icons/user.svg';
 
+import './App.css';
+
 function GamePage() {
     const location = useLocation();
     const { gameId, playerName } = location.state || {};
@@ -63,104 +65,113 @@ function GamePage() {
     }, [gameId]);
 
     return (
-        <Box sx={{ border: '1px solid black', borderRadius: '8px', marginLeft: '200px', marginRight: '200px', marginTop: 'calc(100vh - 750px)', padding: '10px' }}>
-            <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', height: 'calc(100vh - 200px)', minHeight: '100%' }}>
-                {/* Left side */}
-                <Grid item xs={8}>
-                    <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            <Typography level="h1" justifyContent="center">{team}</Typography>
-                        </Grid>
-                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            <Typography level="h4" justifyContent="center">Highest bid: ${currentHighestBid.toFixed(2)}</Typography>
-                        </Grid>
-                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            {
-                                log ?  <Typography justifyContent="center" sx={{ color: "grey" }}>{log}</Typography>
-                                : <></>
-                            }
-                        </Grid>
-                        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            <Typography level="h4" sx={{ color: countdown <= 3 ? "red" : "inherit" }}>
-                                {countdown.toString().padStart(2, '0')}
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            <Bid gameId={gameId} player={playerName} currentHighestBid={currentHighestBid} team={team}/>
-                        </Grid>
-                    </Grid>
-                </Grid>
+        <div id="outer-container">
+            <Box sx={{ border: '1px solid black', borderRadius: '8px', marginLeft: '200px', marginRight: '200px', marginTop: 'calc(100vh - 800px)', marginBottom: 'calc(100vh - 800px)', padding: '10px', backgroundColor: 'white' }}>
+                <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', height: 'calc(100vh - 200px)', minHeight: '100%' }}>
+                    {/* Left side */}
+                    <Grid item xs={8}>
+                        <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', order: -1}}>
+                                <Typography level="h1" justifyContent="center">{team}</Typography>
+                            </Grid>
 
-                {/* Right side */}
-                <Grid item xs={4}>
-                    <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            <Box sx={{ maxHeight: 500, overflowY: 'auto', width: '100%', border: '1px solid', borderColor: 'grey', borderRadius: 'sm' }}>
-                                <List sx={{ minWidth: 100, maxWidth: 300, width: '100%' }}>
-                                {participants.length > 0 ?
-                                    participants.map((participant, i) => {
-                                    // Calculate hue based on index
-                                    const hue = (i * 30) % 360; // Adjust 30 as needed to change the color spacing
-                                    const participantColor = `hsl(${hue}, 70%, 50%)`; // Adjust saturation and lightness as needed
-                                    
-                                    return (
-                                        <React.Fragment key={i}>
-                                        <ListItem>
-                                            {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={participantColor} width="20px" height="20px" />}
-                                            <Chip>
-                                                <Typography sx={{ color: participantColor }}>
-                                                    {participant}
-                                                </Typography>
-                                                <Typography sx={{ fontSize: '12px' }}>
-                                                    Balance: $ {participantInfos[participant]["balance"].toFixed(2)}
-                                                </Typography>
-                                                <Typography sx={{ fontSize: '12px' }}>
-                                                    Teams:
-                                                </Typography>
-                                                {participantInfos[participant]["teams"].map((team:string, teamIndex:number) => (
-                                                    <Typography key={teamIndex} sx={{ marginLeft: '10px', fontSize: '12px' }}>
-                                                    - {team}
-                                                    </Typography>
-                                                ))}
-                                            </Chip>
-                                        </ListItem>
-                                        </React.Fragment>
-                                    );
-                                    })
-                                    : <Typography>No participants</Typography>
-                                }
-                                </List>
-                            </Box>
+                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                <Box sx={{ border: '1px solid black', height: '100%', width: '100%', borderRadius: 'sm', padding: '10px'}}>
+                                    <Grid container sx={{ justifyContent: 'center', alignItems: 'center' }}>
+                                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                            <Typography level="h4" justifyContent="center">Highest bid: ${currentHighestBid.toFixed(2)}</Typography>
+                                        </Grid>
+                                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                            {
+                                                log ?  <Typography justifyContent="center" sx={{ color: "grey" }}>{log}</Typography>
+                                                : <></>
+                                            }
+                                        </Grid>
+                                        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                            <Typography level="h4" sx={{ color: countdown <= 3 ? "red" : "inherit" }}>
+                                                {countdown.toString().padStart(2, '0')}
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                            <Bid gameId={gameId} player={playerName} currentHighestBid={currentHighestBid} team={team}/>
+                                        </Grid>
+                                    </Grid>
+                                </Box>
+                            </Grid>
                         </Grid>
-                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            <Box sx={{ maxHeight: 500, overflowY: 'auto', width: '100%', border: '1px solid', borderColor: 'grey', borderRadius: 'sm' }}>
-                                <List sx={{ minWidth: 100, maxWidth: 300 }}>
-                                    {remainingTeams.length > 0 ?
-                                        remainingTeams.map((team, i) => {
-                                            return (
-                                                <React.Fragment key={i}>
-                                                    <ListItem>
-                                                        <Chip>
-                                                            <Typography sx={{ color: "grey", fontSize: '12px' }}>
-                                                                {team}
-                                                            </Typography>
-                                                        </Chip>
-                                                    </ListItem>
-                                                </React.Fragment>
-                                            );
+                    </Grid>
+
+                    {/* Right side */}
+                    <Grid item xs={4}>
+                        <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                <Box sx={{ border: '1px solid black', maxHeight: 400, overflowY: 'auto', width: '100%', borderRadius: 'sm' }}>
+                                    <List sx={{ minWidth: 100, maxWidth: 300, width: '100%' }}>
+                                    {participants.length > 0 ?
+                                        participants.map((participant, i) => {
+                                        // Calculate hue based on index
+                                        const hue = (i * 30) % 360; // Adjust 30 as needed to change the color spacing
+                                        const participantColor = `hsl(${hue}, 70%, 50%)`; // Adjust saturation and lightness as needed
+                                        
+                                        return (
+                                            <React.Fragment key={i}>
+                                            <ListItem>
+                                                {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={participantColor} width="20px" height="20px" />}
+                                                <Chip sx={{ padding: '0 20px'  }}>
+                                                    <Typography sx={{ color: participantColor }}>
+                                                        {participant}
+                                                    </Typography>
+                                                    <Typography sx={{ fontSize: '12px' }}>
+                                                        Balance: $ {participantInfos[participant]["balance"].toFixed(2)}
+                                                    </Typography>
+                                                    <Typography sx={{ fontSize: '12px' }}>
+                                                        Teams:
+                                                    </Typography>
+                                                    {participantInfos[participant]["teams"].map((team:string, teamIndex:number) => (
+                                                        <Typography key={teamIndex} sx={{ marginLeft: '10px', fontSize: '12px' }}>
+                                                        - {team}
+                                                        </Typography>
+                                                    ))}
+                                                </Chip>
+                                            </ListItem>
+                                            </React.Fragment>
+                                        );
                                         })
-                                        : <Typography>No teams available</Typography>
+                                        : <Typography>No participants</Typography>
                                     }
-                                </List>
-                            </Box>
+                                    </List>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                <Box sx={{ border: '1px solid black', maxHeight: 400, overflowY: 'auto', width: '100%', borderRadius: 'sm', backgroundColor: 'white' }}>
+                                    <List sx={{ minWidth: 100, maxWidth: 300 }}>
+                                        {remainingTeams.length > 0 ?
+                                            remainingTeams.map((team, i) => {
+                                                return (
+                                                    <React.Fragment key={i}>
+                                                        <ListItem>
+                                                            <Chip>
+                                                                <Typography sx={{ color: "black", fontSize: '12px' }}>
+                                                                    {team}
+                                                                </Typography>
+                                                            </Chip>
+                                                        </ListItem>
+                                                    </React.Fragment>
+                                                );
+                                            })
+                                            : <Typography>No teams available</Typography>
+                                        }
+                                    </List>
+                                </Box>
+                            </Grid>
                         </Grid>
                     </Grid>
                 </Grid>
-            </Grid>
-            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right'}}>
-                <Typography level="h4" justifyContent="center">Teams Remaining: {remainingTeams.length}</Typography>
-            </Grid>
-        </Box>
+                <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right'}}>
+                    <Typography level="h4" justifyContent="center">Teams Remaining: {remainingTeams.length}</Typography>
+                </Grid>
+            </Box>
+        </div>
     )
 }
 

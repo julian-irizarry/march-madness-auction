@@ -99,14 +99,14 @@ function LobbyPage() {
 
             <Grid item>
               <Card variant="outlined">
-                <Typography level="h4" color="primary">{gameId}</Typography> 
+                <Typography level="h4" sx={{ color: 'var(--primary-color)' }}>{gameId}</Typography> 
               </Card>
             </Grid>
           </Grid>
 
           <Grid item>
             {
-              isCreator ? <Button onClick={handleStartGameClick}>Start Game</Button>
+              isCreator ? <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleStartGameClick}>Start Game</Button>
               : <Typography level="h4">Waiting for the host to start the game...</Typography>
             }
           </Grid>

@@ -54,7 +54,7 @@ function Bid(props: BidProps) {
         />
       </Grid>
       <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-        <Button onClick={handleSubmit}>Place Bid</Button>
+        <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleSubmit}>Place Bid</Button>
       </Grid>
     </Grid>
     </>

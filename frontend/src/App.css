@@ -36,3 +36,18 @@
     transform: rotate(360deg);
   }
 }
+
+#outer-container {
+  background-color: var(--tertiary-color);
+  background-image: url('./march_madness_logo.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  min-height: 93vh;
+  padding: 30px;
+}
+
+:root {
+  --primary-color: #009CDE;
+  --secondary-color: #045bb9;
+  --tertiary-color: #134c77;
+}

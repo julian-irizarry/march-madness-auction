@@ -79,17 +79,17 @@ function HomePage() {
     <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', minHeight: '100vh' }}>
       <Grid container spacing={2} sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
         <Grid item>
-          <Button onClick={handleCreateGameClick}>Create Game</Button>
+          <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleCreateGameClick}>Create Game</Button>
         </Grid>
         <Grid item>
           <img src={imageSrc} alt="Central Game" style={{ maxWidth: '450px', margin: '20px 0' }} />
         </Grid>
         <Grid item>
-          <Button onClick={handleJoinGameClick}>Join Game</Button>
+          <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleJoinGameClick}>Join Game</Button>
         </Grid>
       </Grid>
       <Grid item>
-        <Button>View Game</Button> {/* Implement as needed */}
+        <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }}>View Game</Button> {/* Implement as needed */}
       </Grid>
 
       {/* Dialog for Join Game */}
@@ -132,11 +132,11 @@ function HomePage() {
           }
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center' }}>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleCloseDialog}>Cancel</Button>
 
           { isCreator ?
-            <Button onClick={handleCreateGame}>Create</Button>
-            : <Button onClick={handleJoinGame}>Join</Button>
+            <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleCreateGame}>Create</Button>
+            : <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleJoinGame}>Join</Button>
           }
         </DialogActions>
       </Dialog>
