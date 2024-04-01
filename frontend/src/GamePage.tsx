@@ -1,4 +1,4 @@
-import { Typography, List, ListItem, Chip } from '@mui/joy';
+import { Typography, List, ListItem, Chip, Box } from '@mui/joy';
 import { Grid } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
@@ -16,6 +16,7 @@ function GamePage() {
     const [participants, setParticipants] = useState<string[]>([]);
     const [participantInfos, setParticipantsInfos] = useState<Record<string, any>>({});
     const [team, setTeam] = useState<string>("");
+    const [remainingTeams, setRemainingTeams] = useState<string[]>([]);
     const [log, setLog] = useState<string>("");
 
     const baseColor = "#FFD700";
@@ -43,11 +44,18 @@ function GamePage() {
                 setCountdown(data["countdown"]);
             }
             else if ("team" in data) {
-                const team_name: string = data["team"][0] + "(" + data["team"][1] + ")"
+                const team_name: string = data["team"][0] + "(" + data["team"][1] + ")";
                 setTeam(team_name);
             }
             else if ("log" in data) {
                 setLog(data["log"]);
+            }
+            else if ("remaining" in data) {
+                const remaining_teams: string[] = data["remaining"].map((team:string[], i:number) => {
+                    const team_name: string = team[0] + "(" + team[1] + ")";
+                    return team_name;
+                })
+                setRemainingTeams(remaining_teams);
             }
         }
         };
@@ -101,40 +109,67 @@ function GamePage() {
                         <Typography level="h4" justifyContent="center">Participant Overview:</Typography>
                     </Grid>
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <List variant="outlined" sx={{ minWidth: 100, maxWidth: 300, width: '100%', borderRadius: 'sm' }}>
-                        {participants.length > 0 ?
-                            participants.map((participant, i) => {
-                            // Calculate hue based on index
-                            const hue = (i * 30) % 360; // Adjust 30 as needed to change the color spacing
-                            const participantColor = `hsl(${hue}, 70%, 50%)`; // Adjust saturation and lightness as needed
-                            
-                            return (
-                                <React.Fragment key={i}>
-                                <ListItem>
-                                    {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={participantColor} width="20px" height="20px" />}
-                                    <Chip>
-                                        <Typography sx={{ color: participantColor }}>
-                                            {participant}
-                                        </Typography>
-                                        <Typography>
-                                            Balance: $ {participantInfos[participant]["balance"].toFixed(2)}
-                                        </Typography>
-                                        <Typography>
-                                            Teams:
-                                        </Typography>
-                                        {participantInfos[participant]["teams"].map((team:string, teamIndex:number) => (
-                                            <Typography key={teamIndex} sx={{marginLeft: '10px'}}>
-                                            - {team}
+                        <Box sx={{ maxHeight: 500, overflowY: 'auto', width: '100%' }}>
+                            <List variant="outlined" sx={{ minWidth: 100, maxWidth: 300, width: '100%', borderRadius: 'sm' }}>
+                            {participants.length > 0 ?
+                                participants.map((participant, i) => {
+                                // Calculate hue based on index
+                                const hue = (i * 30) % 360; // Adjust 30 as needed to change the color spacing
+                                const participantColor = `hsl(${hue}, 70%, 50%)`; // Adjust saturation and lightness as needed
+                                
+                                return (
+                                    <React.Fragment key={i}>
+                                    <ListItem>
+                                        {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={participantColor} width="20px" height="20px" />}
+                                        <Chip>
+                                            <Typography sx={{ color: participantColor }}>
+                                                {participant}
                                             </Typography>
-                                        ))}
-                                    </Chip>
-                                </ListItem>
-                                </React.Fragment>
-                            );
-                            })
-                            : <Typography>No participants</Typography>
-                        }
-                        </List>
+                                            <Typography sx={{ fontSize: '12px' }}>
+                                                Balance: $ {participantInfos[participant]["balance"].toFixed(2)}
+                                            </Typography>
+                                            <Typography sx={{ fontSize: '12px' }}>
+                                                Teams:
+                                            </Typography>
+                                            {participantInfos[participant]["teams"].map((team:string, teamIndex:number) => (
+                                                <Typography key={teamIndex} sx={{ marginLeft: '10px', fontSize: '12px' }}>
+                                                - {team}
+                                                </Typography>
+                                            ))}
+                                        </Chip>
+                                    </ListItem>
+                                    </React.Fragment>
+                                );
+                                })
+                                : <Typography>No participants</Typography>
+                            }
+                            </List>
+                        </Box>
+                    </Grid>
+                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        <Typography level="h4" justifyContent="center">{remainingTeams.length} Remaining Teams:</Typography>
+                    </Grid>
+                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        <Box sx={{ maxHeight: 300, overflowY: 'auto', width: '100%' }}>
+                            <List variant="outlined" sx={{ minWidth: 100, maxWidth: 300, borderRadius: 'sm' }}>
+                                {remainingTeams.length > 0 ?
+                                    remainingTeams.map((team, i) => {
+                                        return (
+                                            <React.Fragment key={i}>
+                                                <ListItem>
+                                                    <Chip>
+                                                        <Typography sx={{ color: "grey", fontSize: '12px' }}>
+                                                            {team}
+                                                        </Typography>
+                                                    </Chip>
+                                                </ListItem>
+                                            </React.Fragment>
+                                        );
+                                    })
+                                    : <Typography>No teams available</Typography>
+                                }
+                            </List>
+                        </Box>
                     </Grid>
                 </Grid>
             </Grid>

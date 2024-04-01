@@ -96,6 +96,7 @@ async def finalize_bid(game_id: str):
         await ws.send_json({"bid": games[game_id].currentBid})
         await ws.send_json({"countdown": games[game_id].countdown})
         await ws.send_json({"participants": participants})
+        await ws.send_json({"remaining": gameInfo.get_remaining_teams()})
 
 @app.websocket("/ws/{game_id}")
 async def websocket_endpoint(websocket: WebSocket, game_id: str):
@@ -135,6 +136,16 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
             # Handle the WebSocket disconnection
             game_connections[game_id].remove(websocket)
             print(f"WebSocket disconnected: {websocket}")
+    
+    async def send_remaining():
+        try:
+            while True:
+                await websocket.send_json({"remaining": gameInfo.get_remaining_teams()})
+                await asyncio.sleep(10)  # Adjust the sleep duration as needed
+        except WebSocketDisconnect:
+            # Handle the WebSocket disconnection
+            game_connections[game_id].remove(websocket)
+            print(f"WebSocket disconnected: {websocket}")
 
     async def listen_for_messages():
         try: 
@@ -152,11 +163,12 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
     send_participant_task = asyncio.create_task(send_participant_updates())
     send_bid_task = asyncio.create_task(send_bid_updates())
     send_team_task = asyncio.create_task(send_team())
+    send_remaining_task = asyncio.create_task(send_remaining())
     listen_task = asyncio.create_task(listen_for_messages())
 
     # Wait for either task to complete
     done, pending = await asyncio.wait(
-        [send_participant_task, send_bid_task, listen_task, send_team_task],
+        [send_participant_task, send_bid_task, listen_task, send_team_task, send_remaining_task],
         return_when=asyncio.FIRST_COMPLETED,
     )
 
@@ -178,7 +190,7 @@ async def bid(bid_model: BidModel):
     games[bid_model.gameId].countdown = INITIAL_COUNTDOWN  # reset countdown
 
     latest_log: BidModel = games[bid_model.gameId].log[-1]
-    latest_log_s: str = f"{latest_log.player} bid on {latest_log.team} for ${latest_log.bid:.2f}!"
+    latest_log_s: str = f"{latest_log.player} bid on {latest_log.team} for ${latest_log.bid:.2f}"
 
     if bid_model.gameId in game_connections:
         updated_bid = games[bid_model.gameId].currentBid 
