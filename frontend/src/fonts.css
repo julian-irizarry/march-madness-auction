@@ -17,3 +17,8 @@
   font-family: 'clock';
   src: url('../public/DS-DIGIB.ttf') format('truetype');
 }
+
+@font-face {
+  font-family: 'threeDim2';
+  src: url("../public/BroadwayFlat3D.ttf") format("truetype");
+}

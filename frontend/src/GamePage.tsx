@@ -18,7 +18,7 @@ function GamePage() {
     const [countdown, setCountdown] = useState(10);
     const [participants, setParticipants] = useState<string[]>([]);
     const [participantInfos, setParticipantsInfos] = useState<Record<string, any>>({});
-    const [team, setTeam] = useState<string>("");
+    const [team, setTeam] = useState<string[]>([]);
     const [remainingTeams, setRemainingTeams] = useState<string[]>([]);
     const [log, setLog] = useState<string>("");
 
@@ -52,8 +52,7 @@ function GamePage() {
                 setCountdown(data["countdown"]);
             }
             else if ("team" in data) {
-                const team_name: string = data["team"][0] + " (" + data["team"][1] + ")";
-                setTeam(team_name);
+                setTeam(data["team"]);
             }
             else if ("log" in data) {
                 setLog(data["log"]);
@@ -61,8 +60,7 @@ function GamePage() {
             }
             else if ("remaining" in data) {
                 const remaining_teams: string[] = data["remaining"].map((team:string[], i:number) => {
-                    const team_name: string = team[0] + " (" + team[1] + ")";
-                    return team_name;
+                    return `${team[0]} (${team[1]})`;
                 })
                 setRemainingTeams(remaining_teams);
             }
@@ -78,19 +76,26 @@ function GamePage() {
                     {/* Left side */}
                     <Grid item xs={8}>
                         <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', order: -1}}>
-                                <Typography level="h1" justifyContent="center" sx={{fontFamily: 'threeDim'}}>{team}</Typography>
+
+                            {/* Team to bid on */}
+                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                <Typography justifyContent="center">
+                                    <span style={{ fontFamily: 'threeDim2', fontSize: '60px', lineHeight: '40px' }}> {team[0]} </span>
+                                    <span style={{ fontSize: '30px' }}> ({team[1]}) </span>
+                                </Typography>
                             </Grid>
 
-                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', order: -1}}>
+                            {/* Placeholder for bracket */}
+                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                 <Card sx={{ height: '428px', width: '100%', padding: '10px'}}></Card>
                             </Grid>
 
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                {/* <Box sx={{ border: '1px solid black', height: '100%', width: '100%', borderRadius: 'sm', padding: '10px'}}> */}
                                 <Card sx={{ height: '100%', width: '100%', padding: '10px', backgroundColor: 'var(--off-white-color)'}}>
                                     <Grid container sx={{ justifyContent: 'center', alignItems: 'center' }}>
                                         {/* #f0f4f8 */}
+
+                                        {/* Countdown timer */}
                                         <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}> 
                                             <Card sx={{ border: 5, height: '100%', width: '100%', backgroundColor: 'black', borderRadius: 0, borderColor: 'white'}}>
                                                 <Typography sx={{ color: countdown <= 5 ? "red" : "white", textAlign: 'center', fontFamily: 'clock', fontSize: '70px', margin:"0px" }}>
@@ -99,13 +104,14 @@ function GamePage() {
                                             </Card>
                                         </Grid>
 
+                                        {/* Bid */}
                                         <Grid item xs={10} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                             <Grid container spacing={2} sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
                                                 <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                                     <Typography level="h4" justifyContent="center">Current bid: ${currentHighestBid.toFixed(2)}</Typography>
                                                 </Grid>
                                                 <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                                    <Bid gameId={gameId} player={playerName} currentHighestBid={currentHighestBid} team={team}/>
+                                                    <Bid gameId={gameId} player={playerName} currentHighestBid={currentHighestBid} team={`${team[0]} (${team[1]})`}/>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -119,6 +125,8 @@ function GamePage() {
                     {/* Right side */}
                     <Grid item xs={4}>
                         <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+
+                            {/* Participants */}
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                 <Card sx={{ minHeight: 200, maxHeight: 200, overflowY: 'auto', width: '100%', backgroundColor: 'var(--off-white-color)'}}>
                                     <List sx={{ minWidth: 100, maxWidth: 300, width: '100%' }}>
@@ -157,6 +165,8 @@ function GamePage() {
                                     </List>
                                 </Card>
                             </Grid>
+
+                            {/* Remaining Teams */}
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                 <Card sx={{ maxHeight: 440, overflowY: 'auto', width: '100%', backgroundColor: 'var(--off-white-color)'}}>
                                     <List sx={{ minWidth: 100, maxWidth: 300 }}>
@@ -181,12 +191,15 @@ function GamePage() {
                             </Grid>
                         </Grid>
                     </Grid>
+
+                    {/* Floating button showing number of teams remaining */}
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right', marginTop: '-80px' }}>
                         <Fab variant="extended" size="small" sx={{backgroundColor:"white"}}>
                             <Typography justifyContent="center" sx={{fontSize: '12px'}}><b>Teams Remaining: {remainingTeams.length}</b></Typography>
                         </Fab>                
                     </Grid>
 
+                    {/* Display logs on the bottom */}
                     <Snackbar
                         open={openSnackbar}
                         onClose={handleCloseSnackbar}
