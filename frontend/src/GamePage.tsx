@@ -120,7 +120,7 @@ function GamePage() {
                     <Grid item xs={4}>
                         <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                <Card sx={{ minHeight: 200, maxHeight: 400, overflowY: 'auto', width: '100%', backgroundColor: 'var(--off-white-color)'}}>
+                                <Card sx={{ minHeight: 200, maxHeight: 200, overflowY: 'auto', width: '100%', backgroundColor: 'var(--off-white-color)'}}>
                                     <List sx={{ minWidth: 100, maxWidth: 300, width: '100%' }}>
                                     {participants.length > 0 ?
                                         participants.map((participant, i) => {
