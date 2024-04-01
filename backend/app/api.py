@@ -75,14 +75,14 @@ async def finalize_bid(game_id: str):
     # give team to last bidder
     if len(games[game_id].log) > 0:
         winner: BidModel = games[game_id].log[-1]
-        gameInfo.update_player(game_id, winner.player, winner.bid, winner.team)
+        gameInfo.update_player(game_id, winner.player, winner.bid, f"{winner.team} : ${winner.bid:.2f}")
 
-        purchase_msg:str = f"{winner.player} bought {winner.team} for ${winner.bid}!"
+        purchase_msg:str = f"{winner.player} bought {winner.team} for ${winner.bid:.2f}!"
         for ws in game_connections[game_id]:
-            await ws.send_json({"purchase": purchase_msg})
+            await ws.send_json({"log": purchase_msg})
     else:
         purchase_msg:str = f""
-        await ws.send_json({"purchase": purchase_msg})
+        await ws.send_json({"log": purchase_msg})
     
     # pick random new team to auction
     games[game_id].currentTeam = gameInfo.get_random_team()
@@ -178,7 +178,7 @@ async def bid(bid_model: BidModel):
     games[bid_model.gameId].countdown = INITIAL_COUNTDOWN  # reset countdown
 
     latest_log: BidModel = games[bid_model.gameId].log[-1]
-    latest_log_s: str = f"{latest_log.player} bid on {latest_log.team} for ${latest_log.bid}!"
+    latest_log_s: str = f"{latest_log.player} bid on {latest_log.team} for ${latest_log.bid:.2f}!"
 
     if bid_model.gameId in game_connections:
         updated_bid = games[bid_model.gameId].currentBid 

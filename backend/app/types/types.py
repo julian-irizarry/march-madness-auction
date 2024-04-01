@@ -3,7 +3,7 @@ from typing import List
 
 GAME_ID_NUM_CHAR = 6
 INITIAL_COUNTDOWN = 5
-INITIAL_BID = 1
+INITIAL_BID = 0
 INITIAL_BALANCE = 100
 
 class CreateModel(BaseModel):

@@ -69,7 +69,10 @@ function LobbyPage() {
                   return (
                     <React.Fragment key={i}>
                       <ListItem>
-                        {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={participantColor} width="20px" height="20px" />}
+                        {i === 0 ? 
+                          <CrownIcon fill={baseColor} width="20px" height="20px" /> 
+                          : <UserIcon fill={participantColor} width="20px" height="20px" />
+                        }
                         <Chip> {participant} </Chip>
                       </ListItem>
                     </React.Fragment>

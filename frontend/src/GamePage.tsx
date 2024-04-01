@@ -16,7 +16,6 @@ function GamePage() {
     const [participants, setParticipants] = useState<string[]>([]);
     const [participantInfos, setParticipantsInfos] = useState<Record<string, any>>({});
     const [team, setTeam] = useState<string>("");
-    const [purchaseMsg, setPurchaseMsg] = useState<string>("");
     const [log, setLog] = useState<string>("");
 
     const baseColor = "#FFD700";
@@ -47,13 +46,8 @@ function GamePage() {
                 const team_name: string = data["team"][0] + "(" + data["team"][1] + ")"
                 setTeam(team_name);
             }
-            else if ("purchase" in data) {
-                setPurchaseMsg(data["purchase"]);
-                setLog("");
-            }
             else if ("log" in data) {
                 setLog(data["log"]);
-                setPurchaseMsg("");
             }
         }
         };
@@ -81,22 +75,18 @@ function GamePage() {
                         <Typography level="h1" justifyContent="center">Team: {team}</Typography>
                     </Grid>
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        {
-                            purchaseMsg ?  <Typography level="h4" justifyContent="center">{purchaseMsg}</Typography>
-                            : <></>
-                        }
+                        <Typography level="h4" justifyContent="center">Highest bid: ${currentHighestBid.toFixed(2)}</Typography>
                     </Grid>
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         {
-                            log ?  <Typography level="h4" justifyContent="center">{log}</Typography>
+                            log ?  <Typography justifyContent="center" sx={{ color: "grey" }}>{log}</Typography>
                             : <></>
                         }
-                    </Grid>
-                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <Typography level="h4" justifyContent="center">Highest bid: ${currentHighestBid}</Typography>
                     </Grid>
                     <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <Typography level="h4">{secondsToHMS(countdown)}</Typography>
+                        <Typography level="h4" sx={{ color: countdown <= 3 ? "red" : "inherit" }}>
+                            {secondsToHMS(countdown)}
+                        </Typography>
                     </Grid>
                     <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         <Bid gameId={gameId} player={playerName} currentHighestBid={currentHighestBid} team={team}/>
@@ -123,15 +113,20 @@ function GamePage() {
                                 <ListItem>
                                     {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={participantColor} width="20px" height="20px" />}
                                     <Chip>
-                                        <Typography style={{ color: participantColor }}>
+                                        <Typography sx={{ color: participantColor }}>
                                             {participant}
                                         </Typography>
                                         <Typography>
-                                            Balance: $ {participantInfos[participant]["balance"]}
+                                            Balance: $ {participantInfos[participant]["balance"].toFixed(2)}
                                         </Typography>
                                         <Typography>
-                                            Teams: {participantInfos[participant]["teams"]}
+                                            Teams:
                                         </Typography>
+                                        {participantInfos[participant]["teams"].map((team:string, teamIndex:number) => (
+                                            <Typography key={teamIndex} sx={{marginLeft: '10px'}}>
+                                            - {team}
+                                            </Typography>
+                                        ))}
                                     </Chip>
                                 </ListItem>
                                 </React.Fragment>
