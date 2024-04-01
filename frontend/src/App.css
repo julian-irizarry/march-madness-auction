@@ -51,6 +51,7 @@
 :root {
   --primary-color: #009CDE;
   --secondary-color: #045bb9;
-  --tertiary-color: #18293a;
-  --off-white-color: #fdfdfd;
+  --tertiary-color: #141654;
+  /* --off-white-color: #fdfdfd; */
+  --off-white-color: #f0f4f7;
 }

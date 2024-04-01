@@ -81,12 +81,12 @@ function GamePage() {
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                 <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                     <Grid item>
-                                        <Typography justifyContent="center" sx={{ fontFamily: 'threeDim2', fontSize: '60px', marginTop: '-20px', marginBottom: '-20px' }}>
+                                        <Typography justifyContent="center" sx={{ color: 'var(--tertiary-color)', fontFamily: 'threeDim2', fontSize: '60px', marginTop: '-20px', marginBottom: '-20px' }}>
                                             {team[0]}
                                         </Typography>
                                     </Grid>
                                     <Grid item>
-                                        <Typography justifyContent="center" sx={{ fontSize: '40px', marginTop: '-38px', marginBottom: '-20px' }}>
+                                        <Typography justifyContent="center" sx={{ color: 'var(--tertiary-color)', fontSize: '40px', marginTop: '-38px', marginBottom: '-20px' }}>
                                             ({team[1]})
                                         </Typography>
                                     </Grid>
@@ -95,7 +95,7 @@ function GamePage() {
 
                             {/* Placeholder for bracket */}
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                <Card sx={{ height: '428px', width: '100%', padding: '10px'}}></Card>
+                                <Card sx={{ height: '428px', width: '100%', padding: '10px', backgroundColor: '#25252e'}}></Card>
                             </Grid>
 
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
@@ -148,7 +148,7 @@ function GamePage() {
                                             <React.Fragment key={i}>
                                             <ListItem>
                                                 {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={participantColor} width="20px" height="20px" />}
-                                                <Chip sx={{ padding: '0 20px'  }}>
+                                                <Chip sx={{ padding: '0 20px', backgroundColor: 'white' }}>
                                                     <Typography sx={{ color: participantColor }}>
                                                         {participant}
                                                     </Typography>
@@ -183,7 +183,7 @@ function GamePage() {
                                                 return (
                                                     <React.Fragment key={i}>
                                                         <ListItem>
-                                                            <Chip>
+                                                            <Chip sx={{ backgroundColor: 'white' }}>
                                                                 <Typography sx={{ color: "black", fontSize: '12px' }}>
                                                                     {team}
                                                                 </Typography>
