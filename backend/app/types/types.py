@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import List
 
 GAME_ID_NUM_CHAR = 6
-INITIAL_COUNTDOWN = 5
+INITIAL_COUNTDOWN = 10
 INITIAL_BID = 0
 INITIAL_BALANCE = 100
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/joy';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Alert } from '@mui/material';
-import imageSrc from './march_madness_logo.png';
+import imageSrc from './march_madness_logo_auction.png';
 import './fonts.css';
 
 

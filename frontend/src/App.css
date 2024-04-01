@@ -38,10 +38,10 @@
 }
 
 #outer-container {
-  background-color: var(--tertiary-color);
-  background-image: url('./march_madness_logo.png');
-  background-size: cover;
-  background-repeat: no-repeat;
+  /* background-color: var(--primary-color); */
+  /* background-image: url('./march_madness_logo.png'); */
+  /* background-size: 487px; */
+  /* background-repeat: repeat; */
   min-height: 93vh;
   padding: 30px;
 }
@@ -50,4 +50,5 @@
   --primary-color: #009CDE;
   --secondary-color: #045bb9;
   --tertiary-color: #134c77;
+  --off-white-color: #fdfdfd;
 }

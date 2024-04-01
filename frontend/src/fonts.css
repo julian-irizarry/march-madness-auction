@@ -7,3 +7,13 @@
   font-family: 'doubleFeature';
   src: url('../public/doublefeature.ttf') format('truetype');
 }
+
+@font-face {
+  font-family: 'threeDim';
+  src: url('../public/BungeeShade-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'clock';
+  src: url('../public/DS-DIGIB.ttf') format('truetype');
+}

@@ -1,5 +1,5 @@
 import { Typography, List, ListItem, Chip, Box } from '@mui/joy';
-import { Grid } from '@mui/material';
+import { Grid, Paper, Card, Fab, Snackbar, Alert } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
 
@@ -8,18 +8,24 @@ import { ReactComponent as CrownIcon } from './icons/crown.svg';
 import { ReactComponent as UserIcon } from './icons/user.svg';
 
 import './App.css';
+import './fonts.css';
 
 function GamePage() {
     const location = useLocation();
     const { gameId, playerName } = location.state || {};
 
     const [currentHighestBid, setCurrentHighestBid] = useState<number>(0);
-    const [countdown, setCountdown] = useState(5);
+    const [countdown, setCountdown] = useState(10);
     const [participants, setParticipants] = useState<string[]>([]);
     const [participantInfos, setParticipantsInfos] = useState<Record<string, any>>({});
     const [team, setTeam] = useState<string>("");
     const [remainingTeams, setRemainingTeams] = useState<string[]>([]);
     const [log, setLog] = useState<string>("");
+
+    const [openSnackbar, setOpenSnackbar] = React.useState(false);
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    };
 
     const baseColor = "#FFD700";
 
@@ -51,6 +57,7 @@ function GamePage() {
             }
             else if ("log" in data) {
                 setLog(data["log"]);
+                setOpenSnackbar(true);
             }
             else if ("remaining" in data) {
                 const remaining_teams: string[] = data["remaining"].map((team:string[], i:number) => {
@@ -66,37 +73,45 @@ function GamePage() {
 
     return (
         <div id="outer-container">
-            <Box sx={{ border: '1px solid black', borderRadius: '8px', marginLeft: '200px', marginRight: '200px', marginTop: 'calc(100vh - 800px)', marginBottom: 'calc(100vh - 800px)', padding: '10px', backgroundColor: 'white' }}>
-                <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', height: 'calc(100vh - 200px)', minHeight: '100%' }}>
+            <Paper elevation={1} sx={{marginLeft: '200px', marginRight: '200px', marginTop: 'calc(100vh - 800px)', marginBottom: 'calc(100vh - 800px)', padding: '10px', backgroundColor: '#fcfcfc'}}>
+                <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', height: 'calc(100vh - 170px)', minHeight: '100%' }}>
                     {/* Left side */}
                     <Grid item xs={8}>
                         <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', order: -1}}>
-                                <Typography level="h1" justifyContent="center">{team}</Typography>
+                                <Typography level="h1" justifyContent="center" sx={{fontFamily: 'threeDim'}}>{team}</Typography>
+                            </Grid>
+
+                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', order: -1}}>
+                                <Card sx={{ height: '428px', width: '100%', padding: '10px'}}></Card>
                             </Grid>
 
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                <Box sx={{ border: '1px solid black', height: '100%', width: '100%', borderRadius: 'sm', padding: '10px'}}>
+                                {/* <Box sx={{ border: '1px solid black', height: '100%', width: '100%', borderRadius: 'sm', padding: '10px'}}> */}
+                                <Card sx={{ height: '100%', width: '100%', padding: '10px', backgroundColor: 'var(--off-white-color)'}}>
                                     <Grid container sx={{ justifyContent: 'center', alignItems: 'center' }}>
-                                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                            <Typography level="h4" justifyContent="center">Highest bid: ${currentHighestBid.toFixed(2)}</Typography>
+                                        {/* #f0f4f8 */}
+                                        <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}> 
+                                            <Card sx={{ border: 5, height: '100%', width: '100%', backgroundColor: 'black', borderRadius: 0, borderColor: 'white'}}>
+                                                <Typography sx={{ color: countdown <= 5 ? "red" : "white", textAlign: 'center', fontFamily: 'clock', fontSize: '70px', margin:"0px" }}>
+                                                    {countdown.toString().padStart(2, '0')}
+                                                </Typography>
+                                            </Card>
                                         </Grid>
-                                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                            {
-                                                log ?  <Typography justifyContent="center" sx={{ color: "grey" }}>{log}</Typography>
-                                                : <></>
-                                            }
+
+                                        <Grid item xs={10} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                            <Grid container spacing={2} sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                                                <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                                    <Typography level="h4" justifyContent="center">Current bid: ${currentHighestBid.toFixed(2)}</Typography>
+                                                </Grid>
+                                                <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                                    <Bid gameId={gameId} player={playerName} currentHighestBid={currentHighestBid} team={team}/>
+                                                </Grid>
+                                            </Grid>
                                         </Grid>
-                                        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                            <Typography level="h4" sx={{ color: countdown <= 3 ? "red" : "inherit" }}>
-                                                {countdown.toString().padStart(2, '0')}
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                            <Bid gameId={gameId} player={playerName} currentHighestBid={currentHighestBid} team={team}/>
-                                        </Grid>
+
                                     </Grid>
-                                </Box>
+                                </Card>
                             </Grid>
                         </Grid>
                     </Grid>
@@ -105,7 +120,7 @@ function GamePage() {
                     <Grid item xs={4}>
                         <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                <Box sx={{ border: '1px solid black', maxHeight: 400, overflowY: 'auto', width: '100%', borderRadius: 'sm' }}>
+                                <Card sx={{ minHeight: 200, maxHeight: 400, overflowY: 'auto', width: '100%', backgroundColor: 'var(--off-white-color)'}}>
                                     <List sx={{ minWidth: 100, maxWidth: 300, width: '100%' }}>
                                     {participants.length > 0 ?
                                         participants.map((participant, i) => {
@@ -140,10 +155,10 @@ function GamePage() {
                                         : <Typography>No participants</Typography>
                                     }
                                     </List>
-                                </Box>
+                                </Card>
                             </Grid>
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                <Box sx={{ border: '1px solid black', maxHeight: 400, overflowY: 'auto', width: '100%', borderRadius: 'sm', backgroundColor: 'white' }}>
+                                <Card sx={{ maxHeight: 440, overflowY: 'auto', width: '100%', backgroundColor: 'var(--off-white-color)'}}>
                                     <List sx={{ minWidth: 100, maxWidth: 300 }}>
                                         {remainingTeams.length > 0 ?
                                             remainingTeams.map((team, i) => {
@@ -162,15 +177,33 @@ function GamePage() {
                                             : <Typography>No teams available</Typography>
                                         }
                                     </List>
-                                </Box>
+                                </Card>
                             </Grid>
                         </Grid>
                     </Grid>
+                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right', marginTop: '-80px' }}>
+                        <Fab variant="extended" size="small" sx={{backgroundColor:"white"}}>
+                            <Typography justifyContent="center" sx={{fontSize: '12px'}}><b>Teams Remaining: {remainingTeams.length}</b></Typography>
+                        </Fab>                
+                    </Grid>
+
+                    <Snackbar
+                        open={openSnackbar}
+                        onClose={handleCloseSnackbar}
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} 
+                        >
+                        <Alert
+                            elevation={6}
+                            variant="filled"
+                            onClose={handleCloseSnackbar}
+                            severity="info"
+                        >
+                            {log}
+                        </Alert>
+                    </Snackbar>
                 </Grid>
-                <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right'}}>
-                    <Typography level="h4" justifyContent="center">Teams Remaining: {remainingTeams.length}</Typography>
-                </Grid>
-            </Box>
+
+            </Paper>
         </div>
     )
 }
