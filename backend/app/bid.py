@@ -19,7 +19,7 @@ class GameTracker():
         self.games[gameId][player].teams.append(purchasedTeam)
     
     def get_player_info(self, gameId: str, player: str) -> PlayerInfo:
-        return self.games[gameId][id]
+        return self.games[gameId][player]
 
     def get_all_players(self, gameId: str) -> dict[str,PlayerInfo]:
         return self.games[gameId]

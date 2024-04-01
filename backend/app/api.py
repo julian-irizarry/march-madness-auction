@@ -35,9 +35,6 @@ gameInfo: GameTracker = GameTracker(year=2024, month="03", day=('21', '22'))
 # Dictionary to store countdown timer tasks
 countdown_tasks: dict[str, asyncio.Task] = {}
 
-# Dictionary to store finalize bid tasks
-finalize_bid_tasks: dict[str, asyncio.Task] = {}
-
 @app.post("/create-game/")
 async def create_game(create_model: CreateModel) -> dict:
     new_game_id: str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=GAME_ID_NUM_CHAR))
@@ -71,40 +68,34 @@ async def start_countdown(game_id: str):
             await ws.send_json({"countdown": games[game_id].countdown})
         await asyncio.sleep(1)  # Wait for 1 second between each decrement
         if games[game_id].countdown-1 == -1:
-            for ws in game_connections[game_id]:
-                # Ensure there's no running countdown task or cancel if there is one
-                if game_id in finalize_bid_tasks and not finalize_bid_tasks[game_id].cancelled():
-                    finalize_bid_tasks[game_id].cancel()
-                    
-                finalize_bid_tasks[game_id] = asyncio.create_task(finalize_bid(game_id))
+            await finalize_bid(game_id)
             break
 
 async def finalize_bid(game_id: str):
+    # give team to last bidder
+    if len(games[game_id].log) > 0:
+        winner: BidModel = games[game_id].log[-1]
+        gameInfo.update_player(game_id, winner.player, winner.bid, winner.team)
+
+        purchase_msg:str = f"{winner.player} bought {winner.team} for ${winner.bid}!"
+        for ws in game_connections[game_id]:
+            await ws.send_json({"purchase": purchase_msg})
+    else:
+        purchase_msg:str = f""
+        await ws.send_json({"purchase": purchase_msg})
+    
+    # pick random new team to auction
+    games[game_id].currentTeam = gameInfo.get_random_team()
+    games[game_id].currentBid = INITIAL_BID # reset bid
+    games[game_id].countdown = INITIAL_COUNTDOWN  # reset countdown
+    games[game_id].log = []  # reset log
+
+    participants = {k: v.dict() for k, v in gameInfo.get_all_players(game_id).items()}
     for ws in game_connections[game_id]:
-        # give team to last bidder
-        if len(games[game_id].log) > 0:
-            winner: BidModel = games[game_id].log[-1]
-            gameInfo.update_player(game_id, winner.player, winner.bid, winner.team)
-
-            log_s: list[str] = [f"{l.player} bid on {l.team} for ${l.bid}!" for l in games[game_id].log]
-            await ws.send_json({"log": log_s})
-            purchase_msg:str = f"{winner.player} bought {winner.team} for ${winner.bid}!"
-            await ws.send_json({"purchase": purchase_msg})
-        else:
-            purchase_msg:str = f""
-            await ws.send_json({"purchase": purchase_msg})
-        
-        # pick random new team to auction
-        games[game_id].currentTeam = gameInfo.get_random_team()
-        games[game_id].currentBid = INITIAL_BID # reset bid
-        games[game_id].countdown = INITIAL_COUNTDOWN  # reset countdown
-        games[game_id].log = []  # reset log
-
-        # Ensure there's no running countdown task or cancel if there is one
-        if game_id in countdown_tasks and not countdown_tasks[game_id].cancelled():
-            countdown_tasks[game_id].cancel()
-
-        countdown_tasks[game_id] = asyncio.create_task(start_countdown(game_id))
+        await ws.send_json({"team": games[game_id].currentTeam})
+        await ws.send_json({"bid": games[game_id].currentBid})
+        await ws.send_json({"countdown": games[game_id].countdown})
+        await ws.send_json({"participants": participants})
 
 @app.websocket("/ws/{game_id}")
 async def websocket_endpoint(websocket: WebSocket, game_id: str):
@@ -145,17 +136,6 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
             game_connections[game_id].remove(websocket)
             print(f"WebSocket disconnected: {websocket}")
 
-    async def send_log():
-        try:
-            while True:
-                log_s: list[str] = [f"{l.player} bid on {l.team} for ${l.bid}!" for l in games[game_id].log]
-                await websocket.send_json({"log": log_s})
-                await asyncio.sleep(10)  # Adjust the sleep duration as needed
-        except WebSocketDisconnect:
-            # Handle the WebSocket disconnection
-            game_connections[game_id].remove(websocket)
-            print(f"WebSocket disconnected: {websocket}")
-
     async def listen_for_messages():
         try: 
             while True:
@@ -172,12 +152,11 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
     send_participant_task = asyncio.create_task(send_participant_updates())
     send_bid_task = asyncio.create_task(send_bid_updates())
     send_team_task = asyncio.create_task(send_team())
-    send_log_task = asyncio.create_task(send_log())
     listen_task = asyncio.create_task(listen_for_messages())
 
     # Wait for either task to complete
     done, pending = await asyncio.wait(
-        [send_participant_task, send_bid_task, listen_task, send_team_task, send_log_task],
+        [send_participant_task, send_bid_task, listen_task, send_team_task],
         return_when=asyncio.FIRST_COMPLETED,
     )
 
@@ -197,13 +176,15 @@ async def bid(bid_model: BidModel):
     games[bid_model.gameId].log.append(bid_model)
     games[bid_model.gameId].currentBid = bid_model.bid
     games[bid_model.gameId].countdown = INITIAL_COUNTDOWN  # reset countdown
-    log_s: list[str] = [f"{l.player} bid on {l.team} for ${l.bid}!" for l in games[bid_model.gameId].log]
+
+    latest_log: BidModel = games[bid_model.gameId].log[-1]
+    latest_log_s: str = f"{latest_log.player} bid on {latest_log.team} for ${latest_log.bid}!"
 
     if bid_model.gameId in game_connections:
         updated_bid = games[bid_model.gameId].currentBid 
         for ws in game_connections[bid_model.gameId]:
             await ws.send_json({"bid": updated_bid})
-            await ws.send_json({"log": log_s})
+            await ws.send_json({"log": latest_log_s})
 
     # Ensure there's no running countdown task or cancel if there is one
     if bid_model.gameId in countdown_tasks and not countdown_tasks[bid_model.gameId].cancelled():

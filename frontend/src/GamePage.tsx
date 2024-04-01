@@ -17,7 +17,7 @@ function GamePage() {
     const [participantInfos, setParticipantsInfos] = useState<Record<string, any>>({});
     const [team, setTeam] = useState<string>("");
     const [purchaseMsg, setPurchaseMsg] = useState<string>("");
-    const [log, setLog] = useState<string[]>([]);
+    const [log, setLog] = useState<string>("");
 
     const baseColor = "#FFD700";
 
@@ -49,9 +49,11 @@ function GamePage() {
             }
             else if ("purchase" in data) {
                 setPurchaseMsg(data["purchase"]);
+                setLog("");
             }
             else if ("log" in data) {
                 setLog(data["log"]);
+                setPurchaseMsg("");
             }
         }
         };
@@ -81,6 +83,12 @@ function GamePage() {
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                         {
                             purchaseMsg ?  <Typography level="h4" justifyContent="center">{purchaseMsg}</Typography>
+                            : <></>
+                        }
+                    </Grid>
+                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        {
+                            log ?  <Typography level="h4" justifyContent="center">{log}</Typography>
                             : <></>
                         }
                     </Grid>
