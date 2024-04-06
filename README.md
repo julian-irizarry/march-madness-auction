@@ -6,6 +6,12 @@
 
 Docker based development and setup.
 
+To build the project:
+
+```bash
+docker compose build
+```
+
 
 ## Usage
 
