@@ -7,5 +7,3 @@ PROJECT_DIR="/app/"
 NPM_COMMAND="start"
 
 cd $PROJECT_DIR && npm $NPM_COMMAND
-
-

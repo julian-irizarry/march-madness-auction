@@ -28,7 +28,7 @@ function HomePage() {
         },
         body: JSON.stringify({ player: playerName }),
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         const createdGameId = data.id;
@@ -60,7 +60,7 @@ function HomePage() {
         },
         body: JSON.stringify({ gameId: joinGameId, player: playerName }),
       });
-  
+
       if (response.ok) {
         navigate('/lobby', { state: { gameId: joinGameId, isCreator: false, playerName: playerName } });
         setIsDialogOpen(false); // Close the dialog after handling the join
@@ -103,8 +103,8 @@ function HomePage() {
       {/* Dialog for Join Game */}
       <Dialog maxWidth="lg" open={isDialogOpen} onClose={handleCloseDialog}>
         <DialogTitle sx={{
-          textAlign: 'center', 
-          fontFamily: 'doubleFeature', 
+          textAlign: 'center',
+          fontFamily: 'doubleFeature',
         }}><b>{ isCreator ? "CREATE GAME" : "JOIN GAME"}</b></DialogTitle>
         <DialogContent>
 
@@ -129,7 +129,7 @@ function HomePage() {
               fullWidth
               label="Game ID"
               // InputLabelProps={{
-              //   style: { 
+              //   style: {
               //     fontFamily: 'doubleFeature'
               //   },
               // }}

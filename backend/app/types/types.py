@@ -1,23 +1,28 @@
-from pydantic import BaseModel
 from typing import List
+
+from pydantic import BaseModel
 
 GAME_ID_NUM_CHAR = 6
 INITIAL_COUNTDOWN = 10
 INITIAL_BID = 0
 INITIAL_BALANCE = 100
 
+
 class CreateModel(BaseModel):
     player: str
+
 
 class JoinModel(BaseModel):
     gameId: str
     player: str
 
+
 class BidModel(BaseModel):
     gameId: str
     player: str
-    bid: float
+    bid: int
     team: str
+
 
 class GameInfo(BaseModel):
     creator: str
@@ -26,6 +31,7 @@ class GameInfo(BaseModel):
     countdown: float = INITIAL_COUNTDOWN
     currentTeam: List[str]
     log: List[BidModel] = []
+
 
 class PlayerInfo(BaseModel):
     gameId: str

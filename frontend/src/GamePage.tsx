@@ -104,7 +104,7 @@ function GamePage() {
                                         {/* #f0f4f8 */}
 
                                         {/* Countdown timer */}
-                                        <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}> 
+                                        <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                             <Card sx={{ border: 5, height: '100%', width: '100%', backgroundColor: 'black', borderRadius: 0, borderColor: 'white'}}>
                                                 <Typography sx={{ color: countdown <= 5 ? "red" : "white", textAlign: 'center', fontFamily: 'clock', fontSize: '70px', margin:"0px" }}>
                                                     {countdown.toString().padStart(2, '0')}
@@ -143,7 +143,7 @@ function GamePage() {
                                         // Calculate hue based on index
                                         const hue = (i * 30) % 360; // Adjust 30 as needed to change the color spacing
                                         const participantColor = `hsl(${hue}, 70%, 50%)`; // Adjust saturation and lightness as needed
-                                        
+
                                         return (
                                             <React.Fragment key={i}>
                                             <ListItem>
@@ -204,14 +204,14 @@ function GamePage() {
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right', marginTop: '-80px' }}>
                         <Fab variant="extended" size="small" sx={{backgroundColor:"white"}}>
                             <Typography justifyContent="center" sx={{fontSize: '12px'}}><b>Teams Remaining: {remainingTeams.length}</b></Typography>
-                        </Fab>                
+                        </Fab>
                     </Grid>
 
                     {/* Display logs on the bottom */}
                     <Snackbar
                         open={openSnackbar}
                         onClose={handleCloseSnackbar}
-                        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} 
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
                         >
                         <Alert
                             elevation={6}

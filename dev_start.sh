@@ -21,4 +21,3 @@ tmux send-keys -t 1 "docker-compose up backend" C-m
 
 # Attach to the session
 tmux attach-session -t $SESSION
-
