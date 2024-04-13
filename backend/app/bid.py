@@ -31,4 +31,5 @@ class GameTracker:
         return team
 
     def get_remaining_teams(self) -> list[list[str]]:
+        self.teams.sort(key=lambda x: int(x[1]))
         return self.teams
