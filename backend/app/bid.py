@@ -8,6 +8,7 @@ class GameTracker:
     def __init__(self, year: int, month: str, day: tuple[str, str]):
         self.games: dict[str, dict[str, PlayerInfo]] = {}
         self.teams = get_teams(year, month, day)
+        self.teams.sort(key=lambda x: int(x[1]))
 
     def add_game(self, gameId: str) -> None:
         self.games[gameId] = {}
@@ -31,5 +32,4 @@ class GameTracker:
         return team
 
     def get_remaining_teams(self) -> list[list[str]]:
-        self.teams.sort(key=lambda x: int(x[1]))
         return self.teams
