@@ -4,5 +4,3 @@
 FASTAPI_APP="app.api:app"
 
 uvicorn $FASTAPI_APP --reload
-
-

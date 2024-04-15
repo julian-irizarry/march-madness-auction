@@ -44,7 +44,7 @@ function Bid(props: BidProps) {
     <>
     <Grid container spacing={0.5} direction="row" alignItems="center">
       <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-        <Input 
+        <Input
           type="number"
           value={bid}
           onChange={(e) => setBid(e.target.value)}
