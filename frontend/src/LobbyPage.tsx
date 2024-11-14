@@ -3,7 +3,7 @@ import { Button, Typography, List, ListItem, Card, Chip } from '@mui/joy';
 import { Grid, Paper } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import imageSrc from './march_madness_logo_auction.png';
+import imageSrc from './images/march_madness_logo_auction.png';
 import { ReactComponent as CrownIcon } from './icons/crown.svg';
 import { ReactComponent as UserIcon } from './icons/user.svg';
 

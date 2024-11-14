@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/joy';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Alert, Paper } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Alert } from '@mui/material';
 
-import imageSrc from './march_madness_logo_auction.png';
-import './fonts.css';
+import imageSrc from './images/march_madness_logo_auction.png';
+import './css/Fonts.css';
 
 function HomePage() {
   const navigate = useNavigate();

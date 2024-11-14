@@ -1,14 +1,14 @@
-import { Typography, List, ListItem, Chip, Box } from '@mui/joy';
+import { Typography, List, ListItem, Chip } from '@mui/joy';
 import { Grid, Paper, Card, Fab, Snackbar, Alert } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
 
-import Bid from './bid';
+import Bid from './Bid';
 import { ReactComponent as CrownIcon } from './icons/crown.svg';
 import { ReactComponent as UserIcon } from './icons/user.svg';
 
-import './App.css';
-import './fonts.css';
+import './css/App.css';
+import './css/Fonts.css';
 
 function GamePage() {
     const location = useLocation();

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Input} from '@mui/joy';
 import { Grid } from '@mui/material';
 
-import './App.css';
+import './css/App.css';
 
 interface BidProps {
   gameId: string

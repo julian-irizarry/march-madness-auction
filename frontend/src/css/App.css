@@ -39,7 +39,7 @@
 
 #outer-container {
   /* background-color: var(--tertiary-color); */
-  background-image: url('./basketball_court5.png');
+  background-image: url('../images/basketball_court5.png');
   /* background-size: 487px;
   background-repeat: repeat; */
   background-size: cover;
