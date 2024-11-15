@@ -1,15 +1,18 @@
-name: Push the Docker image to AWS ECR Repo
+name: Push and Clean Docker Images in AWS ECR Repo
+
 on:
   push:
     tags: [ 'v*.*.*' ]
   pull_request:
     branches:
       - main
+    types: [opened, synchronize, closed]
 
 jobs:
   Build:
     name: Build
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' || github.event.action != 'closed' }} # Only run this job if it's not a closed PR
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -58,3 +61,28 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f docker/Dockerfile.frontend .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  Delete-PR-Image:
+    name: Delete PR Docker Image from ECR
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    needs: Build
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Delete backend PR image from ECR
+        run: |
+          aws ecr batch-delete-image --repository-name ${{ secrets.REPO_NAME }} --image-ids imageTag=backend.pr-${{ github.event.pull_request.number }}
+
+      - name: Delete frontend PR image from ECR
+        run: |
+          aws ecr batch-delete-image --repository-name ${{ secrets.REPO_NAME }} --image-ids imageTag=frontend.pr-${{ github.event.pull_request.number }}
