@@ -1,8 +1,11 @@
 name: Push the Docker image to AWS ECR Repo
 on:
   push:
+    tags: [ 'v*.*.*' ]
+  pull_request:
     branches:
-      - github-actions
+      - main
+
 jobs:
   Build:
     name: Build
@@ -32,7 +35,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: backend.${{ steps.extract_branch.outputs.branch }}.${{ github.sha }}
+          IMAGE_TAG: backend.${{ github.ref_name }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f docker/Dockerfile.backend .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -43,7 +46,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: frontend.${{ steps.extract_branch.outputs.branch }}.${{ github.sha }}
+          IMAGE_TAG: frontend.${{ github.ref_name }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f docker/Dockerfile.frontend .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
