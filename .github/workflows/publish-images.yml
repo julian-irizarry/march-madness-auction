@@ -6,13 +6,12 @@ on:
   pull_request:
     branches:
       - main
-    types: [opened, synchronize, closed]
+    types: [opened, synchronize]
 
 jobs:
   Build:
     name: Build
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'pull_request' || github.event.action != 'closed' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -42,8 +41,11 @@ jobs:
             echo "IMAGE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
           fi
 
+      - name: Delete old backend image if exists
+        run: |
+          aws ecr batch-delete-image --repository-name ${{ secrets.REPO_NAME }} --image-ids imageTag=backend.${{ env.IMAGE_TAG }} || echo "No existing backend image to delete."
+
       - name: Build, tag, and push the backend image to Amazon ECR
-        id: build-backend-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
@@ -52,8 +54,11 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f docker/Dockerfile.backend .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+      - name: Delete old frontend image if exists
+        run: |
+          aws ecr batch-delete-image --repository-name ${{ secrets.REPO_NAME }} --image-ids imageTag=frontend.${{ env.IMAGE_TAG }} || echo "No existing frontend image to delete."
+
       - name: Build, tag, and push the frontend image to Amazon ECR
-        id: build-frontend-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
@@ -61,28 +66,3 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f docker/Dockerfile.frontend .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-  Delete-PR-Image:
-    name: Delete PR Docker Image from ECR
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
-    needs: Build
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Delete backend PR image from ECR
-        run: |
-          aws ecr batch-delete-image --repository-name ${{ secrets.REPO_NAME }} --image-ids imageTag=backend.pr-${{ github.event.pull_request.number }}
-
-      - name: Delete frontend PR image from ECR
-        run: |
-          aws ecr batch-delete-image --repository-name ${{ secrets.REPO_NAME }} --image-ids imageTag=frontend.pr-${{ github.event.pull_request.number }}
