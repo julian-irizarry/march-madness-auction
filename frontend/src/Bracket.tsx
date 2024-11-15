@@ -7,17 +7,19 @@ interface MatchProps {
 }
 
 function MatchComponent({ match }: MatchProps) {
+    const is_determined = match.participants[0];
+
     return (
-        <Card sx={{ margin:0.5, padding:1, border:1, borderRadius:0, borderColor: 'gray', width: match.participants[0] ? '120px' : '30px' }}>
-            <Typography variant="body2" justifyContent="center" sx={{ color: 'var(--tertiary-color)', fontSize: '10px' }}>
+        <Card sx={{ margin:0.5, padding:1, border:1, borderRadius:0, borderColor: 'var(--light-grey-color)', width: match.participants[0] ? '120px' : '30px' }}>
+            <Typography variant="body2" justifyContent="center" sx={{ color: is_determined ? 'var(--tertiary-color)' : 'gray', fontSize: '10px' }}>
                 {
-                    match.participants[0] ? `${match.participants[0].name} (${match.participants[0].seed})` : "TBD"
+                    is_determined ? `${match.participants[0].name} (${match.participants[0].seed})` : "TBD"
                 }
             </Typography>
             <Divider/>
-            <Typography variant="body2" justifyContent="center" sx={{ color: 'var(--tertiary-color)', fontSize: '10px' }}>
+            <Typography variant="body2" justifyContent="center" sx={{ color: is_determined ? 'var(--tertiary-color)' : 'gray', fontSize: '10px' }}>
                 {
-                    match.participants[1] ? `${match.participants[1].name} (${match.participants[1].seed})` : "TBD"
+                    is_determined ? `${match.participants[1].name} (${match.participants[1].seed})` : "TBD"
                 }
             </Typography>
         </Card>
@@ -50,10 +52,26 @@ function Region(props: RegionProps) {
             {roundsToRender.map(([round, matchArr]) => (
                 <Grid item key={round}>
                     <Grid container direction="column" spacing={7 * (5 - matchArr.length)} justifyContent="center" alignItems="center">
+                        {
+                            matchArr.length === 1 ?
+                            <Grid item key={`${round}_${matchArr[0].id}`}>
+                                <Card sx={{ margin:0.5, padding:1, border:1, borderRadius:0, borderColor: 'var(--light-grey-color)', width: '100px' }}>
+                                    <Typography variant="body2" justifyContent="center" sx={{ color: 'var(--tertiary-color)', fontSize: '10px' }}>
+                                        {props.region_name} REGIONAL CHAMPION
+                                    </Typography>
+                                </Card>
+                            </Grid>
+                            : <></>
+
+                        }
                         {matchArr.map((val) => (
-                        <Grid item key={`${round}_${val.id}`}>
-                            <MatchComponent match={val} />
-                        </Grid>
+                            matchArr.length != 1 ?
+                            <Grid item key={`${round}_${val.id}`}>
+                                <div className='bracket-arrow'>
+                                    <MatchComponent match={val} />
+                                </div>
+                            </Grid>
+                            : <></>
                         ))}
                     </Grid>
                 </Grid>
