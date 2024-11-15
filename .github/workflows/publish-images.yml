@@ -10,7 +10,7 @@ on:
 
 jobs:
   Build:
-    name: Build
+    name: Manage ECR image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
