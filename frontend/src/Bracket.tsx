@@ -16,6 +16,8 @@ function Bracket(props: BracketProps) {
         matchComponent={Match}
         svgWrapper={({ children, ...props }) => (
           <SVGViewer
+            width={1000}
+            height={1000}
             background="rgb(11, 13, 19)"
             SVGBackground="rgb(11, 13, 19)"
             {...props}
@@ -23,8 +25,6 @@ function Bracket(props: BracketProps) {
             {children}
           </SVGViewer>
         )}
-        onMatchClick={(match) => console.log(match)}
-        onPartyClick={(match) => console.log(match)}
       />
     </>
   );

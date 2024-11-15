@@ -92,7 +92,7 @@ function GamePage() {
 
     return (
         <div id="outer-container">
-            <Paper elevation={1} sx={{marginLeft: '180px', marginRight: '180px', marginTop: 'calc(100vh - 800px)', marginBottom: 'calc(100vh - 800px)', padding: '10px', backgroundColor: '#fcfcfc'}}>
+            <Paper elevation={1} sx={{marginLeft: '120px', marginRight: '120px', marginTop: 'calc(100vh - 800px)', marginBottom: 'calc(100vh - 800px)', padding: '10px', backgroundColor: '#fcfcfc'}}>
                 <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', height: 'calc(100vh - 120px)', minHeight: '100%' }}>
                     {/* Left side */}
                     <Grid item xs={10}>
@@ -117,12 +117,10 @@ function GamePage() {
                             {/* Display bracket */}
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                 <Card sx={{ height: '428px', width: '100%', padding: '10px', backgroundColor: 'var(--grey-color)'}}>
-                                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                        {allTeams.length > 0 ?
-                                            <Bracket all_teams={allTeams}/>
-                                            : <Typography>No teams available</Typography>
-                                        }
-                                    </Grid>
+                                    {allTeams.length > 0 ?
+                                        <Bracket all_teams={allTeams}/>
+                                        : <Typography>No teams available</Typography>
+                                    }
                                 </Card>
                             </Grid>
 
