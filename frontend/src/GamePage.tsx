@@ -4,6 +4,8 @@ import { useLocation } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
 
 import Bid from './Bid';
+import Bracket from './Bracket';
+import { TeamData } from './Utils'
 import { ReactComponent as CrownIcon } from './icons/crown.svg';
 import { ReactComponent as UserIcon } from './icons/user.svg';
 
@@ -18,8 +20,9 @@ function GamePage() {
     const [countdown, setCountdown] = useState(10);
     const [participants, setParticipants] = useState<string[]>([]);
     const [participantInfos, setParticipantsInfos] = useState<Record<string, any>>({});
-    const [team, setTeam] = useState<string[]>([]);
-    const [remainingTeams, setRemainingTeams] = useState<string[]>([]);
+    const [team, setTeam] = useState<TeamData>({name:"",seed:-1,region:""});
+    const [remainingTeams, setRemainingTeams] = useState<TeamData[]>([]);
+    const [allTeams, setAllTeams] = useState<TeamData[]>([]);
     const [log, setLog] = useState<string>("");
 
     const [openSnackbar, setOpenSnackbar] = React.useState(false);
@@ -52,17 +55,35 @@ function GamePage() {
                 setCountdown(data["countdown"]);
             }
             else if ("team" in data) {
-                setTeam(data["team"]);
+                setTeam({
+                    name: data["team"][0],
+                    seed: parseInt(data["team"][1]),
+                    region: data["team"][2],
+                });
             }
             else if ("log" in data) {
                 setLog(data["log"]);
                 setOpenSnackbar(true);
             }
             else if ("remaining" in data) {
-                const remaining_teams: string[] = data["remaining"].map((team:string[], i:number) => {
-                    return `${team[0]} (${team[1]})`;
+                const remaining_teams: TeamData[] = data["remaining"].map((temp_team:string[], i:number) => {
+                    return {
+                        name: temp_team[0],         // Team name (index 0)
+                        seed: parseInt(temp_team[1]), // Seed (index 1), converted to number
+                        region: temp_team[2],       // Region (index 2)
+                      };
                 })
                 setRemainingTeams(remaining_teams);
+            }
+            else if ("all_teams" in data) {
+                const all_teams: TeamData[] = data["all_teams"].map((temp_team:string[], i:number) => {
+                    return {
+                        name: temp_team[0],         // Team name (index 0)
+                        seed: parseInt(temp_team[1]), // Seed (index 1), converted to number
+                        region: temp_team[2],       // Region (index 2)
+                      };
+                })
+                setAllTeams(all_teams);
             }
         }
         };
@@ -71,10 +92,10 @@ function GamePage() {
 
     return (
         <div id="outer-container">
-            <Paper elevation={1} sx={{marginLeft: '200px', marginRight: '200px', marginTop: 'calc(100vh - 800px)', marginBottom: 'calc(100vh - 800px)', padding: '10px', backgroundColor: '#fcfcfc'}}>
-                <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', height: 'calc(100vh - 170px)', minHeight: '100%' }}>
+            <Paper elevation={1} sx={{marginLeft: '180px', marginRight: '180px', marginTop: 'calc(100vh - 800px)', marginBottom: 'calc(100vh - 800px)', padding: '10px', backgroundColor: '#fcfcfc'}}>
+                <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', height: 'calc(100vh - 120px)', minHeight: '100%' }}>
                     {/* Left side */}
-                    <Grid item xs={8}>
+                    <Grid item xs={10}>
                         <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
 
                             {/* Team to bid on */}
@@ -82,20 +103,27 @@ function GamePage() {
                                 <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                     <Grid item>
                                         <Typography justifyContent="center" sx={{ color: 'var(--tertiary-color)', fontFamily: 'threeDim2', fontSize: '60px', marginTop: '-20px', marginBottom: '-20px' }}>
-                                            {team[0]}
+                                            {team.name}
                                         </Typography>
                                     </Grid>
                                     <Grid item>
                                         <Typography justifyContent="center" sx={{ color: 'var(--tertiary-color)', fontSize: '40px', marginTop: '-38px', marginBottom: '-20px' }}>
-                                            ({team[1]})
+                                            ({team.seed})
                                         </Typography>
                                     </Grid>
                                 </Grid>
                             </Grid>
 
-                            {/* Placeholder for bracket */}
+                            {/* Display bracket */}
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                <Card sx={{ height: '428px', width: '100%', padding: '10px', backgroundColor: '#25252e'}}></Card>
+                                <Card sx={{ height: '428px', width: '100%', padding: '10px', backgroundColor: 'var(--grey-color)'}}>
+                                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                        {allTeams.length > 0 ?
+                                            <Bracket all_teams={allTeams}/>
+                                            : <Typography>No teams available</Typography>
+                                        }
+                                    </Grid>
+                                </Card>
                             </Grid>
 
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
@@ -119,7 +147,7 @@ function GamePage() {
                                                     <Typography level="h4" justifyContent="center">Current bid: ${currentHighestBid.toFixed(2)}</Typography>
                                                 </Grid>
                                                 <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                                    <Bid gameId={gameId} player={playerName} currentHighestBid={currentHighestBid} team={`${team[0]} (${team[1]})`}/>
+                                                    <Bid gameId={gameId} player={playerName} currentHighestBid={currentHighestBid} team={`${team.name} (${team.seed})`}/>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -131,7 +159,7 @@ function GamePage() {
                     </Grid>
 
                     {/* Right side */}
-                    <Grid item xs={4}>
+                    <Grid item xs={2}>
                         <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
 
                             {/* Participants */}
@@ -158,9 +186,9 @@ function GamePage() {
                                                     <Typography sx={{ fontSize: '12px' }}>
                                                         Teams:
                                                     </Typography>
-                                                    {participantInfos[participant]["teams"].map((team:string, teamIndex:number) => (
+                                                    {participantInfos[participant]["teams"].map((temp_team:string, teamIndex:number) => (
                                                         <Typography key={teamIndex} sx={{ marginLeft: '10px', fontSize: '12px' }}>
-                                                        - {team}
+                                                        - {temp_team}
                                                         </Typography>
                                                     ))}
                                                 </Chip>
@@ -179,13 +207,13 @@ function GamePage() {
                                 <Card sx={{ maxHeight: 440, overflowY: 'auto', width: '100%', backgroundColor: 'var(--off-white-color)'}}>
                                     <List sx={{ minWidth: 100, maxWidth: 300 }}>
                                         {remainingTeams.length > 0 ?
-                                            remainingTeams.map((team, i) => {
+                                            remainingTeams.map((temp_team, i) => {
                                                 return (
                                                     <React.Fragment key={i}>
                                                         <ListItem>
                                                             <Chip sx={{ backgroundColor: 'white' }}>
                                                                 <Typography sx={{ color: "black", fontSize: '12px' }}>
-                                                                    {team}
+                                                                    {temp_team.name} ({temp_team.seed})
                                                                 </Typography>
                                                             </Chip>
                                                         </ListItem>

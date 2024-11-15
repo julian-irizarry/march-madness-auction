@@ -104,6 +104,7 @@ async def finalize_bid(game_id: str):
         await ws.send_json({"countdown": games[game_id].countdown})
         await ws.send_json({"participants": participants})
         await ws.send_json({"remaining": gameInfo.get_remaining_teams()})
+        await ws.send_json({"all_teams": gameInfo.get_all_teams()})
 
 
 @app.websocket("/ws/{game_id}")
@@ -122,8 +123,9 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
                 await asyncio.sleep(10)  # Adjust the sleep duration as needed
         except WebSocketDisconnect:
             # Handle the WebSocket disconnection
-            game_connections[game_id].remove(websocket)
-            print(f"WebSocket disconnected: {websocket}")
+            if websocket in game_connections[game_id]:
+                game_connections[game_id].remove(websocket)
+                print(f"WebSocket disconnected: {websocket}")
 
     async def send_bid_updates():
         try:
@@ -132,8 +134,9 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
                 await asyncio.sleep(10)  # Adjust the sleep duration as needed
         except WebSocketDisconnect:
             # Handle the WebSocket disconnection
-            game_connections[game_id].remove(websocket)
-            print(f"WebSocket disconnected: {websocket}")
+            if websocket in game_connections[game_id]:
+                game_connections[game_id].remove(websocket)
+                print(f"WebSocket disconnected: {websocket}")
 
     async def send_team():
         try:
@@ -142,8 +145,9 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
                 await asyncio.sleep(10)  # Adjust the sleep duration as needed
         except WebSocketDisconnect:
             # Handle the WebSocket disconnection
-            game_connections[game_id].remove(websocket)
-            print(f"WebSocket disconnected: {websocket}")
+            if websocket in game_connections[game_id]:
+                game_connections[game_id].remove(websocket)
+                print(f"WebSocket disconnected: {websocket}")
 
     async def send_remaining():
         try:
@@ -152,8 +156,20 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
                 await asyncio.sleep(10)  # Adjust the sleep duration as needed
         except WebSocketDisconnect:
             # Handle the WebSocket disconnection
-            game_connections[game_id].remove(websocket)
-            print(f"WebSocket disconnected: {websocket}")
+            if websocket in game_connections[game_id]:
+                game_connections[game_id].remove(websocket)
+                print(f"WebSocket disconnected: {websocket}")
+
+    async def send_all_teams():
+        try:
+            while True:
+                await websocket.send_json({"all_teams": gameInfo.get_all_teams()})
+                await asyncio.sleep(10)  # Adjust the sleep duration as needed
+        except WebSocketDisconnect:
+            # Handle the WebSocket disconnection
+            if websocket in game_connections[game_id]:
+                game_connections[game_id].remove(websocket)
+                print(f"WebSocket disconnected: {websocket}")
 
     async def listen_for_messages():
         try:
@@ -165,18 +181,20 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
                     break  # Exit the loop if the game starts
         except WebSocketDisconnect:
             # Handle the WebSocket disconnection
-            game_connections[game_id].remove(websocket)
-            print(f"WebSocket disconnected: {websocket}")
+            if websocket in game_connections[game_id]:
+                game_connections[game_id].remove(websocket)
+                print(f"WebSocket disconnected: {websocket}")
 
     send_participant_task = asyncio.create_task(send_participant_updates())
     send_bid_task = asyncio.create_task(send_bid_updates())
     send_team_task = asyncio.create_task(send_team())
     send_remaining_task = asyncio.create_task(send_remaining())
+    send_all_teams_task = asyncio.create_task(send_all_teams())
     listen_task = asyncio.create_task(listen_for_messages())
 
     # Wait for either task to complete
     done, pending = await asyncio.wait(
-        [send_participant_task, send_bid_task, listen_task, send_team_task, send_remaining_task],
+        [send_participant_task, send_bid_task, listen_task, send_team_task, send_remaining_task, send_all_teams_task],
         return_when=asyncio.FIRST_COMPLETED,
     )
 
@@ -185,7 +203,7 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
         task.cancel()
 
     # Cleanup after tasks complete
-    if game_id in game_connections:
+    if game_id in game_connections and websocket in game_connections[game_id]:
         game_connections[game_id].remove(websocket)
 
 

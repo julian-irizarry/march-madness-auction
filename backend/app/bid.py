@@ -9,6 +9,7 @@ class GameTracker:
         self.games: dict[str, dict[str, PlayerInfo]] = {}
         self.teams = get_teams(year, month, day)
         self.teams.sort(key=lambda x: int(x[1]))
+        self.teams_master = self.teams.copy()
 
     def add_game(self, gameId: str) -> None:
         self.games[gameId] = {}
@@ -33,3 +34,6 @@ class GameTracker:
 
     def get_remaining_teams(self) -> list[list[str]]:
         return self.teams
+    
+    def get_all_teams(self) -> list[list[str]]:
+        return self.teams_master
