@@ -21,10 +21,10 @@ function GenerateBracketData(data: TeamData[]): any[] {
             const match = {
                 id: matchId++,
                 nextMatchId: null, // Will be set later
-                tournamentRoundText: `Round 1 - ${roundLabels[0]}`,
+                tournamentRoundText: roundLabels[0],
                 startTime: "TBD", // Could be set later with actual match times
                 state: 'NO_PARTY', // Placeholder until the match state is updated
-                participants: [team, opponent]
+                participants: [{name:`${team.name} (${team.seed})`}, {name:`${opponent.name} (${opponent.seed})`}]
             };
 
             matches.push(match);
@@ -66,7 +66,10 @@ function GenerateBracketData(data: TeamData[]): any[] {
     // Start recursive next match ID assignment
     assignNextMatchId(round1Matches, 1);
 
+    console.log("MATCHES ", matches);
+
     return matches;
 }
+  
 
 export default GenerateBracketData;

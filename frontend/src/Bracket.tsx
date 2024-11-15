@@ -16,8 +16,8 @@ function Bracket(props: BracketProps) {
         matchComponent={Match}
         svgWrapper={({ children, ...props }) => (
           <SVGViewer
-            width={1000}
-            height={1000}
+            width={1050}
+            height={500}
             background="rgb(11, 13, 19)"
             SVGBackground="rgb(11, 13, 19)"
             {...props}

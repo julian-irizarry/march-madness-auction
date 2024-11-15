@@ -92,8 +92,8 @@ function GamePage() {
 
     return (
         <div id="outer-container">
-            <Paper elevation={1} sx={{marginLeft: '120px', marginRight: '120px', marginTop: 'calc(100vh - 800px)', marginBottom: 'calc(100vh - 800px)', padding: '10px', backgroundColor: '#fcfcfc'}}>
-                <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', height: 'calc(100vh - 120px)', minHeight: '100%' }}>
+            <Paper elevation={1} sx={{marginLeft: '50px', marginRight: '50px', marginTop: 'calc(100vh - 800px)', marginBottom: 'calc(100vh - 500px)', padding: '10px', backgroundColor: '#fcfcfc'}}>
+                <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', height: 'calc(100vh - 60px)', minHeight: '100%' }}>
                     {/* Left side */}
                     <Grid item xs={10}>
                         <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
@@ -116,7 +116,7 @@ function GamePage() {
 
                             {/* Display bracket */}
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                <Card sx={{ height: '428px', width: '100%', padding: '10px', backgroundColor: 'var(--grey-color)'}}>
+                                <Card sx={{ height: '500px', width: '100%', padding: '10px', backgroundColor: 'var(--grey-color)'}}>
                                     {allTeams.length > 0 ?
                                         <Bracket all_teams={allTeams}/>
                                         : <Typography>No teams available</Typography>
@@ -127,7 +127,6 @@ function GamePage() {
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                 <Card sx={{ height: '100%', width: '100%', padding: '10px', backgroundColor: 'var(--off-white-color)'}}>
                                     <Grid container sx={{ justifyContent: 'center', alignItems: 'center' }}>
-                                        {/* #f0f4f8 */}
 
                                         {/* Countdown timer */}
                                         <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
@@ -202,7 +201,7 @@ function GamePage() {
 
                             {/* Remaining Teams */}
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                <Card sx={{ maxHeight: 440, overflowY: 'auto', width: '100%', backgroundColor: 'var(--off-white-color)'}}>
+                                <Card sx={{ maxHeight: 510, overflowY: 'auto', width: '100%', backgroundColor: 'var(--off-white-color)'}}>
                                     <List sx={{ minWidth: 100, maxWidth: 300 }}>
                                         {remainingTeams.length > 0 ?
                                             remainingTeams.map((temp_team, i) => {
