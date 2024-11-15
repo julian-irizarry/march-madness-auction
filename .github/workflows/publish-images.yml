@@ -27,12 +27,23 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag, and push the image to Amazon ECR
-        id: build-image
+      - name: Build, tag, and push the backend image to Amazon ECR
+        id: build-backend-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-          IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}.${{ github.sha }}
+          IMAGE_TAG: backend.${{ steps.extract_branch.outputs.branch }}.${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f docker/Dockerfile.backend .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+
+      - name: Build, tag, and push the frontend image to Amazon ECR
+        id: build-frontend-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+          IMAGE_TAG: frontend.${{ steps.extract_branch.outputs.branch }}.${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f docker/Dockerfile.frontend .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
