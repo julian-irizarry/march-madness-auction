@@ -48,30 +48,21 @@ function Region(props: RegionProps) {
     const roundsToRender = props.reverse ? sortedRounds.reverse() : sortedRounds;
 
     return (
-        <Grid container spacing={2}  sx={{ margin:3, display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+        <Grid container spacing={2}  sx={{ marginTop:3, marginBottom:3, display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
             {roundsToRender.map(([round, matchArr]) => (
                 <Grid item key={round}>
                     <Grid container direction="column" spacing={7 * (5 - matchArr.length)} justifyContent="center" alignItems="center">
-                        {
-                            matchArr.length === 1 ?
-                            <Grid item key={`${round}_${matchArr[0].id}`}>
-                                <Card sx={{ margin:0.5, padding:1, border:1, borderRadius:0, borderColor: 'var(--light-grey-color)', width: '100px' }}>
-                                    <Typography variant="body2" justifyContent="center" sx={{ color: 'var(--tertiary-color)', fontSize: '10px' }}>
-                                        {props.region_name} REGIONAL CHAMPION
-                                    </Typography>
-                                </Card>
-                            </Grid>
-                            : <></>
-
-                        }
                         {matchArr.map((val) => (
-                            matchArr.length != 1 ?
                             <Grid item key={`${round}_${val.id}`}>
-                                <div className='bracket-arrow'>
-                                    <MatchComponent match={val} />
-                                </div>
+                                {
+                                matchArr.length == 1 ?
+                                <Typography variant="body2" justifyContent="center" sx={{ color: 'var(--tertiary-color)', fontSize: '10px' }}>
+                                    {props.region_name}
+                                </Typography>
+                                : <></>
+                                }
+                                <MatchComponent match={val} />
                             </Grid>
-                            : <></>
                         ))}
                     </Grid>
                 </Grid>
@@ -97,11 +88,67 @@ function Bracket(props: BracketProps) {
         <>
             <Grid container spacing={0} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', overflowY: 'auto', maxHeight: '70vh'}}>
                 {Array.from(region_sorted_teams.entries()).map(([key, val], index) => (
+                    
+                    <>
                     <Grid item key={key} xs={6}>
                         <Paper elevation={0} sx={{ borderRadius:0 }}>
                             <Region region_name={key} region_teams={val} reverse={index % 2 === 1}/>
                         </Paper>
                     </Grid>
+
+                    {
+                        index == 1 ? 
+                        
+                        <Grid container key={key} xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
+                            <Grid item xs={2}></Grid>
+                            <Grid item xs={2}>
+                                <Grid item sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
+                                    <Typography variant="body2" justifyContent="center" sx={{ color: 'var(--tertiary-color)', fontSize: '10px' }}>
+                                        FINAL FOUR
+                                    </Typography>
+                                </Grid>
+                                <Grid item sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
+                                    <Card sx={{ margin:0.5, padding:1, border:1, borderRadius:0, borderColor: 'var(--light-grey-color)', width: '100px' }}>
+                                        <Typography variant="body2" justifyContent="center" sx={{ color: 'gray', fontSize: '10px' }}> TBD </Typography>
+                                        <Divider/>
+                                        <Typography variant="body2" justifyContent="center" sx={{ color: 'gray', fontSize: '10px' }}> TBD </Typography>
+                                    </Card>
+                                </Grid>
+                            </Grid>
+                            <Grid item xs={2}>
+                                <Grid item sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
+                                    <Typography variant="body2" justifyContent="center" sx={{ color: 'var(--tertiary-color)', fontSize: '10px' }}>
+                                        CHAMPIONSHIP
+                                    </Typography>
+                                </Grid>
+                                <Grid item sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
+                                    <Card sx={{ margin:0.5, padding:1, border:1, borderRadius:0, borderColor: 'var(--light-grey-color)', width: '100px' }}>
+                                        <Typography variant="body2" justifyContent="center" sx={{ color: 'gray', fontSize: '10px' }}> TBD </Typography>
+                                        <Divider/>
+                                        <Typography variant="body2" justifyContent="center" sx={{ color: 'gray', fontSize: '10px' }}> TBD </Typography>
+                                    </Card>
+                                </Grid>
+                            </Grid>
+                            <Grid item xs={2}>
+                                <Grid item sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
+                                    <Typography variant="body2" justifyContent="center" sx={{ color: 'var(--tertiary-color)', fontSize: '10px' }}>
+                                        FINAL FOUR
+                                    </Typography>
+                                </Grid>
+                                <Grid item sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
+                                    <Card sx={{ margin:0.5, padding:1, border:1, borderRadius:0, borderColor: 'var(--light-grey-color)', width: '100px' }}>
+                                        <Typography variant="body2" justifyContent="center" sx={{ color: 'gray', fontSize: '10px' }}> TBD </Typography>
+                                        <Divider/>
+                                        <Typography variant="body2" justifyContent="center" sx={{ color: 'gray', fontSize: '10px' }}> TBD </Typography>
+                                    </Card>
+                                </Grid>
+                            </Grid>
+                            <Grid item xs={2}></Grid>
+                        </Grid>
+                        :
+                        <></>
+                    }
+                    </>
                 ))}
             </Grid>
         </>
