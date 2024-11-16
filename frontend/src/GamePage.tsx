@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import Bid from "./Bid";
 import Bracket from "./Bracket";
-import { TeamData } from "./Utils"
+import { PlayerInfo, TeamData } from "./Utils"
 import { ReactComponent as CrownIcon } from "./icons/crown.svg";
 import { ReactComponent as UserIcon } from "./icons/user.svg";
 
@@ -18,8 +18,7 @@ function GamePage() {
 
     const [currentHighestBid, setCurrentHighestBid] = useState<number>(0);
     const [countdown, setCountdown] = useState(10);
-    const [participants, setParticipants] = useState<string[]>([]);
-    const [participantInfos, setParticipantsInfos] = useState<Record<string, any>>({});
+    const [participantInfos, setParticipantsInfos] = useState<Map<string, PlayerInfo>>(new Map());
     const [team, setTeam] = useState<TeamData>({ name: "", seed: -1, region: "" });
     const [remainingTeams, setRemainingTeams] = useState<TeamData[]>([]);
     const [allTeams, setAllTeams] = useState<TeamData[]>([]);
@@ -45,8 +44,15 @@ function GamePage() {
                 const data = JSON.parse(event.data);
                 console.log("DATA", data);
                 if ("participants" in data) {
-                    setParticipants(Object.keys(data["participants"]));
-                    setParticipantsInfos(data["participants"]);
+                    const participants = new Map<string, PlayerInfo>();
+                    Object.entries(data.participants).forEach(([key, temp_player]: [string, any]) => {
+                        participants.set(key, {
+                            gameId: temp_player.gameId,
+                            balance: parseInt(temp_player.balance),
+                            teams: temp_player.teams,
+                        });
+                    });
+                    setParticipantsInfos(participants);
                 }
                 else if ("bid" in data) {
                     setCurrentHighestBid(data["bid"]);
@@ -171,8 +177,8 @@ function GamePage() {
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                 <Card sx={{ height: 200, overflowY: "auto", width: "100%", backgroundColor: "white" }}>
                                     <List sx={{ width: "100%" }}>
-                                        {participants.length > 0 ?
-                                            participants.map((participant, i) => {
+                                        {participantInfos.size > 0 ?
+                                            Array.from(participantInfos.entries()).map(([participant, participant_info], i) => {
                                                 // Calculate hue based on index
                                                 const hue = (i * 30) % 360; // Adjust 30 as needed to change the color spacing
                                                 const participantColor = `hsl(${hue}, 70%, 50%)`; // Adjust saturation and lightness as needed
@@ -186,12 +192,12 @@ function GamePage() {
                                                                     {participant}
                                                                 </Typography>
                                                                 <Typography sx={{ fontSize: "12px" }}>
-                                                                    Balance: $ {participantInfos[participant]["balance"].toFixed(2)}
+                                                                    Balance: $ {participant_info["balance"].toFixed(2)}
                                                                 </Typography>
                                                                 <Typography sx={{ fontSize: "12px" }}>
                                                                     Teams:
                                                                 </Typography>
-                                                                {participantInfos[participant]["teams"].map((temp_team: string, teamIndex: number) => (
+                                                                {participant_info["teams"].map((temp_team: string, teamIndex: number) => (
                                                                     <Typography key={teamIndex} sx={{ marginLeft: "10px", fontSize: "12px" }}>
                                                                         - {temp_team}
                                                                     </Typography>

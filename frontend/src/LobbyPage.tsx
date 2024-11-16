@@ -54,11 +54,13 @@ function LobbyPage() {
             <Grid container spacing={2} direction="column" alignItems="center">
 
               {/* Player */}
-              <Grid item>
-                <Typography level="h4" justifyContent="center">
+              <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <Typography level="h4" justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "30px" }}>
                   {playerName ? `Welcome ${playerName}!` : ""}
                 </Typography>
-                <Typography level="h4" justifyContent="center">
+              </Grid>
+              <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <Typography level="h4" justifyContent="center" sx={{ color: "gray", fontSize: "20px" }}>
                   You are {isCreator ? "the game creator" : "a participant"}.
                 </Typography>
               </Grid>
@@ -103,7 +105,7 @@ function LobbyPage() {
               {/* Game ID */}
               <Grid container item spacing={2} sx={{ justifyContent: "center", alignItems: "center", flexDirection: "row" }} >
                 <Grid item>
-                  <Typography level="h4">Your Room Code:</Typography>
+                  <Typography level="h4" sx={{ color: "var(--tertiary-color)" }}>Your Room Code:</Typography>
                 </Grid>
 
                 <Grid item>
@@ -117,7 +119,7 @@ function LobbyPage() {
               <Grid item>
                 {
                   isCreator ? <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleStartGameClick}>Start Game</Button>
-                    : <Typography level="h4">Waiting for the host to start the game...</Typography>
+                    : <Typography level="h4" sx={{ color: "var(--tertiary-color)" }} >Waiting for the host to start the game...</Typography>
                 }
               </Grid>
             </Grid>

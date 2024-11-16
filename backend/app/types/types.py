@@ -17,6 +17,10 @@ class JoinModel(BaseModel):
     player: str
 
 
+class ViewModel(BaseModel):
+    gameId: str
+
+
 class BidModel(BaseModel):
     gameId: str
     player: str

@@ -12,9 +12,10 @@ from .types.types import (
     INITIAL_BID,
     INITIAL_COUNTDOWN,
     BidModel,
-    CreateModel,
     GameInfo,
+    CreateModel,
     JoinModel,
+    ViewModel
 )
 
 app = FastAPI()
@@ -67,6 +68,17 @@ async def join_game(join_model: JoinModel):
 
     return {"detail": "Joined game successfully"}
 
+@app.post("/view-game/")
+async def join_game(join_model: ViewModel):
+    if join_model.gameId not in games:
+        raise HTTPException(status_code=404, detail="Game ID not found")
+    
+    if join_model.gameId in game_connections:
+        participants = {k: v.dict() for k, v in gameInfo.get_all_players(join_model.gameId).items()}
+        for ws in game_connections[join_model.gameId]:
+            await ws.send_json({"participants": participants})
+
+    return {"detail": "Viewed game successfully"}
 
 async def start_countdown(game_id: str):
     while True:

@@ -1,3 +1,9 @@
+export interface PlayerInfo {
+    gameId: string
+    balance: number
+    teams: string[]
+}
+
 export interface TeamData {
     name: string;
     seed: number;
