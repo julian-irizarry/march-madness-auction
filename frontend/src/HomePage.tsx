@@ -102,47 +102,27 @@ function HomePage() {
 
       {/* Dialog for Join Game */}
       <Dialog maxWidth="lg" open={isDialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle sx={{
-          textAlign: "center",
-          fontFamily: "doubleFeature",
-        }}><b>{ isCreator ? "CREATE GAME" : "JOIN GAME"}</b></DialogTitle>
-        <DialogContent>
 
+        <DialogTitle sx={{ textAlign: "center", fontFamily: "doubleFeature", }}>
+          <b>{isCreator ? "CREATE GAME" : "JOIN GAME"}</b>
+        </DialogTitle>
+
+        <DialogContent>
           {
             joinGameError ? <Alert severity="error">{joinGameError}</Alert>
-            : <></>
+              : <></>
           }
 
-          <TextField
-            fullWidth
-            label="Your Name"
-            // InputLabelProps={{
-            //   style: { fontFamily: "doubleFeature" },
-            // }}
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-            margin="dense"
-          />
+          <TextField fullWidth label="Your Name" value={playerName} onChange={(e) => setPlayerName(e.target.value)} margin="dense" />
 
-          { isCreator ? <></> :
-            <TextField
-              fullWidth
-              label="Game ID"
-              // InputLabelProps={{
-              //   style: {
-              //     fontFamily: "doubleFeature"
-              //   },
-              // }}
-              value={joinGameId}
-              onChange={(e) => setJoinGameId(e.target.value)}
-              margin="dense"
-            />
+          {isCreator ? <></> :
+            <TextField fullWidth label="Game ID" value={joinGameId} onChange={(e) => setJoinGameId(e.target.value)} margin="dense" />
           }
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center" }}>
           <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleCloseDialog}>Cancel</Button>
 
-          { isCreator ?
+          {isCreator ?
             <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleCreateGame}>Create</Button>
             : <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleJoinGame}>Join</Button>
           }

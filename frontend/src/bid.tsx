@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Input} from '@mui/joy';
+import { Button, Input } from '@mui/joy';
 import { Grid } from '@mui/material';
 
 import './css/App.css';
@@ -42,21 +42,21 @@ function Bid(props: BidProps) {
 
   return (
     <>
-    <Grid container spacing={0.5} direction="row" alignItems="center">
-      <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-        <Input
-          type="number"
-          value={bid}
-          onChange={(e) => setBid(e.target.value)}
-          placeholder="Enter bid"
-          startDecorator="$"
-          sx={{ width: 125 }}
-        />
+      <Grid container spacing={0.5} direction="row" alignItems="center">
+        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Input
+            type="number"
+            value={bid}
+            onChange={(e) => setBid(e.target.value)}
+            placeholder="Enter bid"
+            startDecorator="$"
+            sx={{ width: 125 }}
+          />
+        </Grid>
+        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleSubmit}>Place Bid</Button>
+        </Grid>
       </Grid>
-      <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-        <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleSubmit}>Place Bid</Button>
-      </Grid>
-    </Grid>
     </>
   );
 }
