@@ -1,24 +1,24 @@
 @font-face {
-  font-family: 'terrorFont';
-  src: url('../../public/fonts/bloody_terror.ttf') format('truetype');
+  font-family: "terrorFont";
+  src: url("../../public/fonts/bloody_terror.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: 'doubleFeature';
-  src: url('../../public/fonts/doublefeature.ttf') format('truetype');
+  font-family: "doubleFeature";
+  src: url("../../public/fonts/doublefeature.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: 'threeDim';
-  src: url('../../public/fonts/bungee.ttf') format('truetype');
+  font-family: "threeDim";
+  src: url("../../public/fonts/bungee.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: 'clock';
-  src: url('../../public/fonts/clock.ttf') format('truetype');
+  font-family: "clock";
+  src: url("../../public/fonts/clock.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: 'threeDim2';
+  font-family: "threeDim2";
   src: url("../../public/fonts/broadway.ttf") format("truetype");
 }

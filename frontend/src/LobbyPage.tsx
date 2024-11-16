@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Button, Typography, List, ListItem, Card, Chip } from '@mui/joy';
-import { Grid, Paper } from '@mui/material';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from "react";
+import { Button, Typography, List, ListItem, Card, Chip } from "@mui/joy";
+import { Grid, Paper } from "@mui/material";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import imageSrc from './images/march_madness_logo_auction.png';
-import { ReactComponent as CrownIcon } from './icons/crown.svg';
-import { ReactComponent as UserIcon } from './icons/user.svg';
+import imageSrc from "./images/march_madness_logo_auction.png";
+import { ReactComponent as CrownIcon } from "./icons/crown.svg";
+import { ReactComponent as UserIcon } from "./icons/user.svg";
 
 function LobbyPage() {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ function LobbyPage() {
     ws.onmessage = (event) => {
       if (event.data === "gameStarted") {
         // Navigate to the game/bid page when the game starts
-        navigate('/game', { state: { gameId, isCreator, playerName } });
+        navigate("/game", { state: { gameId, isCreator, playerName } });
       }
       else {
         const data = JSON.parse(event.data);
@@ -46,8 +46,8 @@ function LobbyPage() {
 
   return (
     <div id="outer-container">
-      <Paper elevation={1} sx={{marginLeft: '200px', marginRight: '200px', marginTop: 'calc(100vh - 800px)', marginBottom: 'calc(100vh - 800px)', padding: '10px', backgroundColor: '#fcfcfc'}}>
-        <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', height: 'calc(100vh - 170px)', minHeight: '100%' }}>
+      <Paper elevation={1} sx={{marginLeft: "200px", marginRight: "200px", marginTop: "calc(100vh - 800px)", marginBottom: "calc(100vh - 800px)", padding: "10px", backgroundColor: "#fcfcfc"}}>
+        <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", height: "calc(100vh - 170px)", minHeight: "100%" }}>
 
           {/* Left side */}
           <Grid item xs={4}>
@@ -59,13 +59,13 @@ function LobbyPage() {
                   {playerName ? `Welcome ${playerName}!` : ""}
                 </Typography>
                 <Typography level="h4" justifyContent="center">
-                  You are {isCreator ? 'the game creator' : 'a participant'}.
+                  You are {isCreator ? "the game creator" : "a participant"}.
                 </Typography>
               </Grid>
 
               {/* List of participants */}
               <Grid item>
-                <List variant="outlined" sx={{ minWidth: 240, borderRadius: 'sm' }}>
+                <List variant="outlined" sx={{ minWidth: 240, borderRadius: "sm" }}>
                   {participants.length > 0 ?
                     participants.map((participant, i) => {
                       // Calculate hue based on index
@@ -97,18 +97,18 @@ function LobbyPage() {
 
               {/* March Madness logo */}
               <Grid item>
-                <img src={imageSrc} alt="Central Game" style={{ maxWidth: '350px', margin: '20px 0' }} />
+                <img src={imageSrc} alt="Central Game" style={{ maxWidth: "350px", margin: "20px 0" }} />
               </Grid>
 
               {/* Game ID */}
-              <Grid container item spacing={2} sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }} >
+              <Grid container item spacing={2} sx={{ justifyContent: "center", alignItems: "center", flexDirection: "row" }} >
                 <Grid item>
                   <Typography level="h4">Your Room Code:</Typography>
                 </Grid>
 
                 <Grid item>
                   <Card variant="outlined">
-                    <Typography level="h4" sx={{ color: 'var(--primary-color)' }}>{gameId}</Typography>
+                    <Typography level="h4" sx={{ color: "var(--primary-color)" }}>{gameId}</Typography>
                   </Card>
                 </Grid>
               </Grid>
@@ -116,7 +116,7 @@ function LobbyPage() {
               {/* Start game button */}
               <Grid item>
                 {
-                  isCreator ? <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleStartGameClick}>Start Game</Button>
+                  isCreator ? <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleStartGameClick}>Start Game</Button>
                   : <Typography level="h4">Waiting for the host to start the game...</Typography>
                 }
               </Grid>

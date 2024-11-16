@@ -1,16 +1,16 @@
-import { Typography, List, ListItem, Chip } from '@mui/joy';
-import { Grid, Paper, Card, Fab, Snackbar, Alert } from '@mui/material';
-import { useLocation } from 'react-router-dom';
-import React, { useState, useEffect, useRef } from 'react';
+import { Typography, List, ListItem, Chip } from "@mui/joy";
+import { Grid, Paper, Card, Fab, Snackbar, Alert } from "@mui/material";
+import { useLocation } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
 
-import Bid from './Bid';
-import Bracket from './Bracket';
-import { TeamData } from './Utils'
-import { ReactComponent as CrownIcon } from './icons/crown.svg';
-import { ReactComponent as UserIcon } from './icons/user.svg';
+import Bid from "./Bid";
+import Bracket from "./Bracket";
+import { TeamData } from "./Utils"
+import { ReactComponent as CrownIcon } from "./icons/crown.svg";
+import { ReactComponent as UserIcon } from "./icons/user.svg";
 
-import './css/App.css';
-import './css/Fonts.css';
+import "./css/App.css";
+import "./css/Fonts.css";
 
 function GamePage() {
     const location = useLocation();
@@ -92,31 +92,31 @@ function GamePage() {
 
     return (
         <div id="outer-container">
-            <Paper elevation={1} sx={{height:'720px', width:'1400px', padding: '10px', backgroundColor: '#fcfcfc'}}>
-                <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', height: 'calc(100vh - 60px)', minHeight: '100%' }}>
+            <Paper elevation={1} sx={{height:"720px", width:"1400px", padding: "10px", backgroundColor: "#fcfcfc"}}>
+                <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", height: "calc(100vh - 60px)", minHeight: "100%" }}>
                     {/* Left side */}
                     <Grid item xs={10}>
-                        <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
 
                             {/* Team to bid on */}
-                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                            <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+                                <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
                                     <Grid item>
-                                        <Typography justifyContent="center" sx={{ color: 'var(--tertiary-color)', fontFamily: 'threeDim2', fontSize: '60px', marginTop: '-20px', marginBottom: '-20px' }}>
+                                        <Typography justifyContent="center" sx={{ color: "var(--tertiary-color)", fontFamily: "threeDim2", fontSize: "60px", marginTop: "-20px", marginBottom: "-20px" }}>
                                             {team.name}
                                         </Typography>
                                     </Grid>
                                     <Grid item>
-                                        <Typography justifyContent="center" sx={{ color: 'var(--tertiary-color)', fontSize: '40px', marginTop: '-38px', marginBottom: '-20px' }}>
-                                            ({team.seed})
+                                        <Typography justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "40px", marginTop: "-38px", marginBottom: "-20px" }}>
+                                            {team.seed ? `(${team.seed})`: ""}
                                         </Typography>
                                     </Grid>
                                 </Grid>
                             </Grid>
 
                             {/* Display bracket */}
-                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                <Card sx={{ height: '540px', width: '100%', padding: '10px', backgroundColor: 'white'}}>
+                            <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+                                <Card sx={{ height: "540px", width: "100%", padding: "10px", backgroundColor: "white"}}>
                                     {allTeams.length > 0 ?
                                         <Bracket all_teams={allTeams} selected_team={team}/>
                                         : <Typography>No teams available</Typography>
@@ -124,38 +124,38 @@ function GamePage() {
                                 </Card>
                             </Grid>
 
-                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                <Card sx={{ height: '70px', width: '100%', padding: '10px', backgroundColor: 'white'}}>
-                                    <Grid container sx={{ justifyContent: 'center', alignItems: 'center' }}>
+                            <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+                                <Card sx={{ height: "70px", width: "100%", padding: "10px", backgroundColor: "white"}}>
+                                    <Grid container sx={{ justifyContent: "center", alignItems: "center" }}>
 
                                         {/* Spacing */}
-                                        <Grid item xs={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}/>
+                                        <Grid item xs={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}/>
 
                                         {/* Countdown timer */}
-                                        <Grid item xs={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                            <Card sx={{ border: 5, height: '50px', width: '50px', backgroundColor: 'black', borderRadius: 0, borderColor: 'white'}}>
-                                                <Typography sx={{ color: countdown <= 5 ? "red" : "white", textAlign: 'center', fontFamily: 'clock', fontSize: '45px', my:'-10px' }}>
-                                                    {countdown.toString().padStart(2, '0')}
+                                        <Grid item xs={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+                                            <Card sx={{ border: 5, height: "50px", width: "50px", backgroundColor: "black", borderRadius: 0, borderColor: "white"}}>
+                                                <Typography sx={{ color: countdown <= 5 ? "red" : "white", textAlign: "center", fontFamily: "clock", fontSize: "45px", my:"-10px" }}>
+                                                    {countdown.toString().padStart(2, "0")}
                                                 </Typography>
                                             </Card>
                                         </Grid>
 
                                         {/* Bid */}
-                                        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                            <Grid container spacing={2} sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
-                                                <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                                    <Typography level="h4" sx={{justifyContent:'center', my:'-10px'}}>
+                                        <Grid item xs={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+                                            <Grid container spacing={2} sx={{ justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
+                                                <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+                                                    <Typography level="h4" sx={{justifyContent:"center", my:"-10px"}}>
                                                         Current bid: ${currentHighestBid.toFixed(2)}
                                                     </Typography>
                                                 </Grid>
-                                                <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                                <Grid item xs={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
                                                     <Bid gameId={gameId} player={playerName} currentHighestBid={currentHighestBid} team={`${team.name} (${team.seed})`}/>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
 
                                         {/* Spacing */}
-                                        <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}/>
+                                        <Grid item xs={2} sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}/>
 
                                     </Grid>
                                 </Card>
@@ -165,12 +165,12 @@ function GamePage() {
 
                     {/* Right side */}
                     <Grid item xs={2}>
-                        <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
 
                             {/* Participants */}
-                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                <Card sx={{ height:200, overflowY: 'auto', width: '100%', backgroundColor: 'white'}}>
-                                    <List sx={{ width: '100%' }}>
+                            <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+                                <Card sx={{ height:200, overflowY: "auto", width: "100%", backgroundColor: "white"}}>
+                                    <List sx={{ width: "100%" }}>
                                     {participants.length > 0 ?
                                         participants.map((participant, i) => {
                                         // Calculate hue based on index
@@ -181,18 +181,18 @@ function GamePage() {
                                             <React.Fragment key={i}>
                                             <ListItem>
                                                 {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={participantColor} width="20px" height="20px" />}
-                                                <Chip sx={{ padding: '0 20px', backgroundColor: 'var(--off-white-color)' }}>
+                                                <Chip sx={{ padding: "0 20px", backgroundColor: "var(--off-white-color)" }}>
                                                     <Typography sx={{ color: participantColor }}>
                                                         {participant}
                                                     </Typography>
-                                                    <Typography sx={{ fontSize: '12px' }}>
+                                                    <Typography sx={{ fontSize: "12px" }}>
                                                         Balance: $ {participantInfos[participant]["balance"].toFixed(2)}
                                                     </Typography>
-                                                    <Typography sx={{ fontSize: '12px' }}>
+                                                    <Typography sx={{ fontSize: "12px" }}>
                                                         Teams:
                                                     </Typography>
                                                     {participantInfos[participant]["teams"].map((temp_team:string, teamIndex:number) => (
-                                                        <Typography key={teamIndex} sx={{ marginLeft: '10px', fontSize: '12px' }}>
+                                                        <Typography key={teamIndex} sx={{ marginLeft: "10px", fontSize: "12px" }}>
                                                         - {temp_team}
                                                         </Typography>
                                                     ))}
@@ -208,16 +208,16 @@ function GamePage() {
                             </Grid>
 
                             {/* Remaining Teams */}
-                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                <Card sx={{ maxHeight: 510, overflowY: 'auto', width: '100%', backgroundColor: 'white'}}>
+                            <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+                                <Card sx={{ maxHeight: 510, overflowY: "auto", width: "100%", backgroundColor: "white"}}>
                                     <List sx={{ minWidth: 100, maxWidth: 300 }}>
                                         {remainingTeams.length > 0 ?
                                             remainingTeams.map((temp_team, i) => {
                                                 return (
                                                     <React.Fragment key={i}>
                                                         <ListItem>
-                                                            <Chip sx={{ backgroundColor: 'var(--off-white-color)' }}>
-                                                                <Typography sx={{ color: "black", fontSize: '12px' }}>
+                                                            <Chip sx={{ backgroundColor: "var(--off-white-color)" }}>
+                                                                <Typography sx={{ color: "black", fontSize: "12px" }}>
                                                                     {temp_team.name} ({temp_team.seed})
                                                                 </Typography>
                                                             </Chip>
@@ -234,9 +234,9 @@ function GamePage() {
                     </Grid>
 
                     {/* Floating button showing number of teams remaining */}
-                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right', marginTop: '-80px' }}>
-                        <Fab variant="extended" size="small" sx={{backgroundColor:'var(--off-white-color)'}}>
-                            <Typography justifyContent="center" sx={{fontSize: '12px'}}><b>Teams Remaining: {remainingTeams.length}</b></Typography>
+                    <Grid item xs={12} sx={{ display: "flex", justifyContent: "right", alignItems: "right", marginTop: "-80px" }}>
+                        <Fab variant="extended" size="small" sx={{backgroundColor:"var(--off-white-color)"}}>
+                            <Typography justifyContent="center" sx={{fontSize: "12px"}}><b>Teams Remaining: {remainingTeams.length}</b></Typography>
                         </Fab>
                     </Grid>
 
@@ -244,7 +244,7 @@ function GamePage() {
                     <Snackbar
                         open={openSnackbar}
                         onClose={handleCloseSnackbar}
-                        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                         >
                         <Alert
                             elevation={6}
