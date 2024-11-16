@@ -6,20 +6,42 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Ale
 import imageSrc from "./images/march_madness_logo_auction.png";
 import "./css/Fonts.css";
 
+const DIALOG_MODE = {
+  CREATE: "CREATE",
+  JOIN: "JOIN",
+  VIEW: "VIEW"
+};
+
 function HomePage() {
   const navigate = useNavigate();
-  const [isCreator, setIsCreator] = useState(false);
+  const [dialogMode, setDialogMode] = useState(DIALOG_MODE.VIEW);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [playerName, setPlayerName] = useState("");
-  const [joinGameId, setJoinGameId] = useState("");
-  const [joinGameError, setJoinGameError] = useState("");
+  const [gameId, setGameId] = useState("");
+  const [dialogError, setDialogError] = useState("");
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setDialogError("");
+  };
 
   const handleCreateGameClick = () => {
-    setIsCreator(true);
-    setIsDialogOpen(true); // Open the join game dialog
+    setDialogMode(DIALOG_MODE.CREATE);
+    setIsDialogOpen(true);
+  };
+
+  const handleJoinGameClick = () => {
+    setDialogMode(DIALOG_MODE.JOIN);
+    setIsDialogOpen(true);
+  };
+
+  const handleViewGameClick = () => {
+    setDialogMode(DIALOG_MODE.VIEW);
+    setIsDialogOpen(true);
   };
 
   const handleCreateGame = async (event: React.FormEvent) => {
+    setDialogError("");
     try {
       const response = await fetch("http://localhost:8000/create-game/", {
         method: "POST",
@@ -33,7 +55,9 @@ function HomePage() {
         const data = await response.json();
         const createdGameId = data.id;
         navigate("/lobby", { state: { gameId: createdGameId, isCreator: true, playerName: playerName } });
-      } else {
+      }
+      // Handle error response
+      else {
         console.error("Failed to create game:", response.statusText);
       }
     } catch (error) {
@@ -41,34 +65,52 @@ function HomePage() {
     }
   };
 
-  const handleJoinGameClick = () => {
-    setIsCreator(false);
-    setIsDialogOpen(true); // Open the join game dialog
-  };
-
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false); // Close the dialog
-  };
-
   const handleJoinGame = async (event: React.FormEvent) => {
-    setJoinGameError("");
+    setDialogError("");
     try {
       const response = await fetch("http://localhost:8000/join-game/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ gameId: joinGameId, player: playerName }),
+        body: JSON.stringify({ gameId: gameId, player: playerName }),
       });
 
       if (response.ok) {
-        navigate("/lobby", { state: { gameId: joinGameId, isCreator: false, playerName: playerName } });
-        setIsDialogOpen(false); // Close the dialog after handling the join
-      } else {
-        // Handle error response
-        const responseData = await response.json(); // Assuming the error message is returned as JSON
+        navigate("/lobby", { state: { gameId: gameId, isCreator: false, playerName: playerName } });
+        setIsDialogOpen(false);
+      }
+      // Handle error response
+      else {
+        const responseData = await response.json();
         console.error("Error joining game:", responseData.detail);
-        setJoinGameError(responseData.detail);
+        setDialogError(responseData.detail);
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+    }
+  };
+
+  const handleViewGame = async (event: React.FormEvent) => {
+    setDialogError("");
+    try {
+      const response = await fetch("http://localhost:8000/view-game/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ gameId: gameId }),
+      });
+
+      if (response.ok) {
+        navigate("/view", { state: { gameId: gameId } });
+        setIsDialogOpen(false);
+      }
+      // Handle error response
+      else {
+        const responseData = await response.json();
+        console.error("Error viewing game:", responseData.detail);
+        setDialogError(responseData.detail);
       }
     } catch (error) {
       console.error("Network error:", error);
@@ -97,35 +139,34 @@ function HomePage() {
 
       {/* View game button */}
       <Grid item>
-        <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }}>View Game</Button> {/* Implement as needed */}
+        <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleViewGameClick}>View Game</Button>
       </Grid>
 
-      {/* Dialog for Join Game */}
+      {/* Dialog to prompt user*/}
       <Dialog maxWidth="lg" open={isDialogOpen} onClose={handleCloseDialog}>
 
+        {/* Dialog title */}
         <DialogTitle sx={{ textAlign: "center", fontFamily: "doubleFeature", }}>
-          <b>{isCreator ? "CREATE GAME" : "JOIN GAME"}</b>
+          <b>{`${dialogMode} GAME`}</b>
         </DialogTitle>
 
         <DialogContent>
-          {
-            joinGameError ? <Alert severity="error">{joinGameError}</Alert>
-              : <></>
-          }
+          {/* Display game error is any */}
+          {dialogError ? <Alert severity="error">{dialogError}</Alert> : <></>}
 
-          <TextField fullWidth label="Your Name" value={playerName} onChange={(e) => setPlayerName(e.target.value)} margin="dense" />
+          {/* Enter user name to create or join game */}
+          {(dialogMode === DIALOG_MODE.CREATE || dialogMode === DIALOG_MODE.JOIN) ? <TextField fullWidth label="Your Name" value={playerName} onChange={(e) => setPlayerName(e.target.value)} margin="dense" /> : <></>}
 
-          {isCreator ? <></> :
-            <TextField fullWidth label="Game ID" value={joinGameId} onChange={(e) => setJoinGameId(e.target.value)} margin="dense" />
-          }
+          {/* Enter game id to join */}
+          {(dialogMode === DIALOG_MODE.JOIN || dialogMode === DIALOG_MODE.VIEW) ? <TextField fullWidth label="Game ID" value={gameId} onChange={(e) => setGameId(e.target.value)} margin="dense" /> : <></>}
         </DialogContent>
+
         <DialogActions sx={{ justifyContent: "center" }}>
           <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleCloseDialog}>Cancel</Button>
 
-          {isCreator ?
-            <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleCreateGame}>Create</Button>
-            : <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleJoinGame}>Join</Button>
-          }
+          {dialogMode === DIALOG_MODE.CREATE ? <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleCreateGame}>Create</Button> : <></>}
+          {dialogMode === DIALOG_MODE.JOIN ? <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleJoinGame}>Join</Button> : <></>}
+          {dialogMode === DIALOG_MODE.VIEW ? <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleViewGame}>View</Button> : <></>}
         </DialogActions>
       </Dialog>
     </Grid>
