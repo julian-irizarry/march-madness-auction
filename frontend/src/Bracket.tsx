@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Typography, Grid, Divider, Paper } from '@mui/material';
-import GenerateRegionBracketData, { TeamData, Match } from './Utils'
+import GenerateRegionBracketData, { TeamData, Match, MapTeamToUrlTeam } from './Utils'
 
 interface MatchProps {
     match: Match
@@ -9,19 +9,42 @@ interface MatchProps {
 function MatchComponent({ match }: MatchProps) {
     const is_determined = match.participants[0];
 
+    const team1Logo = is_determined ? `https://i.turner.ncaa.com/sites/default/files/images/logos/schools/bgl/${MapTeamToUrlTeam.get(match.participants[0].name)}.svg` : '';
+    const team2Logo = is_determined ? `https://i.turner.ncaa.com/sites/default/files/images/logos/schools/bgl/${MapTeamToUrlTeam.get(match.participants[1].name)}.svg` : '';
+
     return (
-        <Card sx={{ margin:0.5, padding:1, border:1, borderRadius:0, borderColor: 'var(--light-grey-color)', width: match.participants[0] ? '120px' : '30px' }}>
-            <Typography variant="body2" justifyContent="center" sx={{ color: is_determined ? 'var(--tertiary-color)' : 'gray', fontSize: '10px' }}>
-                {
-                    is_determined ? `${match.participants[0].name} (${match.participants[0].seed})` : "TBD"
-                }
-            </Typography>
+        <Card sx={{ margin:0.5, padding:1, border:1, borderRadius:0, borderColor: 'var(--light-grey-color)', width: match.participants[0] ? '140px' : '30px' }}>
+            <Grid sx={{ display: 'flex', justifyContent: 'left', alignItems: 'left' }}>
+                {is_determined && (
+                    <img
+                    src={team1Logo}
+                    alt={`${match.participants[0].name} logo`}
+                    style={{ width: '20px', height: '20px', marginRight: '10px' }}
+                    />
+                )}
+                <Typography variant="body2" justifyContent="center" sx={{ color: is_determined ? 'var(--tertiary-color)' : 'gray', fontSize: '10px' }}>
+                    {
+                        is_determined ? `${match.participants[0].name} (${match.participants[0].seed})` : "TBD"
+                    }
+                </Typography>
+            </Grid>
+
             <Divider/>
-            <Typography variant="body2" justifyContent="center" sx={{ color: is_determined ? 'var(--tertiary-color)' : 'gray', fontSize: '10px' }}>
-                {
-                    is_determined ? `${match.participants[1].name} (${match.participants[1].seed})` : "TBD"
-                }
-            </Typography>
+
+            <Grid sx={{ display: 'flex', justifyContent: 'left', alignItems: 'left' }}>
+                {is_determined && (
+                    <img
+                    src={team2Logo}
+                    alt={`${match.participants[1].name} logo`}
+                    style={{ width: '20px', height: '20px', marginRight: '10px' }}
+                    />
+                )}
+                <Typography variant="body2" justifyContent="center" sx={{ color: is_determined ? 'var(--tertiary-color)' : 'gray', fontSize: '10px' }}>
+                    {
+                        is_determined ? `${match.participants[1].name} (${match.participants[1].seed})` : "TBD"
+                    }
+                </Typography>
+            </Grid>
         </Card>
     );
 }
@@ -48,10 +71,10 @@ function Region(props: RegionProps) {
     const roundsToRender = props.reverse ? sortedRounds.reverse() : sortedRounds;
 
     return (
-        <Grid container spacing={2}  sx={{ marginTop:3, marginBottom:3, display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+        <Grid container spacing={2} sx={{ marginTop:3, marginBottom:3, display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
             {roundsToRender.map(([round, matchArr]) => (
                 <Grid item key={round}>
-                    <Grid container direction="column" spacing={7 * (5 - matchArr.length)} justifyContent="center" alignItems="center">
+                    <Grid container direction="column" spacing={10 * (5 - matchArr.length)} justifyContent="center" alignItems="center">
                         {matchArr.map((val) => (
                             <Grid item key={`${round}_${val.id}`}>
                                 {
@@ -99,7 +122,7 @@ function Bracket(props: BracketProps) {
                     {
                         index == 1 ? 
                         
-                        <Grid container key={key} xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
+                        <Grid container key={"finals"} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
                             <Grid item xs={2}></Grid>
                             <Grid item xs={2}>
                                 <Grid item sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
