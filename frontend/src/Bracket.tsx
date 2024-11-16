@@ -4,24 +4,25 @@ import GenerateRegionBracketData, { TeamData, Match, MapTeamToUrlTeam } from './
 
 interface MatchProps {
     match: Match
+    highlight: boolean
 }
 
-function MatchComponent({ match }: MatchProps) {
-    const is_determined = match.participants[0];
+function MatchComponent(props: MatchProps) {
+    const is_determined = props.match.participants[0];
 
-    const team1Logo = is_determined ? `https://i.turner.ncaa.com/sites/default/files/images/logos/schools/bgl/${MapTeamToUrlTeam.get(match.participants[0].name)}.svg` : '';
-    const team2Logo = is_determined ? `https://i.turner.ncaa.com/sites/default/files/images/logos/schools/bgl/${MapTeamToUrlTeam.get(match.participants[1].name)}.svg` : '';
+    const team1Logo = is_determined ? `https://i.turner.ncaa.com/sites/default/files/images/logos/schools/bgl/${MapTeamToUrlTeam.get(props.match.participants[0].name)}.svg` : '';
+    const team2Logo = is_determined ? `https://i.turner.ncaa.com/sites/default/files/images/logos/schools/bgl/${MapTeamToUrlTeam.get(props.match.participants[1].name)}.svg` : '';
 
     return (
-        <Card sx={{ margin: 0.5, padding: 1, border: 1, borderRadius: 0, borderColor: 'var(--light-grey-color)', width: match.participants[0] ? '140px' : '30px' }}>
+        <Card sx={{ margin: 0.5, padding: 1, border: props.highlight ? 3 : 1, borderRadius: 0, borderColor: props.highlight ? 'var(--neon-yellow-color)' : 'var(--light-grey-color)', width: props.match.participants[0] ? '140px' : '30px' }}>
             <Grid sx={{ display: 'flex', justifyContent: 'left', alignItems: 'left' }}>
 
                 {/* Team logo */}
-                {is_determined && (<img src={team1Logo} alt={`${match.participants[0].name} logo`} style={{ width: '20px', height: '20px', marginRight: '10px' }} />)}
+                {is_determined && (<img src={team1Logo} alt={`${props.match.participants[0].name} logo`} style={{ width: '20px', height: '20px', marginRight: '10px' }} />)}
 
                 {/* Team name and seed */}
                 <Typography variant="body2" justifyContent="center" sx={{ color: is_determined ? 'var(--tertiary-color)' : 'gray', fontSize: '10px' }}>
-                    {is_determined ? `${match.participants[0].name} (${match.participants[0].seed})` : "TBD"}
+                    {is_determined ? `${props.match.participants[0].name} (${props.match.participants[0].seed})` : "TBD"}
                 </Typography>
             </Grid>
 
@@ -30,11 +31,11 @@ function MatchComponent({ match }: MatchProps) {
             <Grid sx={{ display: 'flex', justifyContent: 'left', alignItems: 'left' }}>
 
                 {/* Team logo */}
-                {is_determined && (<img src={team2Logo} alt={`${match.participants[1].name} logo`} style={{ width: '20px', height: '20px', marginRight: '10px' }} />)}
+                {is_determined && (<img src={team2Logo} alt={`${props.match.participants[1].name} logo`} style={{ width: '20px', height: '20px', marginRight: '10px' }} />)}
 
                 {/* Team name and seed */}
                 <Typography variant="body2" justifyContent="center" sx={{ color: is_determined ? 'var(--tertiary-color)' : 'gray', fontSize: '10px' }}>
-                    {is_determined ? `${match.participants[1].name} (${match.participants[1].seed})` : "TBD"}
+                    {is_determined ? `${props.match.participants[1].name} (${props.match.participants[1].seed})` : "TBD"}
                 </Typography>
             </Grid>
         </Card>
@@ -45,6 +46,7 @@ interface RegionProps {
     region_name: string;
     region_teams: TeamData[];
     reverse: boolean
+    selected_team: TeamData|null
 }
 
 function Region(props: RegionProps) {
@@ -86,7 +88,7 @@ function Region(props: RegionProps) {
                                 }
 
                                 {/* Display match */}
-                                <MatchComponent match={val} />
+                                <MatchComponent match={val} highlight={!!(props.selected_team && val.participants[0] && val.participants[1] && (props.selected_team.name === val.participants[0].name || props.selected_team.name === val.participants[1].name))}/>
                             </Grid>
                         ))}
                     </Grid>
@@ -98,6 +100,7 @@ function Region(props: RegionProps) {
 
 interface BracketProps {
     all_teams: TeamData[]
+    selected_team: TeamData
 }
 
 function Bracket(props: BracketProps) {
@@ -121,7 +124,7 @@ function Bracket(props: BracketProps) {
                         {/* Display regional bracket */}
                         <Grid item key={key} xs={6}>
                             <Paper elevation={0} sx={{ borderRadius: 0 }}>
-                                <Region region_name={key} region_teams={val} reverse={index % 2 === 1} />
+                                <Region region_name={key} region_teams={val} reverse={index % 2 === 1} selected_team={props.selected_team.region == key ? props.selected_team : null} />
                             </Paper>
                         </Grid>
 

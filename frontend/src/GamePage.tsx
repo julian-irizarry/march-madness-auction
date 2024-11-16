@@ -118,7 +118,7 @@ function GamePage() {
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                 <Card sx={{ height: '540px', width: '100%', padding: '10px', backgroundColor: 'white'}}>
                                     {allTeams.length > 0 ?
-                                        <Bracket all_teams={allTeams}/>
+                                        <Bracket all_teams={allTeams} selected_team={team}/>
                                         : <Typography>No teams available</Typography>
                                     }
                                 </Card>
