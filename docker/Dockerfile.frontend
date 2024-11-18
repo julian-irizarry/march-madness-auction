@@ -21,4 +21,4 @@ EXPOSE 80
 
 # # Install serve and serve your React app
 RUN npm install -g serve
-CMD ["serve", "-s", "build", "-l", "80"]
+CMD ["serve", "-s", "build", "-l", "0.0.0.0:80"]
