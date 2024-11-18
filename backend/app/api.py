@@ -87,7 +87,6 @@ async def finalize_bid(game_id: str):
         await ws.send_json({"countdown": gameTracker.get_current_countdown(game_id)})
         await ws.send_json({"players": jsonify_dict(gameTracker.get_all_players(game_id))})
         await ws.send_json({"remaining": jsonify_list(gameTracker.get_remaining_teams(game_id))})
-        await ws.send_json({"all_teams": jsonify_list(gameTracker.get_all_teams())})
 
 
 @app.websocket("/ws/{game_id}")
@@ -168,6 +167,20 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
                 game_connections[game_id].remove(websocket)
                 print(f"WebSocket disconnected: {websocket}")
 
+    async def send_match_results():
+        try:
+            while True:
+                if websocket.application_state == WebSocketState.CONNECTED:
+                    await websocket.send_json({"match_results": jsonify_list(gameTracker.match_results)})
+                else:
+                    break  # Stop sending if the connection is no longer active
+                await asyncio.sleep(10)
+        except WebSocketDisconnect:
+            # Handle the WebSocket disconnection
+            if websocket in game_connections[game_id]:
+                game_connections[game_id].remove(websocket)
+                print(f"WebSocket disconnected: {websocket}")
+
     async def listen_for_messages():
         try:
             while True:
@@ -187,11 +200,12 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
     send_team_task = asyncio.create_task(send_team())
     send_remaining_task = asyncio.create_task(send_remaining())
     send_all_teams_task = asyncio.create_task(send_all_teams())
+    send_match_results_task = asyncio.create_task(send_match_results())
     listen_task = asyncio.create_task(listen_for_messages())
 
     # Wait for either task to complete
     done, pending = await asyncio.wait(
-        [send_participant_task, send_bid_task, listen_task, send_team_task, send_remaining_task, send_all_teams_task],
+        [send_participant_task, send_bid_task, listen_task, send_team_task, send_remaining_task, send_all_teams_task, send_match_results_task],
         return_when=asyncio.FIRST_COMPLETED,
     )
 

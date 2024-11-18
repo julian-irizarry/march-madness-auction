@@ -17,9 +17,10 @@ export interface Match {
     nextMatchId: number | null;
     roundName: string;
     participants: TeamInfo[];
+    winner?: string
 }
 
-function GenerateRegionBracketData(regionTeams: TeamInfo[]): Match[] {
+export function GenerateRegionBracketData(regionTeams: TeamInfo[]): Match[] {
     let matchId = 1;
     const matches: Match[] = [];
     const roundMatches: { [round: number]: Match[] } = {};
@@ -85,4 +86,8 @@ function GenerateRegionBracketData(regionTeams: TeamInfo[]): Match[] {
     return matches;
 }
 
-export default GenerateRegionBracketData;
+
+export function IntegrateMatchResults(bracketMatches:Match[], matchResults:Match[]): Match[] {
+    
+    return bracketMatches;
+}

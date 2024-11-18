@@ -1,7 +1,7 @@
 import random
 
 from app.types.types import PlayerInfo, TeamInfo, GameInfo, BidModel, INITIAL_BID, INITIAL_COUNTDOWN
-from app.bracket import get_teams
+from app.bracket import get_teams, get_matches
 
 
 class GameTracker:
@@ -9,6 +9,7 @@ class GameTracker:
         self.games: dict[str, GameInfo] = {}
         self.teams_master = get_teams(year, month, day)
         self.teams_master.sort(key=lambda x: int(x.seed))
+        self.match_results = get_matches(year, month, day)
 
     def add_game(self, gameId: str, creator: str) -> None:
         creator_info = PlayerInfo(

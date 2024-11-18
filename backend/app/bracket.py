@@ -78,7 +78,7 @@ def get_matches(year: int, month: str, days: tuple[str, str]) -> list[MatchInfo]
                 home_team = game.get("game").get("home")
                 region = game.get("game").get("bracketRegion")
                 start_date = game.get("game").get("startDate")
-                bracket_round = game.get("game").get("roundName")
+                bracket_round = game.get("game").get("bracketRound")
 
                 away_team_info = TeamInfo(
                     shortName=away_team.get("names").get("short"),

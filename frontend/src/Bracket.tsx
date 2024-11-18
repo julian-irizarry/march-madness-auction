@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, Typography, Grid, Divider, Paper } from "@mui/material";
-import GenerateRegionBracketData, { TeamInfo, Match } from "./Utils"
+import { GenerateRegionBracketData, IntegrateMatchResults, TeamInfo, Match } from "./Utils"
 
 interface MatchProps {
   match: Match
@@ -114,10 +114,15 @@ interface RegionProps {
   region_teams: TeamInfo[];
   reverse: boolean
   selected_team: TeamInfo | null
+  match_results?: Match[] | null
 }
 
 function Region(props: RegionProps) {
   let matches = GenerateRegionBracketData(props.region_teams);
+
+  if (props.match_results) {
+    matches = IntegrateMatchResults(matches, props.match_results);
+  }
 
   // Sort matches by rounds 
   const rounds_sorted_matches = new Map<string, Match[]>();
@@ -167,7 +172,8 @@ function Region(props: RegionProps) {
 
 interface BracketProps {
   all_teams: TeamInfo[]
-  selected_team: TeamInfo
+  selected_team?: TeamInfo
+  match_results?: Match[]
 }
 
 function Bracket(props: BracketProps) {
@@ -181,6 +187,19 @@ function Bracket(props: BracketProps) {
     region_sorted_teams.get(item.region)!.push(item);
   });
 
+  // Sort match results by regions
+  const region_sorted_match_results = new Map<string, Match[]>();
+  if (props.match_results) {
+    props.match_results.forEach((item) => {
+      if (item.participants[0].region === item.participants[1].region) {
+        if (!region_sorted_match_results.has(item.participants[0].region)) {
+          region_sorted_match_results.set(item.participants[0].region, []);
+        }
+        region_sorted_match_results.get(item.participants[0].region)!.push(item);
+      }
+    })
+  }
+
   return (
     <>
       {/* Display all 4 regional brackets */}
@@ -191,7 +210,7 @@ function Bracket(props: BracketProps) {
             {/* Display regional bracket */}
             <Grid item xs={6}>
               <Paper elevation={0} sx={{ borderRadius: 0 }}>
-                <Region region_name={key} region_teams={val} reverse={index % 2 === 1} selected_team={props.selected_team.region === key ? props.selected_team : null} />
+                <Region region_name={key} region_teams={val} reverse={index % 2 === 1} selected_team={(props.selected_team && props.selected_team.region === key) ? props.selected_team : null} match_results={region_sorted_match_results.size > 0 ? region_sorted_match_results.get(key) : null}/>
               </Paper>
             </Grid>
 
