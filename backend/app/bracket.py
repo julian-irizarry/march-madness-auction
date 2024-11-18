@@ -20,7 +20,7 @@ def get_teams(year: int, month: str, days: tuple[str, str]) -> list[list[str]]:
     teams = []
     for day in days:
         url: str = f"https://data.ncaa.com/casablanca/scoreboard/basketball-men/d1/{year}/{month}/{day}/scoreboard.json"
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
 
         if response.status_code == 200:
             data = response.json()
