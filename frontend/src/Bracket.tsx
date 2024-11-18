@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, Typography, Grid, Divider, Paper } from "@mui/material";
-import GenerateRegionBracketData, { TeamData, Match, MapTeamToUrlTeam } from "./Utils"
+import GenerateRegionBracketData, { TeamInfo, Match } from "./Utils"
 
 interface MatchProps {
   match: Match
@@ -11,8 +11,8 @@ interface MatchProps {
 function MatchComponent(props: MatchProps) {
   const is_determined = props.match.participants[0];
 
-  const team1Logo = is_determined ? `https://i.turner.ncaa.com/sites/default/files/images/logos/schools/bgl/${MapTeamToUrlTeam.get(props.match.participants[0].name)}.svg` : "";
-  const team2Logo = is_determined ? `https://i.turner.ncaa.com/sites/default/files/images/logos/schools/bgl/${MapTeamToUrlTeam.get(props.match.participants[1].name)}.svg` : "";
+  const team1Logo = is_determined ? `https://i.turner.ncaa.com/sites/default/files/images/logos/schools/bgl/${props.match.participants[0].urlName}.svg` : "";
+  const team2Logo = is_determined ? `https://i.turner.ncaa.com/sites/default/files/images/logos/schools/bgl/${props.match.participants[1].urlName}.svg` : "";
 
   return (
     <Card sx={{ margin: 0.5, padding: 1, border: props.highlight ? 3 : 1, borderRadius: 0, borderColor: props.highlight ? "var(--neon-yellow-color)" : "var(--light-grey-color)", width: props.match.participants[0] ? "180px" : "30px" }}>
@@ -23,7 +23,7 @@ function MatchComponent(props: MatchProps) {
               {/* Team name */}
               <Grid item xs={6} sx={{ display: "flex", justifyContent: "right", alignItems: "right" }}>
                 <Typography variant="body2" justifyContent="right" sx={{ color: is_determined ? "var(--tertiary-color)" : "gray", fontSize: "10px" }}>
-                  {is_determined ? props.match.participants[0].name : "TBD"}
+                  {is_determined ? props.match.participants[0].shortName : "TBD"}
                 </Typography>
               </Grid>
               <Grid item xs={2} sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}>
@@ -34,14 +34,14 @@ function MatchComponent(props: MatchProps) {
               </Grid>
               <Grid item xs={2} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                 {/* Team logo */}
-                {is_determined && (<img src={team1Logo} alt={`${props.match.participants[0].name} logo`} style={{ width: "20px", height: "20px" }} />)}
+                {is_determined && (<img src={team1Logo} alt={`${props.match.participants[0].shortName} logo`} style={{ width: "20px", height: "20px" }} />)}
               </Grid>
             </>
             :
             <>
               <Grid item xs={2} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                 {/* Team logo */}
-                {is_determined && (<img src={team1Logo} alt={`${props.match.participants[0].name} logo`} style={{ width: "20px", height: "20px" }} />)}
+                {is_determined && (<img src={team1Logo} alt={`${props.match.participants[0].shortName} logo`} style={{ width: "20px", height: "20px" }} />)}
               </Grid>
               <Grid item xs={2} sx={{ display: "flex", justifyContent: "right", alignItems: "right" }}>
                 {/* Team seed */}
@@ -52,7 +52,7 @@ function MatchComponent(props: MatchProps) {
               {/* Team name */}
               <Grid item xs={6} sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}>
                 <Typography variant="body2" justifyContent="left" sx={{ color: is_determined ? "var(--tertiary-color)" : "gray", fontSize: "10px" }}>
-                  {is_determined ? props.match.participants[0].name : "TBD"}
+                  {is_determined ? props.match.participants[0].shortName : "TBD"}
                 </Typography>
               </Grid>
             </>
@@ -70,7 +70,7 @@ function MatchComponent(props: MatchProps) {
               {/* Team name */}
               <Grid item xs={6} sx={{ display: "flex", justifyContent: "right", alignItems: "right" }}>
                 <Typography variant="body2" justifyContent="right" sx={{ color: is_determined ? "var(--tertiary-color)" : "gray", fontSize: "10px" }}>
-                  {is_determined ? props.match.participants[1].name : "TBD"}
+                  {is_determined ? props.match.participants[1].shortName : "TBD"}
                 </Typography>
               </Grid>
               <Grid item xs={2} sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}>
@@ -81,14 +81,14 @@ function MatchComponent(props: MatchProps) {
               </Grid>
               <Grid item xs={2} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                 {/* Team logo */}
-                {is_determined && (<img src={team2Logo} alt={`${props.match.participants[1].name} logo`} style={{ width: "20px", height: "20px" }} />)}
+                {is_determined && (<img src={team2Logo} alt={`${props.match.participants[1].shortName} logo`} style={{ width: "20px", height: "20px" }} />)}
               </Grid>
             </>
             :
             <>
               <Grid item xs={2} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                 {/* Team logo */}
-                {is_determined && (<img src={team2Logo} alt={`${props.match.participants[1].name} logo`} style={{ width: "20px", height: "20px" }} />)}
+                {is_determined && (<img src={team2Logo} alt={`${props.match.participants[1].shortName} logo`} style={{ width: "20px", height: "20px" }} />)}
               </Grid>
               <Grid item xs={2} sx={{ display: "flex", justifyContent: "right", alignItems: "right" }}>
                 {/* Team seed */}
@@ -99,7 +99,7 @@ function MatchComponent(props: MatchProps) {
               {/* Team name */}
               <Grid item xs={6} sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}>
                 <Typography variant="body2" justifyContent="left" sx={{ color: is_determined ? "var(--tertiary-color)" : "gray", fontSize: "10px" }}>
-                  {is_determined ? props.match.participants[1].name : "TBD"}
+                  {is_determined ? props.match.participants[1].shortName : "TBD"}
                 </Typography>
               </Grid>
             </>
@@ -111,9 +111,9 @@ function MatchComponent(props: MatchProps) {
 
 interface RegionProps {
   region_name: string;
-  region_teams: TeamData[];
+  region_teams: TeamInfo[];
   reverse: boolean
-  selected_team: TeamData | null
+  selected_team: TeamInfo | null
 }
 
 function Region(props: RegionProps) {
@@ -122,10 +122,10 @@ function Region(props: RegionProps) {
   // Sort matches by rounds 
   const rounds_sorted_matches = new Map<string, Match[]>();
   matches.forEach((item) => {
-    if (!rounds_sorted_matches.has(item.tournamentRoundText)) {
-      rounds_sorted_matches.set(item.tournamentRoundText, []);
+    if (!rounds_sorted_matches.has(item.roundName)) {
+      rounds_sorted_matches.set(item.roundName, []);
     }
-    rounds_sorted_matches.get(item.tournamentRoundText)!.push(item);
+    rounds_sorted_matches.get(item.roundName)!.push(item);
   });
 
   // Reverse bracket
@@ -155,7 +155,7 @@ function Region(props: RegionProps) {
                 }
 
                 {/* Display match */}
-                <MatchComponent match={val} reverse={props.reverse} highlight={!!(props.selected_team && val.participants[0] && val.participants[1] && (props.selected_team.name === val.participants[0].name || props.selected_team.name === val.participants[1].name))} />
+                <MatchComponent match={val} reverse={props.reverse} highlight={!!(props.selected_team && val.participants[0] && val.participants[1] && (props.selected_team.shortName === val.participants[0].shortName || props.selected_team.shortName === val.participants[1].shortName))} />
               </Grid>
             ))}
           </Grid>
@@ -166,14 +166,14 @@ function Region(props: RegionProps) {
 }
 
 interface BracketProps {
-  all_teams: TeamData[]
-  selected_team: TeamData
+  all_teams: TeamInfo[]
+  selected_team: TeamInfo
 }
 
 function Bracket(props: BracketProps) {
 
   // Sort teams by regions
-  const region_sorted_teams = new Map<string, TeamData[]>();
+  const region_sorted_teams = new Map<string, TeamInfo[]>();
   props.all_teams.forEach((item) => {
     if (!region_sorted_teams.has(item.region)) {
       region_sorted_teams.set(item.region, []);
@@ -187,9 +187,9 @@ function Bracket(props: BracketProps) {
       <Grid container spacing={0} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", overflowY: "auto", maxHeight: "70vh" }}>
         {Array.from(region_sorted_teams.entries()).map(([key, val], index) => (
 
-          <>
+          <React.Fragment key={key}>
             {/* Display regional bracket */}
-            <Grid item key={key} xs={6}>
+            <Grid item xs={6}>
               <Paper elevation={0} sx={{ borderRadius: 0 }}>
                 <Region region_name={key} region_teams={val} reverse={index % 2 === 1} selected_team={props.selected_team.region === key ? props.selected_team : null} />
               </Paper>
@@ -256,7 +256,7 @@ function Bracket(props: BracketProps) {
                 :
                 <></>
             }
-          </>
+          </React.Fragment>
         ))}
       </Grid>
     </>

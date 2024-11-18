@@ -1,11 +1,13 @@
 export interface PlayerInfo {
+    name: string
     gameId: string
     balance: number
     teams: string[]
 }
 
-export interface TeamData {
-    name: string;
+export interface TeamInfo {
+    shortName: string
+    urlName: string
     seed: number;
     region: string;
 }
@@ -13,24 +15,24 @@ export interface TeamData {
 export interface Match {
     id: number;
     nextMatchId: number | null;
-    tournamentRoundText: string;
-    participants: TeamData[];
+    roundName: string;
+    participants: TeamInfo[];
 }
 
-function GenerateRegionBracketData(regionTeams: TeamData[]): Match[] {
+function GenerateRegionBracketData(regionTeams: TeamInfo[]): Match[] {
     let matchId = 1;
     const matches: Match[] = [];
     const roundMatches: { [round: number]: Match[] } = {};
 
     const createMatch = (
-        participants: TeamData[],
+        participants: TeamInfo[],
         round: number,
         nextMatchId: number | null
     ): Match => {
         const match: Match = {
             id: matchId++,
             nextMatchId,
-            tournamentRoundText: `Round ${round}`,
+            roundName: `Round ${round}`,
             participants,
         };
         matches.push(match);
@@ -84,70 +86,3 @@ function GenerateRegionBracketData(regionTeams: TeamData[]): Match[] {
 }
 
 export default GenerateRegionBracketData;
-
-export const MapTeamToUrlTeam = new Map<string, string>([
-    ["Akron", "akron"],
-    ["Alabama", "alabama"],
-    ["Arizona", "arizona"],
-    ["Auburn", "auburn"],
-    ["Baylor", "baylor"],
-    ["BYU", "byu"],
-    ["Clemson", "clemson"],
-    ["Col. of Charleston", "col-of-charleston"],
-    ["Colgate", "colgate"],
-    ["Colorado St.", "colorado-st"],
-    ["Colorado", "colorado"],
-    ["Creighton", "creighton"],
-    ["Dayton", "dayton"],
-    ["Drake", "drake"],
-    ["Duke", "duke"],
-    ["Duquesne", "duquesne"],
-    ["Fla. Atlantic", "fla-atlantic"],
-    ["Florida", "florida"],
-    ["Gonzaga", "gonzaga"],
-    ["Grambling", "grambling"],
-    ["Grand Canyon", "grand-canyon"],
-    ["Houston", "houston"],
-    ["Illinois", "illinois"],
-    ["Iowa St.", "iowa-st"],
-    ["James Madison", "james-madison"],
-    ["Kansas", "kansas"],
-    ["Kentucky", "kentucky"],
-    ["Long Beach St.", "long-beach-st"],
-    ["Longwood", "longwood"],
-    ["Marquette", "marquette"],
-    ["McNeese", "mcneese"],
-    ["Michigan St.", "michigan-st"],
-    ["Mississippi St.", "mississippi-st"],
-    ["Morehead St.", "morehead-st"],
-    ["NC State", "north-carolina-st"],
-    ["Nebraska", "nebraska"],
-    ["Nevada", "nevada"],
-    ["New Mexico", "new-mexico"],
-    ["North Carolina", "north-carolina"],
-    ["Northwestern", "northwestern"],
-    ["Oakland", "oakland"],
-    ["Oregon", "oregon"],
-    ["Purdue", "purdue"],
-    ["Saint Mary's (CA)", "st-marys-ca"],
-    ["Saint Peter's", "st-peters"],
-    ["Samford", "samford"],
-    ["San Diego St.", "san-diego-st"],
-    ["South Carolina", "south-carolina"],
-    ["South Dakota St.", "south-dakota-st"],
-    ["Stetson", "stetson"],
-    ["TCU", "tcu"],
-    ["Tennessee", "tennessee"],
-    ["Texas A&M", "texas-am"],
-    ["Texas Tech", "texas-tech"],
-    ["Texas", "texas"],
-    ["UAB", "uab"],
-    ["UConn", "uconn"],
-    ["Utah St.", "utah-st"],
-    ["Vermont", "vermont"],
-    ["Wagner", "wagner"],
-    ["Washington St.", "washington-st"],
-    ["Western Ky.", "western-ky"],
-    ["Wisconsin", "wisconsin"],
-    ["Yale", "yale"],
-])

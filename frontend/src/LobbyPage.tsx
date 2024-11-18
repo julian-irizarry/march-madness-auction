@@ -13,7 +13,7 @@ function LobbyPage() {
   const location = useLocation();
   const { gameId, isCreator, playerName } = location.state || {};
 
-  const [participants, setParticipants] = useState<string[]>([]);
+  const [players, setPlayers] = useState<string[]>([]);
   const baseColor = "#FFD700";
   const wsRef = useRef<WebSocket | null>(null); // Use useRef to hold the WebSocket connection
 
@@ -29,8 +29,8 @@ function LobbyPage() {
       else {
         const data = JSON.parse(event.data);
 
-        if ("participants" in data) {
-          setParticipants(Object.keys(data["participants"]));
+        if ("players" in data) {
+          setPlayers(Object.keys(data["players"]));
         }
       }
     };
@@ -65,11 +65,11 @@ function LobbyPage() {
                 </Typography>
               </Grid>
 
-              {/* List of participants */}
+              {/* List of players */}
               <Grid item>
                 <List variant="outlined" sx={{ minWidth: 240, borderRadius: "sm" }}>
-                  {participants.length > 0 ?
-                    participants.map((participant, i) => {
+                  {players.length > 0 ?
+                    players.map((participant, i) => {
                       // Calculate hue based on index
                       const hue = (i * 30) % 360; // Adjust 30 as needed to change the color spacing
                       const participantColor = `hsl(${hue}, 70%, 50%)`; // Adjust saturation and lightness as needed
@@ -86,7 +86,7 @@ function LobbyPage() {
                         </React.Fragment>
                       );
                     })
-                    : <Typography>No participants</Typography>
+                    : <Typography>No players</Typography>
                   }
                 </List>
               </Grid>
