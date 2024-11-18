@@ -14,8 +14,8 @@ RUN npm install
 COPY ../frontend/ .
 
 # # Build your app
-# RUN npm run build
+RUN npm run build
 #
 # # Install serve and serve your React app
-# RUN npm install -g serve
-# CMD ["serve", "-s", "build"]
+RUN npm install -g serve
+CMD ["serve", "-s", "build"]
