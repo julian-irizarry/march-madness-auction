@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button, Input } from '@mui/joy';
 import { Grid } from '@mui/material';
 
+import { BACKEND_URL } from "./Utils"
+
 import './css/App.css';
 
 interface BidProps {
@@ -28,7 +30,7 @@ function Bid(props: BidProps) {
       return;
     }
     try {
-      await fetch('http://localhost:8000/bid/', {
+      await fetch(`http://${BACKEND_URL}/bid/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

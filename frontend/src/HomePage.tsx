@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/joy";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Alert } from "@mui/material";
 
+import { BACKEND_URL } from "./Utils"
 import imageSrc from "./images/march_madness_logo_auction.png";
 import "./css/Fonts.css";
 
@@ -43,7 +44,7 @@ function HomePage() {
   const handleCreateGame = async (event: React.FormEvent) => {
     setDialogError("");
     try {
-      const response = await fetch("http://localhost:8000/create-game/", {
+      const response = await fetch(`http://${BACKEND_URL}/create-game/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +69,7 @@ function HomePage() {
   const handleJoinGame = async (event: React.FormEvent) => {
     setDialogError("");
     try {
-      const response = await fetch("http://localhost:8000/join-game/", {
+      const response = await fetch(`http://${BACKEND_URL}/join-game/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -94,7 +95,7 @@ function HomePage() {
   const handleViewGame = async (event: React.FormEvent) => {
     setDialogError("");
     try {
-      const response = await fetch("http://localhost:8000/view-game/", {
+      const response = await fetch(`http://${BACKEND_URL}/view-game/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

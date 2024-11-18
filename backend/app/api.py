@@ -5,13 +5,22 @@ from typing import List
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.websockets import WebSocketState
+from dotenv import load_dotenv
+import os
 
 from app import GameTracker, GAME_ID_NUM_CHAR, CreateModel, JoinModel, ViewModel, BidModel
 from app.types.types import jsonify_dict, jsonify_list
 
 # ================== SETUP APP ==================
 
-origins = ["http://localhost:3000", "localhost:3000"]
+load_dotenv()
+
+FRONTEND_HOST = os.getenv("FRONTEND_HOST", "127.0.0.1")
+FRONTEND_PORT = int(os.getenv("FRONTEND_PORT", 3000))
+REACT_APP_BACKEND_HOST = os.getenv("REACT_APP_BACKEND_HOST", "127.0.0.1")
+REACT_APP_BACKEND_PORT = int(os.getenv("REACT_APP_BACKEND_PORT", 8000))
+
+origins = [f"http://{FRONTEND_HOST}:{FRONTEND_PORT}", f"{FRONTEND_HOST}:{FRONTEND_PORT}", f"http://localhost:{FRONTEND_PORT}"]
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"]

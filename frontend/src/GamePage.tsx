@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import Bid from "./Bid";
 import Bracket from "./Bracket";
-import { PlayerInfo, TeamInfo } from "./Utils"
+import { PlayerInfo, TeamInfo, BACKEND_URL } from "./Utils"
 import { ReactComponent as CrownIcon } from "./icons/crown.svg";
 import { ReactComponent as UserIcon } from "./icons/user.svg";
 
@@ -33,7 +33,7 @@ function GamePage() {
 
     const wsRef = useRef<WebSocket | null>(null); // Use useRef to hold the WebSocket connection
     useEffect(() => {
-        const ws = new WebSocket(`ws://localhost:8000/ws/${gameId}`);
+        const ws = new WebSocket(`ws://${BACKEND_URL}/ws/${gameId}`);
         wsRef.current = ws;
 
         ws.onmessage = (event) => {

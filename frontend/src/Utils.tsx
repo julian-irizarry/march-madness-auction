@@ -1,3 +1,6 @@
+export const BACKEND_URL = `${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}`;
+console.log("BACKEND_URL", BACKEND_URL)
+
 export interface PlayerInfo {
     name: string
     gameId: string
