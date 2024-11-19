@@ -50,7 +50,15 @@ function GamePage() {
                             name: temp_player.name,
                             gameId: temp_player.gameId,
                             balance: parseInt(temp_player.balance),
-                            teams: temp_player.teams,
+                            points: parseInt(temp_player.points),
+                            teams: Object.values(temp_player.teams).map((temp_team: any) => {
+                                return {
+                                    shortName: temp_team.shortName,
+                                    urlName: temp_team.urlName,
+                                    seed: temp_team.seed,
+                                    region: temp_team.region
+                                };
+                            }),
                         });
                     });
                     setPlayerInfos(players);
@@ -196,14 +204,14 @@ function GamePage() {
                                                                     {player}
                                                                 </Typography>
                                                                 <Typography sx={{ fontSize: "12px" }}>
-                                                                    Balance: $ {player_info["balance"].toFixed(2)}
+                                                                    Balance: ${player_info["balance"].toFixed(2)}
                                                                 </Typography>
                                                                 <Typography sx={{ fontSize: "12px" }}>
                                                                     Teams:
                                                                 </Typography>
-                                                                {player_info["teams"].map((temp_team: string, teamIndex: number) => (
+                                                                {player_info["teams"].map((temp_team: TeamInfo, teamIndex: number) => (
                                                                     <Typography key={teamIndex} sx={{ marginLeft: "10px", fontSize: "12px" }}>
-                                                                        - {temp_team}
+                                                                        - {temp_team.shortName} (${temp_team.purchasePrice})
                                                                     </Typography>
                                                                 ))}
                                                             </Chip>

@@ -8,7 +8,9 @@ class GameTracker:
     def __init__(self, year: int, month: str, day: tuple[str, str]):
         self.games: dict[str, GameInfo] = {}
         self.teams_master = get_teams(year, month, day)
-        self.teams_master.sort(key=lambda x: int(x.seed))
+        teams_list = list(self.teams_master.items())
+        teams_list.sort(key=lambda x: int(x[1].seed))
+        self.teams_master = {key: value for key, value in teams_list}
         self.match_results = get_matches(year, month, day)
 
     def add_game(self, gameId: str, creator: str) -> None:
@@ -31,7 +33,14 @@ class GameTracker:
 
     def update_player(self, gameId: str, player: str, bidAmount: int, purchasedTeam: str) -> None:
         self.games[gameId].players[player].balance -= bidAmount
-        self.games[gameId].players[player].teams.append(purchasedTeam)
+        team = self.games[gameId].currentTeam.model_copy()
+        if (team.shortName != purchasedTeam):
+            for temp_team in self.games[gameId].teams.values():
+                if temp_team.shortName == purchasedTeam:
+                    team = temp_team.model_copy()
+                    break
+        team.purchasePrice=bidAmount
+        self.games[gameId].players[player].teams[team.shortName] = team
 
     def get_player_info(self, gameId: str, player: str) -> PlayerInfo:
         return self.games[gameId].players[player]
@@ -40,15 +49,15 @@ class GameTracker:
         return self.games[gameId].players
 
     def get_random_team(self, gameId: str) -> TeamInfo:
-        team: TeamInfo = random.choice(self.games[gameId].teams)
-        self.games[gameId].teams.remove(team)
+        team: TeamInfo = random.choice(list(self.games[gameId].teams.values()))
+        del self.games[gameId].teams[team.shortName]
         return team
 
     def get_remaining_teams(self, gameId: str) -> list[TeamInfo]:
-        return self.games[gameId].teams
+        return list(self.games[gameId].teams.values())
     
     def get_all_teams(self) -> list[TeamInfo]:
-        return self.teams_master
+        return list(self.teams_master.values())
 
     def place_bid(self, bid_model: BidModel) -> None:
         self.games[bid_model.gameId].log.append(bid_model)
@@ -60,7 +69,7 @@ class GameTracker:
 
         if len(self.games[gameId].log) > 0:
             winner = self.games[gameId].log[-1]
-            self.update_player(gameId, winner.player, winner.bid, f"{winner.team} : ${winner.bid:.2f}")
+            self.update_player(gameId, winner.player, winner.bid, winner.team)
         else:
             winner = BidModel(
                 gameId="",
@@ -88,3 +97,25 @@ class GameTracker:
 
     def decrement_countdown(self, gameId: str) -> None:
         self.games[gameId].countdown -= 1
+
+    def calculate_player_points(self, gameId: str) -> None:
+        '''
+        Using very naive point system here. +1 for each team wins.
+        '''
+
+        # { player_name : { team_name: points, team_name:points... } }
+        score_map = {player.name: {team:0 for team in player.teams.keys()} for player in self.games[gameId].players.values()}
+
+        for match in self.match_results:
+            winner = match.participants[0] if match.winner == match.participants[0].shortName else match.participants[1]
+            for player in score_map.keys():
+                if winner.shortName in score_map[player].keys():
+                    score_map[player][winner.shortName] += 1
+
+        for player, teams in score_map.items():
+            final_score = 0
+            for team_name, score in teams.items():
+                final_score += score
+                self.games[gameId].players[player].teams[team_name].points = score
+
+            self.games[gameId].players[player].points = final_score

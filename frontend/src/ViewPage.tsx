@@ -1,10 +1,9 @@
-import { Typography, List, ListItem, Chip } from "@mui/joy";
-import { Paper, Grid, Card } from "@mui/material";
+import { Typography, Card, List, ListItem, Chip } from "@mui/joy";
+import { Paper, Grid } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 
-import Bracket from "./Bracket";
-import { PlayerInfo, TeamInfo, Match, BACKEND_URL } from "./Utils"
+import { PlayerInfo, TeamInfo, BACKEND_URL } from "./Utils"
 import { ReactComponent as CrownIcon } from "./icons/crown.svg";
 import { ReactComponent as UserIcon } from "./icons/user.svg";
 
@@ -13,8 +12,6 @@ function ViewPage() {
     const { gameId } = location.state || {};
 
     const [playerInfos, setPlayerInfos] = useState<Map<string, PlayerInfo>>(new Map());
-    const [allTeams, setAllTeams] = useState<TeamInfo[]>([]);
-    const [matchResults, setMatchResults] = useState<Match[]>([]);
 
     const baseColor = "#FFD700";
 
@@ -37,45 +34,20 @@ function ViewPage() {
                             name: temp_player.name,
                             gameId: temp_player.gameId,
                             balance: parseInt(temp_player.balance),
-                            teams: temp_player.teams,
+                            points: parseInt(temp_player.points),
+                            teams: Object.values(temp_player.teams).map((temp_team: any) => {
+                                return {
+                                    shortName: temp_team.shortName,
+                                    urlName: temp_team.urlName,
+                                    seed: temp_team.seed,
+                                    region: temp_team.region,
+                                    purchasePrice: temp_team.purchasePrice,
+                                    points: temp_team.points,
+                                };
+                            }),
                         });
                     });
                     setPlayerInfos(players);
-                }
-                else if ("all_teams" in data) {
-                    const all_teams: TeamInfo[] = data["all_teams"].map((temp_team: { [key: string]: any }, i: number) => {
-                        return {
-                            shortName: temp_team["shortName"],
-                            urlName: temp_team["urlName"],
-                            seed: parseInt(temp_team["seed"]),
-                            region: temp_team["region"]
-                        };
-                    })
-                    setAllTeams(all_teams);
-                }
-                else if ("match_results" in data) {
-                    const match_results: Match[] = data["match_results"].map((temp_match: { [key: string]: any }, i: number) => {
-                        return {
-                            id: parseInt(temp_match["id"]),
-                            roundName: temp_match["roundName"],
-                            participants: [
-                                {
-                                    shortName: temp_match["participants"][0]["shortName"],
-                                    urlName: temp_match["participants"][0]["urlName"],
-                                    seed: parseInt(temp_match["participants"][0]["seed"]),
-                                    region: temp_match["participants"][0]["region"]
-                                },
-                                {
-                                    shortName: temp_match["participants"][1]["shortName"],
-                                    urlName: temp_match["participants"][1]["urlName"],
-                                    seed: parseInt(temp_match["participants"][1]["seed"]),
-                                    region: temp_match["participants"][1]["region"]
-                                }
-                            ],
-                            winner: temp_match["winner"]
-                        };
-                    })
-                    setMatchResults(match_results);
                 }
             }
         };
@@ -85,56 +57,66 @@ function ViewPage() {
     return (
         <div id="outer-container">
             <Paper elevation={1} sx={{ height: "720px", width: "1400px", padding: "10px", backgroundColor: "#fcfcfc" }}>
-                <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", height: "calc(100vh - 60px)", minHeight: "100%" }}>
+                <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", height: "calc(100vh - 60px)", minHeight: "100%" }}>
 
-                    {/* Display bracket */}
-                    <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                        <Card sx={{ height: "540px", width: "100%", padding: "10px", backgroundColor: "white" }}>
-                            {allTeams.length > 0 ?
-                                <Bracket all_teams={allTeams} match_results={matchResults}/>
-                                : <Typography>No teams available</Typography>
-                            }
-                        </Card>
-                    </Grid>
-                    
+                    {playerInfos.size > 0 ?
+                        Array.from(playerInfos.entries()).map(([player, player_info]: [string, PlayerInfo], i) => {
+                            // Calculate hue based on index
+                            const hue = (i * 30) % 360; // Adjust 30 as needed to change the color spacing
+                            const playerColor = `hsl(${hue}, 70%, 50%)`; // Adjust saturation and lightness as needed
 
-                    <List sx={{ width: "100%" }}>
-                        {playerInfos.size > 0 ?
-                            Array.from(playerInfos.entries()).map(([player, player_info], i) => {
-                                // Calculate hue based on index
-                                const hue = (i * 30) % 360; // Adjust 30 as needed to change the color spacing
-                                const playerColor = `hsl(${hue}, 70%, 50%)`; // Adjust saturation and lightness as needed
+                            return (
+                                <React.Fragment key={i}>
+                                    <Grid item xs={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                        <Card sx={{ height: "200px", width: "80%", padding: "10px", backgroundColor: "var(--off-white-color)" }}>
 
-                                return (
-                                    <React.Fragment key={i}>
-                                        <ListItem>
-                                            {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={playerColor} width="20px" height="20px" />}
-                                            <Chip sx={{ padding: "0 20px", backgroundColor: "var(--off-white-color)" }}>
-                                                <Typography sx={{ color: playerColor }}>
-                                                    {player}
-                                                </Typography>
-                                                <Typography sx={{ fontSize: "12px" }}>
-                                                    Balance: $ {player_info["balance"].toFixed(2)}
-                                                </Typography>
-                                                <Typography sx={{ fontSize: "12px" }}>
-                                                    Teams:
-                                                </Typography>
-                                                {player_info["teams"].map((temp_team: string, teamIndex: number) => (
-                                                    <Typography key={teamIndex} sx={{ marginLeft: "10px", fontSize: "12px" }}>
-                                                        - {temp_team}
+                                            <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
+
+                                                <Grid item xs={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
+                                                    {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={playerColor} width="20px" height="20px" />}
+                                                    <Typography sx={{ color: playerColor, margin: "10px" }}>
+                                                        {player}
                                                     </Typography>
-                                                ))}
-                                            </Chip>
-                                        </ListItem>
-                                    </React.Fragment>
-                                );
-                            })
-                            : <Typography>No players</Typography>
-                        }
-                    </List>
+                                                </Grid>
+                                                <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
+                                                    <Typography sx={{ fontSize: "12px" }}>
+                                                        <b>Points: {player_info.points}</b>
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
+                                                    <Typography sx={{ fontSize: "12px" }}>
+                                                        Teams:
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center", overflowY: "auto" }}>
+                                                    {player_info["teams"].map((temp_team: TeamInfo, teamIndex: number) => (
+                                                        <Card sx={{ padding: "0 20px", backgroundColor: "white", width: "80%" }}>
+                                                            <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
+                                                                <Grid item xs={2} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                                                    {/* Team logo */}
+                                                                    <img src={`https://i.turner.ncaa.com/sites/default/files/images/logos/schools/bgl/${temp_team.urlName}.svg`} alt={`${temp_team.shortName} logo`} style={{ width: "20px", height: "20px" }} />
+                                                                </Grid>
+
+                                                                <Grid item xs={8} sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}>
+                                                                    <Typography key={teamIndex} sx={{ fontSize: "12px", justifyContent: "left", alignItems: "left" }}>
+                                                                        {temp_team.shortName} | ${temp_team.purchasePrice} | {temp_team.points} points
+                                                                    </Typography>
+                                                                </Grid>
+                                                            </Grid>
+                                                        </Card>
+                                                    ))}
+                                                </Grid>
+                                            </Grid>
+                                        </Card>
+                                    </Grid>
+                                </React.Fragment>
+                            );
+                        })
+                        : <Typography>No players</Typography>
+                    }
                 </Grid>
-            </Paper>
-        </div>
+            </Paper >
+        </div >
     )
 }
 

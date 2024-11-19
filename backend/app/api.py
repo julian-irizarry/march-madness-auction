@@ -62,13 +62,15 @@ async def join_game(join_model: JoinModel):
 
 
 @app.post("/view-game/")
-async def join_game(join_model: ViewModel):
-    if join_model.gameId not in gameTracker.games:
+async def join_game(view_model: ViewModel):
+    if view_model.gameId not in gameTracker.games:
         raise HTTPException(status_code=404, detail="Game ID not found")
     
-    if join_model.gameId in game_connections:
-        for ws in game_connections[join_model.gameId]:
-            await ws.send_json({"players": jsonify_dict(gameTracker.get_all_players(join_model.gameId))})
+    gameTracker.calculate_player_points(view_model.gameId)
+    
+    if view_model.gameId in game_connections:
+        for ws in game_connections[view_model.gameId]:
+            await ws.send_json({"players": jsonify_dict(gameTracker.get_all_players(view_model.gameId))})
 
     return {"detail": "Viewed game successfully"}
 
@@ -88,6 +90,8 @@ async def finalize_bid(game_id: str):
     # give team to last bidder
     winner:BidModel = gameTracker.finalize_bid(game_id)
     purchase_msg = f"No one bought {winner.team}!" if not winner.player else f"{winner.player} bought {winner.team} for ${winner.bid:.2f}!"
+
+    gameTracker.calculate_player_points(game_id)
 
     for ws in game_connections[game_id]:
         await ws.send_json({"log": purchase_msg})
@@ -193,11 +197,14 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
     async def listen_for_messages():
         try:
             while True:
-                message = await websocket.receive_text()
-                if message == "startGame" and websocket in game_connections[game_id][:1]:
-                    for participant_ws in game_connections[game_id]:
-                        await participant_ws.send_text("gameStarted")
-                    break  # Exit the loop if the game starts
+                if websocket.application_state == WebSocketState.CONNECTED:
+                    message = await websocket.receive_text()
+                    if message == "startGame" and websocket in game_connections[game_id][:1]:
+                        for participant_ws in game_connections[game_id]:
+                            await participant_ws.send_text("gameStarted")
+                        break  # Exit the loop if the game starts
+                else:
+                    break  # Stop sending if the connection is no longer active
         except WebSocketDisconnect:
             # Handle the WebSocket disconnection
             if websocket in game_connections[game_id]:
