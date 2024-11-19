@@ -21,7 +21,7 @@ function HomePage() {
 
   const handleCreateGame = async (event: React.FormEvent) => {
     try {
-      const response = await fetch('http://localhost:8000/create-game/', {
+      const response = await fetch('http://ec2-100-25-118-6.compute-1.amazonaws.com:8000/create-game/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ function HomePage() {
   const handleJoinGame = async (event: React.FormEvent) => {
     setJoinGameError("");
     try {
-      const response = await fetch('http://localhost:8000/join-game/', {
+      const response = await fetch('http://ec2-100-25-118-6.compute-1.amazonaws.com:8000/join-game/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -105,12 +105,12 @@ function HomePage() {
         <DialogTitle sx={{
           textAlign: 'center',
           fontFamily: 'doubleFeature',
-        }}><b>{ isCreator ? "CREATE GAME" : "JOIN GAME"}</b></DialogTitle>
+        }}><b>{isCreator ? "CREATE GAME" : "JOIN GAME"}</b></DialogTitle>
         <DialogContent>
 
           {
             joinGameError ? <Alert severity="error">{joinGameError}</Alert>
-            : <></>
+              : <></>
           }
 
           <TextField
@@ -124,7 +124,7 @@ function HomePage() {
             margin="dense"
           />
 
-          { isCreator ? <></> :
+          {isCreator ? <></> :
             <TextField
               fullWidth
               label="Game ID"
@@ -142,7 +142,7 @@ function HomePage() {
         <DialogActions sx={{ justifyContent: 'center' }}>
           <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleCloseDialog}>Cancel</Button>
 
-          { isCreator ?
+          {isCreator ?
             <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleCreateGame}>Create</Button>
             : <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleJoinGame}>Join</Button>
           }

@@ -18,7 +18,7 @@ function LobbyPage() {
   const wsRef = useRef<WebSocket | null>(null); // Use useRef to hold the WebSocket connection
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://localhost:8000/ws/${gameId}`);
+    const ws = new WebSocket(`ws://ec2-100-25-118-6.compute-1.amazonaws.com:8000/ws/${gameId}`);
     wsRef.current = ws;
 
     ws.onmessage = (event) => {
@@ -46,7 +46,7 @@ function LobbyPage() {
 
   return (
     <div id="outer-container">
-      <Paper elevation={1} sx={{marginLeft: '200px', marginRight: '200px', marginTop: 'calc(100vh - 800px)', marginBottom: 'calc(100vh - 800px)', padding: '10px', backgroundColor: '#fcfcfc'}}>
+      <Paper elevation={1} sx={{ marginLeft: '200px', marginRight: '200px', marginTop: 'calc(100vh - 800px)', marginBottom: 'calc(100vh - 800px)', padding: '10px', backgroundColor: '#fcfcfc' }}>
         <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', height: 'calc(100vh - 170px)', minHeight: '100%' }}>
 
           {/* Left side */}
@@ -117,7 +117,7 @@ function LobbyPage() {
               <Grid item>
                 {
                   isCreator ? <Button sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} onClick={handleStartGameClick}>Start Game</Button>
-                  : <Typography level="h4">Waiting for the host to start the game...</Typography>
+                    : <Typography level="h4">Waiting for the host to start the game...</Typography>
                 }
               </Grid>
             </Grid>

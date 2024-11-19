@@ -19,7 +19,7 @@ from .types.types import (
 
 app = FastAPI()
 
-origins = ["http://localhost:3000", "localhost:3000"]
+origins = ["http://localhost:3000", "localhost:3000", "http://ec2-100-25-118-6.compute-1.amazonaws.com"]
 
 app.add_middleware(
     CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
@@ -84,9 +84,9 @@ async def finalize_bid(game_id: str):
     purchase_msg: str = ""
     if len(games[game_id].log) > 0:
         winner: BidModel = games[game_id].log[-1]
-        gameInfo.update_player(game_id, winner.player, winner.bid, f"{winner.team} : ${winner.bid:.2f}")
+        gameInfo.update_player(game_id, winner.player, winner.bid, f"{winner.team}: ${winner.bid: .2f}")
 
-        purchase_msg = f"{winner.player} bought {winner.team} for ${winner.bid:.2f}!"
+        purchase_msg = f"{winner.player} bought {winner.team} for ${winner.bid: .2f}!"
 
     for ws in game_connections[game_id]:
         await ws.send_json({"log": purchase_msg})
@@ -199,7 +199,7 @@ async def bid(bid_model: BidModel):
     games[bid_model.gameId].countdown = INITIAL_COUNTDOWN  # reset countdown
 
     latest_log: BidModel = games[bid_model.gameId].log[-1]
-    latest_log_s: str = f"{latest_log.player} bid on {latest_log.team} for ${latest_log.bid:.2f}"
+    latest_log_s: str = f"{latest_log.player} bid on {latest_log.team} for ${latest_log.bid: .2f}"
 
     if bid_model.gameId in game_connections:
         updated_bid = games[bid_model.gameId].currentBid
