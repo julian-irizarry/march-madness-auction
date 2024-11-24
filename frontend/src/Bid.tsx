@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Button, Input } from '@mui/joy';
 import { Grid } from '@mui/material';
 
-import './App.css';
+import { BACKEND_URL } from "./Utils"
+
+import './css/App.css';
 
 interface BidProps {
   gameId: string
@@ -28,7 +30,7 @@ function Bid(props: BidProps) {
       return;
     }
     try {
-      await fetch('http://ec2-100-25-118-6.compute-1.amazonaws.com:8000/bid/', {
+      await fetch(`http://${BACKEND_URL}/bid/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
