@@ -1,15 +1,22 @@
 import asyncio
+import os
 import random
 import string
 from typing import List
+
+from app import (
+    GAME_ID_NUM_CHAR,
+    BidModel,
+    CreateModel,
+    GameTracker,
+    JoinModel,
+    ViewModel,
+)
+from app.types.types import jsonify_dict, jsonify_list
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.websockets import WebSocketState
-from dotenv import load_dotenv
-import os
-
-from app import GameTracker, GAME_ID_NUM_CHAR, CreateModel, JoinModel, ViewModel, BidModel
-from app.types.types import jsonify_dict, jsonify_list
 
 # ================== SETUP APP ==================
 
@@ -20,7 +27,13 @@ FRONTEND_PORT = int(os.getenv("FRONTEND_PORT", 3000))
 REACT_APP_BACKEND_HOST = os.getenv("REACT_APP_BACKEND_HOST", "127.0.0.1")
 REACT_APP_BACKEND_PORT = int(os.getenv("REACT_APP_BACKEND_PORT", 8000))
 
-origins = [f"http://{FRONTEND_HOST}:{FRONTEND_PORT}", f"{FRONTEND_HOST}:{FRONTEND_PORT}", f"http://localhost:{FRONTEND_PORT}"]
+origins = [
+    f"http://{FRONTEND_HOST}:{FRONTEND_PORT}",  # Local frontend
+    f"{FRONTEND_HOST}:{FRONTEND_PORT}",  # Local frontend without protocol
+    f"http://localhost:{FRONTEND_PORT}",  # Localhost for testing
+    "http://mmauctiongame.com",  # Production frontend
+]
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
@@ -36,6 +49,7 @@ gameTracker: GameTracker = GameTracker(year=2024, month="03", day=("21", "22"))
 countdown_tasks: dict[str, asyncio.Task] = {}
 
 # ================== URL PATHS ==================
+
 
 @app.post("/create-game/")
 async def create_game(create_model: CreateModel) -> dict:
@@ -62,10 +76,10 @@ async def join_game(join_model: JoinModel):
 
 
 @app.post("/view-game/")
-async def join_game(join_model: ViewModel):
+async def view_game(join_model: ViewModel):
     if join_model.gameId not in gameTracker.games:
         raise HTTPException(status_code=404, detail="Game ID not found")
-    
+
     if join_model.gameId in game_connections:
         for ws in game_connections[join_model.gameId]:
             await ws.send_json({"players": jsonify_dict(gameTracker.get_all_players(join_model.gameId))})
@@ -86,8 +100,12 @@ async def start_countdown(game_id: str):
 
 async def finalize_bid(game_id: str):
     # give team to last bidder
-    winner:BidModel = gameTracker.finalize_bid(game_id)
-    purchase_msg = f"No one bought {winner.team}!" if not winner.player else f"{winner.player} bought {winner.team} for ${winner.bid:.2f}!"
+    winner: BidModel = gameTracker.finalize_bid(game_id)
+    purchase_msg = (
+        f"No one bought {winner.team}!"
+        if not winner.player
+        else f"{winner.player} bought {winner.team} for ${winner.bid:.2f}!"
+    )
 
     for ws in game_connections[game_id]:
         await ws.send_json({"log": purchase_msg})
@@ -138,7 +156,15 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
         try:
             while True:
                 if websocket.application_state == WebSocketState.CONNECTED:
-                    await websocket.send_json({"team": None if not gameTracker.get_current_team(game_id) else gameTracker.get_current_team(game_id).model_dump()})
+                    await websocket.send_json(
+                        {
+                            "team": (
+                                None
+                                if not gameTracker.get_current_team(game_id)
+                                else gameTracker.get_current_team(game_id).model_dump()
+                            )
+                        }
+                    )
                 else:
                     break  # Stop sending if the connection is no longer active
                 await asyncio.sleep(10)
@@ -214,7 +240,15 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
 
     # Wait for either task to complete
     done, pending = await asyncio.wait(
-        [send_participant_task, send_bid_task, listen_task, send_team_task, send_remaining_task, send_all_teams_task, send_match_results_task],
+        [
+            send_participant_task,
+            send_bid_task,
+            listen_task,
+            send_team_task,
+            send_remaining_task,
+            send_all_teams_task,
+            send_match_results_task,
+        ],
         return_when=asyncio.FIRST_COMPLETED,
     )
 

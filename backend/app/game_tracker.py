@@ -1,7 +1,14 @@
 import random
 
-from app.types.types import PlayerInfo, TeamInfo, GameInfo, BidModel, INITIAL_BID, INITIAL_COUNTDOWN
-from app.bracket import get_teams, get_matches
+from app.bracket import get_matches, get_teams
+from app.types.types import (
+    INITIAL_BID,
+    INITIAL_COUNTDOWN,
+    BidModel,
+    GameInfo,
+    PlayerInfo,
+    TeamInfo,
+)
 
 
 class GameTracker:
@@ -12,22 +19,16 @@ class GameTracker:
         self.match_results = get_matches(year, month, day)
 
     def add_game(self, gameId: str, creator: str) -> None:
-        creator_info = PlayerInfo(
-            name=creator,
-            gameId=gameId
-        )
+        creator_info = PlayerInfo(name=creator, gameId=gameId)
         self.games[gameId] = GameInfo(
-            creator=creator, 
-            players={creator:creator_info},
-            teams=self.teams_master.copy()
+            creator=creator,
+            players={creator: creator_info},
+            teams=self.teams_master.copy(),
         )
         self.games[gameId].currentTeam = self.get_random_team(gameId)
 
     def add_player(self, gameId: str, player: str) -> None:
-        self.games[gameId].players[player] = PlayerInfo(
-            name=player,
-            gameId=gameId
-        )
+        self.games[gameId].players[player] = PlayerInfo(name=player, gameId=gameId)
 
     def update_player(self, gameId: str, player: str, bidAmount: int, purchasedTeam: str) -> None:
         self.games[gameId].players[player].balance -= bidAmount
@@ -46,7 +47,7 @@ class GameTracker:
 
     def get_remaining_teams(self, gameId: str) -> list[TeamInfo]:
         return self.games[gameId].teams
-    
+
     def get_all_teams(self) -> list[TeamInfo]:
         return self.teams_master
 
@@ -56,7 +57,7 @@ class GameTracker:
         self.games[bid_model.gameId].countdown = INITIAL_COUNTDOWN  # reset countdown
 
     def finalize_bid(self, gameId: str) -> BidModel:
-        winner:BidModel
+        winner: BidModel
 
         if len(self.games[gameId].log) > 0:
             winner = self.games[gameId].log[-1]
@@ -66,7 +67,7 @@ class GameTracker:
                 gameId="",
                 player="",
                 bid=-1,
-                team=self.games[gameId].currentTeam.shortName
+                team=self.get_current_team(gameId).shortName,
             )
 
         # pick random new team to auction
@@ -78,11 +79,15 @@ class GameTracker:
         return winner
 
     def get_current_team(self, gameId: str) -> TeamInfo:
-        return self.games[gameId].currentTeam
+        current_team = self.games[gameId].currentTeam
+        if current_team is not None:
+            return current_team
+
+        raise ValueError(f"game id {gameId} does not have a current team")
 
     def get_current_bid(self, gameId: str) -> float:
         return self.games[gameId].currentBid
-    
+
     def get_current_countdown(self, gameId: str) -> float:
         return self.games[gameId].countdown
 

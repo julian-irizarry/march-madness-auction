@@ -1,7 +1,7 @@
 import csv
-import requests
 
-from app.types.types import TeamInfo, MatchInfo
+import requests
+from app.types.types import MatchInfo, TeamInfo
 
 
 def get_teams(year: int, month: str, days: tuple[str, str]) -> list[TeamInfo]:
@@ -21,7 +21,7 @@ def get_teams(year: int, month: str, days: tuple[str, str]) -> list[TeamInfo]:
     teams: dict[str, TeamInfo] = {}
     for day in days:
         url: str = f"https://data.ncaa.com/casablanca/scoreboard/basketball-men/d1/{year}/{month}/{day}/scoreboard.json"
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
 
         if response.status_code == 200:
             data = response.json()
@@ -35,13 +35,13 @@ def get_teams(year: int, month: str, days: tuple[str, str]) -> list[TeamInfo]:
                     shortName=away_team.get("names").get("short"),
                     urlName=away_team.get("names").get("seo"),
                     seed=away_team.get("seed"),
-                    region=region
+                    region=region,
                 )
                 home_team_info = TeamInfo(
                     shortName=home_team.get("names").get("short"),
                     urlName=home_team.get("names").get("seo"),
                     seed=home_team.get("seed"),
-                    region=region
+                    region=region,
                 )
                 teams[away_team_info.shortName] = away_team_info
                 teams[home_team_info.shortName] = home_team_info
@@ -84,13 +84,13 @@ def get_matches(year: int, month: str, days: tuple[str, str]) -> list[MatchInfo]
                     shortName=away_team.get("names").get("short"),
                     urlName=away_team.get("names").get("seo"),
                     seed=away_team.get("seed"),
-                    region=region
+                    region=region,
                 )
                 home_team_info = TeamInfo(
                     shortName=home_team.get("names").get("short"),
                     urlName=home_team.get("names").get("seo"),
                     seed=home_team.get("seed"),
-                    region=region
+                    region=region,
                 )
                 winner_name = away_team_info.shortName if away_team.get("winner") else home_team_info.shortName
 
@@ -99,12 +99,9 @@ def get_matches(year: int, month: str, days: tuple[str, str]) -> list[MatchInfo]
                         id=id,
                         nextMatchId=-1,
                         roundName=bracket_round,
-                        participants=[
-                            away_team_info,
-                            home_team_info
-                        ],
+                        participants=[away_team_info, home_team_info],
                         winner=winner_name,
-                        startDate=start_date
+                        startDate=start_date,
                     )
                 )
         else:

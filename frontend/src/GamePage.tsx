@@ -19,7 +19,7 @@ function GamePage() {
     const [currentHighestBid, setCurrentHighestBid] = useState<number>(0);
     const [countdown, setCountdown] = useState(10);
     const [playerInfos, setPlayerInfos] = useState<Map<string, PlayerInfo>>(new Map());
-    const [team, setTeam] = useState<TeamInfo>({ shortName: "", urlName:"", seed: -1, region: "" });
+    const [team, setTeam] = useState<TeamInfo>({ shortName: "", urlName: "", seed: -1, region: "" });
     const [remainingTeams, setRemainingTeams] = useState<TeamInfo[]>([]);
     const [allTeams, setAllTeams] = useState<TeamInfo[]>([]);
     const [log, setLog] = useState<string>("");

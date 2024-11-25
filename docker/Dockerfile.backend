@@ -13,10 +13,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
 
-# Define environment variable
+# Define environment variables
+ARG FRONTEND_HOST
+ARG FRONTEND_PORT
+ENV FRONTEND_HOST=$FRONTEND_HOST
+ENV FRONTEND_PORT=$FRONTEND_PORT
 ENV UVICORN_HOST=0.0.0.0
 ENV UVICORN_PORT=8000
 ENV UVICORN_LOG_LEVEL=info
 
 # # Run uvicorn when the container launches
-# CMD ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000"]

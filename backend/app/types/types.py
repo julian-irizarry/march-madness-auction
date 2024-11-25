@@ -1,4 +1,5 @@
-from typing import List
+from typing import List, Optional
+
 from pydantic import BaseModel
 
 GAME_ID_NUM_CHAR = 6
@@ -54,14 +55,14 @@ class GameInfo(BaseModel):
     players: dict[str, PlayerInfo] = {}
     currentBid: float = INITIAL_BID
     countdown: float = INITIAL_COUNTDOWN
-    currentTeam: TeamInfo = None
+    currentTeam: Optional[TeamInfo] = None
     teams: List[TeamInfo] = []
     log: List[BidModel] = []
 
 
 class MatchInfo(BaseModel):
     id: int
-    nextMatchId: int|None
+    nextMatchId: int | None
     roundName: str
     participants: List[TeamInfo]
     winner: str
