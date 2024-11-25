@@ -28,10 +28,12 @@ REACT_APP_BACKEND_HOST = os.getenv("REACT_APP_BACKEND_HOST", "127.0.0.1")
 REACT_APP_BACKEND_PORT = int(os.getenv("REACT_APP_BACKEND_PORT", 8000))
 
 origins = [
-    f"http://{FRONTEND_HOST}:{FRONTEND_PORT}",
-    f"{FRONTEND_HOST}:{FRONTEND_PORT}",
-    f"http://localhost:{FRONTEND_PORT}",
+    f"http://{FRONTEND_HOST}:{FRONTEND_PORT}",  # Local frontend
+    f"{FRONTEND_HOST}:{FRONTEND_PORT}",  # Local frontend without protocol
+    f"http://localhost:{FRONTEND_PORT}",  # Localhost for testing
+    "http://mmauctiongame.com",  # Production frontend
 ]
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
