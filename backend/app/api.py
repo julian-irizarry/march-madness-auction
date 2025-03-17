@@ -1,7 +1,7 @@
 import asyncio
 import random
 import string
-from typing import List
+from typing import List, Dict, Set
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.websockets import WebSocketState
@@ -26,14 +26,53 @@ app.add_middleware(
     CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
 )
 
-# Dictionary to keep track of WebSocket connections for each game
-game_connections: dict[str, List[WebSocket]] = {}
-
 # Track Player Teams and Balance. Will turn into a database maybe
 gameTracker: GameTracker = GameTracker(year=2024, month="03", day=("21", "22"))
 
 # Dictionary to store countdown timer tasks
 countdown_tasks: dict[str, asyncio.Task] = {}
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: Dict[str, List[WebSocket]] = {}
+        self.active_games: Set[str] = set()
+
+    async def connect(self, websocket: WebSocket, game_id: str) -> bool:
+        if game_id not in self.active_games:
+            await websocket.close(code=4000, reason="Invalid game ID")
+            return False
+        await websocket.accept()
+        if game_id not in self.active_connections:
+            self.active_connections[game_id] = []
+        self.active_connections[game_id].append(websocket)
+        return True
+
+    async def disconnect(self, websocket: WebSocket, game_id: str):
+        if game_id in self.active_connections:
+            if websocket in self.active_connections[game_id]:
+                self.active_connections[game_id].remove(websocket)
+            if not self.active_connections[game_id]:
+                del self.active_connections[game_id]
+                self.active_games.remove(game_id)
+
+    async def broadcast(self, game_id: str, message: dict):
+        if game_id in self.active_connections:
+            dead_connections = []
+            for connection in self.active_connections[game_id]:
+                try:
+                    await connection.send_json(message)
+                except WebSocketDisconnect:
+                    dead_connections.append(connection)
+            
+            # Cleanup any dead connections
+            for dead_connection in dead_connections:
+                await self.disconnect(dead_connection, game_id)
+
+    def add_game(self, game_id: str):
+        self.active_games.add(game_id)
+
+# Initialize the connection manager
+manager = ConnectionManager()
 
 # ================== URL PATHS ==================
 
@@ -41,7 +80,7 @@ countdown_tasks: dict[str, asyncio.Task] = {}
 async def create_game(create_model: CreateModel) -> dict:
     new_game_id: str = "".join(random.choices(string.ascii_uppercase + string.digits, k=GAME_ID_NUM_CHAR))
     gameTracker.add_game(gameId=new_game_id, creator=create_model.player)
-    game_connections[new_game_id] = []  # Initialize the list of WebSocket connections for this game
+    manager.add_game(new_game_id)
     return {"id": new_game_id}
 
 
@@ -53,10 +92,11 @@ async def join_game(join_model: JoinModel):
         raise HTTPException(status_code=400, detail="Player name already taken in this game")
 
     gameTracker.add_player(gameId=join_model.gameId, player=join_model.player)
-
-    if join_model.gameId in game_connections:
-        for ws in game_connections[join_model.gameId]:
-            await ws.send_json({"players": jsonify_dict(gameTracker.get_all_players(join_model.gameId))})
+    
+    # Broadcast updated player list to all connected clients
+    await manager.broadcast(join_model.gameId, {
+        "players": jsonify_dict(gameTracker.get_all_players(join_model.gameId))
+    })
 
     return {"detail": "Joined game successfully"}
 
@@ -66,9 +106,10 @@ async def join_game(join_model: ViewModel):
     if join_model.gameId not in gameTracker.games:
         raise HTTPException(status_code=404, detail="Game ID not found")
     
-    if join_model.gameId in game_connections:
-        for ws in game_connections[join_model.gameId]:
-            await ws.send_json({"players": jsonify_dict(gameTracker.get_all_players(join_model.gameId))})
+    # Broadcast updated player list to all connected clients
+    await manager.broadcast(join_model.gameId, {
+        "players": jsonify_dict(gameTracker.get_all_players(join_model.gameId))
+    })
 
     return {"detail": "Viewed game successfully"}
 
@@ -76,8 +117,9 @@ async def join_game(join_model: ViewModel):
 async def start_countdown(game_id: str):
     while True:
         gameTracker.decrement_countdown(game_id)
-        for ws in game_connections[game_id]:
-            await ws.send_json({"countdown": gameTracker.games[game_id].countdown})
+        await manager.broadcast(game_id, {
+            "countdown": gameTracker.games[game_id].countdown
+        })
         await asyncio.sleep(1)  # Wait for 1 second between each decrement
         if gameTracker.get_current_countdown(game_id) == 0:
             await finalize_bid(game_id)
@@ -86,145 +128,49 @@ async def start_countdown(game_id: str):
 
 async def finalize_bid(game_id: str):
     # give team to last bidder
-    winner:BidModel = gameTracker.finalize_bid(game_id)
+    winner: BidModel = gameTracker.finalize_bid(game_id)
     purchase_msg = f"No one bought {winner.team}!" if not winner.player else f"{winner.player} bought {winner.team} for ${winner.bid:.2f}!"
 
-    for ws in game_connections[game_id]:
-        await ws.send_json({"log": purchase_msg})
-        await ws.send_json({"team": gameTracker.get_current_team(game_id).model_dump()})
-        await ws.send_json({"bid": gameTracker.get_current_bid(game_id)})
-        await ws.send_json({"countdown": gameTracker.get_current_countdown(game_id)})
-        await ws.send_json({"players": jsonify_dict(gameTracker.get_all_players(game_id))})
-        await ws.send_json({"remaining": jsonify_list(gameTracker.get_remaining_teams(game_id))})
+    await manager.broadcast(game_id, {
+        "log": purchase_msg,
+        "team": gameTracker.get_current_team(game_id).model_dump(),
+        "bid": gameTracker.get_current_bid(game_id),
+        "countdown": gameTracker.get_current_countdown(game_id),
+        "players": jsonify_dict(gameTracker.get_all_players(game_id)),
+        "remaining": jsonify_list(gameTracker.get_remaining_teams(game_id))
+    })
 
 
 @app.websocket("/ws/{game_id}")
 async def websocket_endpoint(websocket: WebSocket, game_id: str):
-    await websocket.accept()
-    if game_id not in game_connections:
-        await websocket.close(code=4000, reason="Invalid game ID")
+    if not await manager.connect(websocket, game_id):
         return
-    game_connections[game_id].append(websocket)
 
-    async def send_participant_updates():
-        try:
-            while True:
-                if websocket.application_state == WebSocketState.CONNECTED:
-                    await websocket.send_json({"players": jsonify_dict(gameTracker.get_all_players(game_id))})
-                else:
-                    break  # Stop sending if the connection is no longer active
-                await asyncio.sleep(10)
-        except WebSocketDisconnect:
-            # Handle the WebSocket disconnection
-            if websocket in game_connections[game_id]:
-                game_connections[game_id].remove(websocket)
-                print(f"WebSocket disconnected: {websocket}")
+    try:
+        # Initial state broadcast
+        await websocket.send_json({
+            "players": jsonify_dict(gameTracker.get_all_players(game_id)),
+            "bid": gameTracker.get_current_bid(game_id),
+            "team": None if not gameTracker.get_current_team(game_id) else gameTracker.get_current_team(game_id).model_dump(),
+            "remaining": jsonify_list(gameTracker.get_remaining_teams(game_id)),
+            "all_teams": jsonify_list(gameTracker.get_all_teams()),
+            "match_results": jsonify_list(gameTracker.match_results)
+        })
 
-    async def send_bid_updates():
-        try:
-            while True:
-                if websocket.application_state == WebSocketState.CONNECTED:
-                    await websocket.send_json({"bid": gameTracker.get_current_bid(game_id)})
-                else:
-                    break  # Stop sending if the connection is no longer active
-                await asyncio.sleep(10)
-        except WebSocketDisconnect:
-            # Handle the WebSocket disconnection
-            if websocket in game_connections[game_id]:
-                game_connections[game_id].remove(websocket)
-                print(f"WebSocket disconnected: {websocket}")
-
-    async def send_team():
-        try:
-            while True:
-                if websocket.application_state == WebSocketState.CONNECTED:
-                    await websocket.send_json({"team": None if not gameTracker.get_current_team(game_id) else gameTracker.get_current_team(game_id).model_dump()})
-                else:
-                    break  # Stop sending if the connection is no longer active
-                await asyncio.sleep(10)
-        except WebSocketDisconnect:
-            # Handle the WebSocket disconnection
-            if websocket in game_connections[game_id]:
-                game_connections[game_id].remove(websocket)
-                print(f"WebSocket disconnected: {websocket}")
-
-    async def send_remaining():
-        try:
-            while True:
-                if websocket.application_state == WebSocketState.CONNECTED:
-                    await websocket.send_json({"remaining": jsonify_list(gameTracker.get_remaining_teams(game_id))})
-                else:
-                    break  # Stop sending if the connection is no longer active
-                await asyncio.sleep(10)
-        except WebSocketDisconnect:
-            # Handle the WebSocket disconnection
-            if websocket in game_connections[game_id]:
-                game_connections[game_id].remove(websocket)
-                print(f"WebSocket disconnected: {websocket}")
-
-    async def send_all_teams():
-        try:
-            while True:
-                if websocket.application_state == WebSocketState.CONNECTED:
-                    await websocket.send_json({"all_teams": jsonify_list(gameTracker.get_all_teams())})
-                else:
-                    break  # Stop sending if the connection is no longer active
-                await asyncio.sleep(10)
-        except WebSocketDisconnect:
-            # Handle the WebSocket disconnection
-            if websocket in game_connections[game_id]:
-                game_connections[game_id].remove(websocket)
-                print(f"WebSocket disconnected: {websocket}")
-
-    async def send_match_results():
-        try:
-            while True:
-                if websocket.application_state == WebSocketState.CONNECTED:
-                    await websocket.send_json({"match_results": jsonify_list(gameTracker.match_results)})
-                else:
-                    break  # Stop sending if the connection is no longer active
-                await asyncio.sleep(10)
-        except WebSocketDisconnect:
-            # Handle the WebSocket disconnection
-            if websocket in game_connections[game_id]:
-                game_connections[game_id].remove(websocket)
-                print(f"WebSocket disconnected: {websocket}")
-
-    async def listen_for_messages():
-        try:
-            while True:
+        while True:
+            try:
                 message = await websocket.receive_text()
-                if message == "startGame" and websocket in game_connections[game_id][:1]:
-                    for participant_ws in game_connections[game_id]:
-                        await participant_ws.send_text("gameStarted")
-                    break  # Exit the loop if the game starts
-        except WebSocketDisconnect:
-            # Handle the WebSocket disconnection
-            if websocket in game_connections[game_id]:
-                game_connections[game_id].remove(websocket)
-                print(f"WebSocket disconnected: {websocket}")
+                if message == "startGame" and websocket == manager.active_connections[game_id][0]:
+                    await manager.broadcast(game_id, {"type": "gameStarted"})
+                    break
+            except WebSocketDisconnect:
+                await manager.disconnect(websocket, game_id)
+                return
 
-    send_participant_task = asyncio.create_task(send_participant_updates())
-    send_bid_task = asyncio.create_task(send_bid_updates())
-    send_team_task = asyncio.create_task(send_team())
-    send_remaining_task = asyncio.create_task(send_remaining())
-    send_all_teams_task = asyncio.create_task(send_all_teams())
-    send_match_results_task = asyncio.create_task(send_match_results())
-    listen_task = asyncio.create_task(listen_for_messages())
-
-    # Wait for either task to complete
-    done, pending = await asyncio.wait(
-        [send_participant_task, send_bid_task, listen_task, send_team_task, send_remaining_task, send_all_teams_task, send_match_results_task],
-        return_when=asyncio.FIRST_COMPLETED,
-    )
-
-    # Cancel any pending tasks if one task completes
-    for task in pending:
-        task.cancel()
-
-    # Cleanup after tasks complete
-    if game_id in game_connections and websocket in game_connections[game_id]:
-        game_connections[game_id].remove(websocket)
+    except Exception as e:
+        print(f"Error in websocket connection: {str(e)}")
+        await manager.disconnect(websocket, game_id)
+        return
 
 
 @app.post("/bid/")
@@ -234,10 +180,11 @@ async def bid(bid_model: BidModel):
 
     gameTracker.place_bid(bid_model)
 
-    if bid_model.gameId in game_connections:
-        for ws in game_connections[bid_model.gameId]:
-            await ws.send_json({"bid": gameTracker.get_current_bid(bid_model.gameId)})
-            await ws.send_json({"log": f"{bid_model.player} bid on {bid_model.team} for ${bid_model.bid:.2f}"})
+    # Broadcast bid updates
+    await manager.broadcast(bid_model.gameId, {
+        "bid": gameTracker.get_current_bid(bid_model.gameId),
+        "log": f"{bid_model.player} bid on {bid_model.team} for ${bid_model.bid:.2f}"
+    })
 
     # Ensure there's no running countdown task or cancel if there is one
     if bid_model.gameId in countdown_tasks and not countdown_tasks[bid_model.gameId].cancelled():

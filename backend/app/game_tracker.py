@@ -19,10 +19,10 @@ class GameTracker:
     def _init_teams(self) -> None:
         """Initialize teams in the database if they don't exist"""
         for team_info in self.teams_master:
-            existing = self.db.query(Team).filter_by(name=team_info.name).first()
+            existing = self.db.query(Team).filter_by(name=team_info.urlName).first()
             if not existing:
                 team = Team(
-                    name=team_info.name,
+                    name=team_info.urlName,
                     short_name=team_info.shortName,
                     seed=int(team_info.seed),
                     region=team_info.region,
@@ -117,7 +117,7 @@ class GameTracker:
         self.db.commit()
         
         return TeamInfo(
-            name=team.name,
+            urlName=team.name,
             shortName=team.short_name,
             seed=str(team.seed),
             region=team.region
@@ -128,7 +128,7 @@ class GameTracker:
         remaining = self.db.query(GameTeam).filter_by(game_id=gameId).all()
         return [
             TeamInfo(
-                name=gt.team.name,
+                urlName=gt.team.name,
                 shortName=gt.team.short_name,
                 seed=str(gt.team.seed),
                 region=gt.team.region
@@ -203,7 +203,7 @@ class GameTracker:
             
         team = game.current_team
         return TeamInfo(
-            name=team.name,
+            urlName=team.name,
             shortName=team.short_name,
             seed=str(team.seed),
             region=team.region
