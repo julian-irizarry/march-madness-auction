@@ -159,7 +159,13 @@ function GamePage() {
                                                     </Typography>
                                                 </Grid>
                                                 <Grid item xs={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                                    <Bid gameId={gameId} player={playerName} currentHighestBid={currentHighestBid} team={`${team.shortName} (${team.seed})`} />
+                                                    <Bid 
+                                                        gameId={gameId} 
+                                                        player={playerName} 
+                                                        currentHighestBid={currentHighestBid} 
+                                                        team={`${team.shortName} (${team.seed})`} 
+                                                        balance={playerInfos.get(playerName)?.balance || 0}
+                                                    />
                                                 </Grid>
                                             </Grid>
                                         </Grid>

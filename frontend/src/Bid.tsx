@@ -11,6 +11,7 @@ interface BidProps {
   player: string
   currentHighestBid: number
   team: string
+  balance: number
 }
 
 function Bid(props: BidProps) {
@@ -25,10 +26,22 @@ function Bid(props: BidProps) {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const bidNumber = parseInt(bid, 10);
-    if (isNaN(bidNumber) || bidNumber <= props.currentHighestBid) {
+    // Validate bid
+    if (isNaN(bidNumber)) {
+      alert('Please enter a valid number for your bid.');
+      return;
+    }
+    
+    if (bidNumber <= props.currentHighestBid) {
       alert('Your bid must be higher than the current highest bid.');
       return;
     }
+
+    if (bidNumber > props.balance) {
+      alert('Your bid cannot exceed your available balance.');
+      return;
+    }
+
     try {
       await fetch(`http://${BACKEND_URL}/bid/`, {
         method: 'POST',
