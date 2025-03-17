@@ -123,25 +123,26 @@ function HomePage() {
       <Grid container spacing={2} sx={{ justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
 
         {/* Create game button */}
-        <Grid item>
+        <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
           <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleCreateGameClick}>Create Game</Button>
         </Grid>
 
         {/* March Madness logo */}
-        <Grid item>
+        <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
           <img src={imageSrc} alt="Central Game" style={{ maxWidth: "450px", margin: "20px 0" }} />
         </Grid>
 
         {/* Join game button */}
-        <Grid item>
+        <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
           <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleJoinGameClick}>Join Game</Button>
+        </Grid>
+        
+        {/* View game button */}
+        <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleViewGameClick}>View Game</Button>
         </Grid>
       </Grid>
 
-      {/* View game button */}
-      <Grid item>
-        <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleViewGameClick}>View Game</Button>
-      </Grid>
 
       {/* Dialog to prompt user*/}
       <Dialog maxWidth="lg" open={isDialogOpen} onClose={handleCloseDialog}>

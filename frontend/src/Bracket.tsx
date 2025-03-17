@@ -203,7 +203,7 @@ function Bracket(props: BracketProps) {
   return (
     <>
       {/* Display all 4 regional brackets */}
-      <Grid container spacing={0} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", overflowY: "auto", maxHeight: "70vh" }}>
+      <Grid container spacing={0} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", overflowX: "auto", overflowY: "auto", maxHeight: "70vh" }}>
         {Array.from(region_sorted_teams.entries()).map(([key, val], index) => (
 
           <React.Fragment key={key}>

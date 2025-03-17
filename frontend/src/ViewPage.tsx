@@ -1,4 +1,4 @@
-import { Typography, Card, List, ListItem, Chip } from "@mui/joy";
+import { Typography, Card } from "@mui/joy";
 import { Paper, Grid } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
@@ -14,6 +14,7 @@ function ViewPage() {
     const [playerInfos, setPlayerInfos] = useState<Map<string, PlayerInfo>>(new Map());
 
     const baseColor = "#FFD700";
+    const [maxPoints, setMaxPoints] = useState<number>(0);
 
     const wsRef = useRef<WebSocket | null>(null); // Use useRef to hold the WebSocket connection
     useEffect(() => {
@@ -30,12 +31,19 @@ function ViewPage() {
                 if ("players" in data) {
                     const players = new Map<string, PlayerInfo>();
                     Object.entries(data.players).forEach(([key, temp_player]: [string, any]) => {
+                        let maxPointsLocal = 0;
+
                         players.set(key, {
                             name: temp_player.name,
                             gameId: temp_player.gameId,
                             balance: parseInt(temp_player.balance),
                             points: parseInt(temp_player.points),
                             teams: Object.values(temp_player.teams).map((temp_team: any) => {
+
+                                if (temp_team.points > maxPointsLocal) {
+                                    maxPointsLocal = temp_team.points;
+                                }
+
                                 return {
                                     shortName: temp_team.shortName,
                                     urlName: temp_team.urlName,
@@ -46,17 +54,33 @@ function ViewPage() {
                                 };
                             }),
                         });
+
+                        if (maxPointsLocal > maxPoints) {
+                            setMaxPoints(maxPointsLocal);
+                        }
                     });
                     setPlayerInfos(players);
                 }
             }
         };
         return () => ws.close();
-    }, [gameId]);
+    }, [gameId, maxPoints]);
+
+    const calculateBackgroundColor = (points: number): string => {
+        const pastelRed = [255, 182, 182]; // RGB value for pastel red
+        const pastelGreen = [182, 255, 182]; // RGB value for pastel green
+        const percentage = points / maxPoints;
+    
+        const r = Math.floor(pastelRed[0] * (1 - percentage) + pastelGreen[0] * percentage);
+        const g = Math.floor(pastelRed[1] * (1 - percentage) + pastelGreen[1] * percentage);
+        const b = Math.floor(pastelRed[2] * (1 - percentage) + pastelGreen[2] * percentage);
+    
+        return `rgb(${r}, ${g}, ${b})`; // Gradient from pastel red to pastel green
+    };
 
     return (
         <div id="outer-container">
-            <Paper elevation={1} sx={{ height: "720px", width: "1400px", padding: "10px", backgroundColor: "#fcfcfc" }}>
+            <Paper elevation={1} sx={{ height: "720px", width: "1400px", padding: "10px", backgroundColor: "#fcfcfc", overflowY: "auto" }}>
                 <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", height: "calc(100vh - 60px)", minHeight: "100%" }}>
 
                     {playerInfos.size > 0 ?
@@ -68,38 +92,43 @@ function ViewPage() {
                             return (
                                 <React.Fragment key={i}>
                                     <Grid item xs={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                        <Card sx={{ height: "200px", width: "80%", padding: "10px", backgroundColor: "var(--off-white-color)" }}>
+                                        <Card sx={{ height: "200px", width: "80%", padding: "10px", backgroundColor: "var(--off-white-color)"}}>
 
-                                            <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
+                                            <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center", overflowY: "auto" }} >
 
-                                                <Grid item xs={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
+                                                <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
                                                     {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={playerColor} width="20px" height="20px" />}
                                                     <Typography sx={{ color: playerColor, margin: "10px" }}>
                                                         {player}
                                                     </Typography>
-                                                </Grid>
-                                                <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
-                                                    <Typography sx={{ fontSize: "12px" }}>
+                                                    <Typography sx={{ fontSize: "12px", margin:2, color: "var(--tertiary-color)" }}>
                                                         <b>Points: {player_info.points}</b>
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
-                                                    <Typography sx={{ fontSize: "12px" }}>
-                                                        Teams:
                                                     </Typography>
                                                 </Grid>
                                                 <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center", overflowY: "auto" }}>
                                                     {player_info["teams"].map((temp_team: TeamInfo, teamIndex: number) => (
-                                                        <Card sx={{ padding: "0 20px", backgroundColor: "white", width: "80%" }}>
+                                                        <Card sx={{ padding: "0 20px", backgroundColor: calculateBackgroundColor(temp_team.points ? temp_team.points : 0), width: "80%", height:"30px" }}>
                                                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
-                                                                <Grid item xs={2} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                                                <Grid item xs={3} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                                                     {/* Team logo */}
                                                                     <img src={`https://i.turner.ncaa.com/sites/default/files/images/logos/schools/bgl/${temp_team.urlName}.svg`} alt={`${temp_team.shortName} logo`} style={{ width: "20px", height: "20px" }} />
                                                                 </Grid>
 
                                                                 <Grid item xs={8} sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}>
-                                                                    <Typography key={teamIndex} sx={{ fontSize: "12px", justifyContent: "left", alignItems: "left" }}>
-                                                                        {temp_team.shortName} | ${temp_team.purchasePrice} | {temp_team.points} points
+                                                                    <Typography key={teamIndex} sx={{ fontSize: "12px", justifyContent: "left", alignItems: "left", color: "var(--tertiary-color)" }}>
+                                                                        {temp_team.shortName}
+                                                                    </Typography>
+                                                                </Grid>
+
+                                                                <Grid item xs={1} sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}>
+                                                                    <Typography key={teamIndex} sx={{ fontSize: "12px", justifyContent: "left", alignItems: "left", color: "gray" }}>
+                                                                        ${temp_team.purchasePrice}
+                                                                    </Typography>
+                                                                </Grid>
+
+                                                                <Grid item xs={2} sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}>
+                                                                    <Typography key={teamIndex} sx={{ fontSize: "12px", justifyContent: "left", alignItems: "left", color: "gray" }}>
+                                                                        {temp_team.points} points
                                                                     </Typography>
                                                                 </Grid>
                                                             </Grid>

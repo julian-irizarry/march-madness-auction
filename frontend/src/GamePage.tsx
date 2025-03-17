@@ -56,7 +56,8 @@ function GamePage() {
                                     shortName: temp_team.shortName,
                                     urlName: temp_team.urlName,
                                     seed: temp_team.seed,
-                                    region: temp_team.region
+                                    region: temp_team.region,
+                                    purchasePrice: temp_team.purchasePrice,
                                 };
                             }),
                         });
@@ -110,7 +111,7 @@ function GamePage() {
 
     return (
         <div id="outer-container">
-            <Paper elevation={1} sx={{ height: "720px", width: "1400px", padding: "10px", backgroundColor: "#fcfcfc" }}>
+            <Paper elevation={1} sx={{ height: "100%", width: "100%", padding: "10px", backgroundColor: "#fcfcfc" }}>
                 <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", height: "calc(100vh - 60px)", minHeight: "100%" }}>
                     {/* Left side */}
                     <Grid item xs={10}>
@@ -182,12 +183,12 @@ function GamePage() {
                     </Grid>
 
                     {/* Right side */}
-                    <Grid item xs={2}>
+                    <Grid item xs={2} sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
                         <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
 
                             {/* Player */}
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Card sx={{ height: 200, overflowY: "auto", width: "100%", backgroundColor: "white" }}>
+                                <Card sx={{ height: 200, overflow: "auto", overflowY: "auto", width: "100%", backgroundColor: "white" }}>
                                     <List sx={{ width: "100%" }}>
                                         {playerInfos.size > 0 ?
                                             Array.from(playerInfos.entries()).map(([player, player_info], i) => {
