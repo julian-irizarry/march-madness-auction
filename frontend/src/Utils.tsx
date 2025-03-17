@@ -11,8 +11,8 @@ export interface PlayerInfo {
 export interface TeamInfo {
     shortName: string
     urlName: string
-    seed: number;
-    region: string;
+    seed: string
+    region: string
 }
 
 export interface Match {

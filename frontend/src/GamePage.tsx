@@ -12,6 +12,110 @@ import { ReactComponent as UserIcon } from "./icons/user.svg";
 import "./css/App.css";
 import "./css/Fonts.css";
 
+// Add more specific types for WebSocket messages
+type WebSocketMessage = {
+    players?: Record<string, PlayerInfo>;
+    bid?: number;
+    countdown?: number;
+    team?: TeamInfo;
+    log?: string;
+    remaining?: TeamInfo[];
+    all_teams?: TeamInfo[];
+};
+
+// Extract WebSocket logic to a custom hook
+function useGameWebSocket(gameId: string) {
+    const [wsData, setWsData] = useState<WebSocketMessage>({});
+    const [error, setError] = useState<string | null>(null);
+    
+    useEffect(() => {
+        const ws = new WebSocket(`ws://${BACKEND_URL}/ws/${gameId}`);
+
+        ws.onerror = (error) => {
+            setError('WebSocket connection error');
+            console.error('WebSocket error:', error);
+        };
+
+        ws.onclose = () => {
+            setError('WebSocket connection closed');
+        };
+
+        ws.onmessage = (event) => {
+            if (event.data === "gameStarted") {
+                // ignore
+            }
+            else {
+                try {
+                    const data: WebSocketMessage = JSON.parse(event.data);
+                    console.log("DATA", data);
+                    if ("players" in data && data.players) {
+                        const players = new Map<string, PlayerInfo>();
+                        Object.entries(data.players).forEach(([key, temp_player]: [string, any]) => {
+                            players.set(key, {
+                                name: temp_player.name,
+                                gameId: temp_player.gameId,
+                                balance: parseInt(temp_player.balance),
+                                teams: temp_player.teams,
+                            });
+                        });
+                        setWsData((prev: WebSocketMessage) => ({ ...prev, players }));
+                    }
+                    else if ("bid" in data) {
+                        setWsData((prev: WebSocketMessage) => ({ ...prev, bid: data["bid"] }));
+                    }
+                    else if ("countdown" in data) {
+                        setWsData((prev: WebSocketMessage) => ({ ...prev, countdown: data["countdown"] }));
+                    }
+                    else if ("team" in data && data.team) {
+                        const team = data.team as TeamInfo;
+                        setWsData((prev: WebSocketMessage) => ({ ...prev, team: {
+                            shortName: team.shortName,
+                            urlName: team.urlName,
+                            seed: team.seed.toString(),
+                            region: team.region
+                        } }));
+                    }
+                    else if ("log" in data) {
+                        setWsData((prev: WebSocketMessage) => ({ ...prev, log: data["log"] }));
+                    }
+                    else if ("remaining" in data && data.remaining) {
+                        const remaining_teams: TeamInfo[] = data.remaining.map((temp_team: { [key: string]: any }, i: number) => {
+                            return {
+                                shortName: temp_team["shortName"],
+                                urlName: temp_team["urlName"],
+                                seed: temp_team["seed"].toString(),
+                                region: temp_team["region"]
+                            };
+                        });
+                        setWsData((prev: WebSocketMessage) => ({ ...prev, remaining: remaining_teams }));
+                    }
+                    else if ("all_teams" in data && data.all_teams) {
+                        const all_teams: TeamInfo[] = data.all_teams.map((temp_team: { [key: string]: any }, i: number) => {
+                            return {
+                                shortName: temp_team["shortName"],
+                                urlName: temp_team["urlName"],
+                                seed: temp_team["seed"].toString(),
+                                region: temp_team["region"]
+                            };
+                        })
+                        setWsData((prev: WebSocketMessage) => ({ ...prev, all_teams }));
+                    }
+                } catch (error) {
+                    console.error('Error parsing WebSocket message:', error);
+                    setError('Invalid message format received');
+                }
+            }
+        };
+        return () => {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.close();
+            }
+        };
+    }, [gameId]);
+
+    return { wsData, error };
+}
+
 function GamePage() {
     const location = useLocation();
     const { gameId, playerName } = location.state || {};
@@ -31,74 +135,32 @@ function GamePage() {
 
     const baseColor = "#FFD700";
 
-    const wsRef = useRef<WebSocket | null>(null); // Use useRef to hold the WebSocket connection
-    useEffect(() => {
-        const ws = new WebSocket(`ws://${BACKEND_URL}/ws/${gameId}`);
-        wsRef.current = ws;
+    const { wsData, error } = useGameWebSocket(gameId);
 
-        ws.onmessage = (event) => {
-            if (event.data === "gameStarted") {
-                // ignore
-            }
-            else {
-                const data = JSON.parse(event.data);
-                console.log("DATA", data);
-                if ("players" in data) {
-                    const players = new Map<string, PlayerInfo>();
-                    Object.entries(data.players).forEach(([key, temp_player]: [string, any]) => {
-                        players.set(key, {
-                            name: temp_player.name,
-                            gameId: temp_player.gameId,
-                            balance: parseInt(temp_player.balance),
-                            teams: temp_player.teams,
-                        });
-                    });
-                    setPlayerInfos(players);
-                }
-                else if ("bid" in data) {
-                    setCurrentHighestBid(data["bid"]);
-                }
-                else if ("countdown" in data) {
-                    setCountdown(data["countdown"]);
-                }
-                else if ("team" in data) {
-                    setTeam({
-                        shortName: data["team"]["shortName"],
-                        urlName: data["team"]["urlName"],
-                        seed: parseInt(data["team"]["seed"]),
-                        region: data["team"]["region"]
-                    });
-                }
-                else if ("log" in data) {
-                    setLog(data["log"]);
-                    setOpenSnackbar(true);
-                }
-                else if ("remaining" in data) {
-                    const remaining_teams: TeamInfo[] = data["remaining"].map((temp_team: { [key: string]: any }, i: number) => {
-                        return {
-                            shortName: temp_team["shortName"],
-                            urlName: temp_team["urlName"],
-                            seed: parseInt(temp_team["seed"]),
-                            region: temp_team["region"]
-                        };
-                    });
-                    setRemainingTeams(remaining_teams);
-                }
-                else if ("all_teams" in data) {
-                    const all_teams: TeamInfo[] = data["all_teams"].map((temp_team: { [key: string]: any }, i: number) => {
-                        return {
-                            shortName: temp_team["shortName"],
-                            urlName: temp_team["urlName"],
-                            seed: parseInt(temp_team["seed"]),
-                            region: temp_team["region"]
-                        };
-                    })
-                    setAllTeams(all_teams);
-                }
-            }
-        };
-        return () => ws.close();
-    }, [gameId]);
+    useEffect(() => {
+        if (wsData.players) {
+            setPlayerInfos(wsData.players);
+        }
+        if (wsData.bid) {
+            setCurrentHighestBid(wsData.bid);
+        }
+        if (wsData.countdown) {
+            setCountdown(wsData.countdown);
+        }
+        if (wsData.team) {
+            setTeam(wsData.team);
+        }
+        if (wsData.log) {
+            setLog(wsData.log);
+            setOpenSnackbar(true);
+        }
+        if (wsData.remaining) {
+            setRemainingTeams(wsData.remaining);
+        }
+        if (wsData.all_teams) {
+            setAllTeams(wsData.all_teams);
+        }
+    }, [wsData.players, wsData.bid, wsData.countdown, wsData.team, wsData.log, wsData.remaining, wsData.all_teams]);
 
     return (
         <div id="outer-container">
