@@ -21,10 +21,22 @@ FRONTEND_PORT = int(os.getenv("FRONTEND_PORT", 3000))
 REACT_APP_BACKEND_HOST = os.getenv("REACT_APP_BACKEND_HOST", "127.0.0.1")
 REACT_APP_BACKEND_PORT = int(os.getenv("REACT_APP_BACKEND_PORT", 8000))
 
-origins = [f"http://{FRONTEND_HOST}:{FRONTEND_PORT}", f"{FRONTEND_HOST}:{FRONTEND_PORT}", f"http://localhost:{FRONTEND_PORT}"]
+origins = [
+    f"http://{FRONTEND_HOST}:{FRONTEND_PORT}",
+    f"ws://{FRONTEND_HOST}:{FRONTEND_PORT}",
+    f"wss://{FRONTEND_HOST}:{FRONTEND_PORT}",
+    f"http://localhost:{FRONTEND_PORT}",
+    f"ws://localhost:{FRONTEND_PORT}",
+    f"wss://localhost:{FRONTEND_PORT}"
+]
+
 app = FastAPI()
 app.add_middleware(
-    CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 # Track Player Teams and Balance. Will turn into a database maybe
@@ -148,10 +160,15 @@ async def finalize_bid(game_id: str):
 
 @app.websocket("/ws/{game_id}")
 async def websocket_endpoint(websocket: WebSocket, game_id: str):
+    print(f"WebSocket connection attempt for game {game_id}")
+    print(f"Active games: {manager.active_games}")
+    
     if not await manager.connect(websocket, game_id):
+        print(f"WebSocket connection rejected for game {game_id}")
         return
 
     try:
+        print(f"WebSocket connection accepted for game {game_id}")
         # Initial state broadcast
         await websocket.send_json({
             "players": jsonify_dict(gameTracker.get_all_players(game_id)),
@@ -161,19 +178,22 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
             "all_teams": jsonify_list(gameTracker.get_all_teams()),
             "match_results": jsonify_list(gameTracker.match_results)
         })
+        print(f"Initial state sent for game {game_id}")
 
         while True:
             try:
                 message = await websocket.receive_text()
+                print(f"Received message from game {game_id}: {message}")
                 if message == "startGame" and websocket == manager.active_connections[game_id][0]:
                     await manager.broadcast(game_id, {"type": "gameStarted"})
                     break
             except WebSocketDisconnect:
+                print(f"WebSocket disconnected for game {game_id}")
                 await manager.disconnect(websocket, game_id)
                 return
 
     except Exception as e:
-        print(f"Error in websocket connection: {str(e)}")
+        print(f"Error in websocket connection for game {game_id}: {str(e)}")
         await manager.disconnect(websocket, game_id)
         return
 
