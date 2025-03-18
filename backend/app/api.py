@@ -10,6 +10,7 @@ import os
 
 from app import GameTracker, GAME_ID_NUM_CHAR, CreateModel, JoinModel, ViewModel, BidModel
 from app.types.types import jsonify_dict, jsonify_list
+from app.models.database import Game
 
 # ================== SETUP APP ==================
 
