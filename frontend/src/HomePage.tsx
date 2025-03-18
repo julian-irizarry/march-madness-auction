@@ -4,6 +4,7 @@ import { Button, IconButton } from "@mui/joy";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Alert } from "@mui/material";
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 import { BACKEND_URL } from "./Utils"
 import imageSrc from "./images/march_madness_logo_auction.png";
@@ -23,25 +24,43 @@ function HomePage() {
   const [gameId, setGameId] = useState("");
   const [dialogError, setDialogError] = useState("");
   const [isMuted, setIsMuted] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const hasInteractedRef = useRef(false);
 
   useEffect(() => {
     // Create audio element
     audioRef.current = new Audio('/audio/metal.mp3');
     audioRef.current.loop = true;
-    
-    // Start playing when component mounts
-    const playAudio = async () => {
+
+    // Function to start audio
+    const startAudio = async () => {
       try {
-        if (audioRef.current) {
+        if (audioRef.current && !isPlaying) {
           await audioRef.current.play();
+          setIsPlaying(true);
+          // Remove the event listeners after successful playback
+          document.removeEventListener('click', handleFirstInteraction);
+          document.removeEventListener('keypress', handleFirstInteraction);
+          document.removeEventListener('scroll', handleFirstInteraction);
         }
       } catch (error) {
-        console.error('Audio autoplay failed:', error);
+        console.error('Audio playback failed:', error);
       }
     };
-    
-    playAudio();
+
+    // Handler for first interaction
+    const handleFirstInteraction = () => {
+      if (!hasInteractedRef.current) {
+        hasInteractedRef.current = true;
+        startAudio();
+      }
+    };
+
+    // Add event listeners for various user interactions
+    document.addEventListener('click', handleFirstInteraction);
+    document.addEventListener('keypress', handleFirstInteraction);
+    document.addEventListener('scroll', handleFirstInteraction);
 
     // Cleanup on unmount
     return () => {
@@ -49,8 +68,11 @@ function HomePage() {
         audioRef.current.pause();
         audioRef.current = null;
       }
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('keypress', handleFirstInteraction);
+      document.removeEventListener('scroll', handleFirstInteraction);
     };
-  }, []);
+  }, [isPlaying]);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -199,7 +221,7 @@ function HomePage() {
           }
         }}
       >
-        {isMuted ? <VolumeOffIcon /> : <VolumeUpIcon />}
+        {!isPlaying ? <PlayArrowIcon /> : (isMuted ? <VolumeOffIcon /> : <VolumeUpIcon />)}
       </IconButton>
 
       {/* Dialog to prompt user*/}
