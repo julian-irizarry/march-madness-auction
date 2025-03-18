@@ -1,7 +1,7 @@
 import { Typography, List, ListItem, Chip } from "@mui/joy";
 import { Grid, Paper, Card, Fab, Snackbar, Alert } from "@mui/material";
 import { useLocation } from "react-router-dom";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
 import Bid from "./Bid";
 import Bracket from "./Bracket";
@@ -14,7 +14,7 @@ import "./css/Fonts.css";
 
 // Add more specific types for WebSocket messages
 type WebSocketMessage = {
-    players?: Record<string, PlayerInfo>;
+    players?: Map<string, PlayerInfo>;
     bid?: number;
     countdown?: number;
     team?: TeamInfo;
@@ -83,7 +83,7 @@ function useGameWebSocket(gameId: string) {
                             return {
                                 shortName: temp_team["shortName"],
                                 urlName: temp_team["urlName"],
-                                seed: temp_team["seed"].toString(),
+                                seed: temp_team["seed"],
                                 region: temp_team["region"]
                             };
                         });
@@ -94,7 +94,7 @@ function useGameWebSocket(gameId: string) {
                             return {
                                 shortName: temp_team["shortName"],
                                 urlName: temp_team["urlName"],
-                                seed: temp_team["seed"].toString(),
+                                seed: temp_team["seed"],
                                 region: temp_team["region"]
                             };
                         })
@@ -123,7 +123,7 @@ function GamePage() {
     const [currentHighestBid, setCurrentHighestBid] = useState<number>(0);
     const [countdown, setCountdown] = useState(10);
     const [playerInfos, setPlayerInfos] = useState<Map<string, PlayerInfo>>(new Map());
-    const [team, setTeam] = useState<TeamInfo>({ shortName: "", urlName:"", seed: -1, region: "" });
+    const [team, setTeam] = useState<TeamInfo>({ shortName: "", urlName:"", seed: "", region: "" });
     const [remainingTeams, setRemainingTeams] = useState<TeamInfo[]>([]);
     const [allTeams, setAllTeams] = useState<TeamInfo[]>([]);
     const [log, setLog] = useState<string>("");
