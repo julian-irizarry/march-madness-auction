@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@mui/joy";
+import { Button, IconButton } from "@mui/joy";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Alert } from "@mui/material";
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 
 import { BACKEND_URL } from "./Utils"
 import imageSrc from "./images/march_madness_logo_auction.png";
@@ -20,6 +22,45 @@ function HomePage() {
   const [playerName, setPlayerName] = useState("");
   const [gameId, setGameId] = useState("");
   const [dialogError, setDialogError] = useState("");
+  const [isMuted, setIsMuted] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    // Create audio element
+    audioRef.current = new Audio('/audio/metal.mp3');
+    audioRef.current.loop = true;
+    
+    // Start playing when component mounts
+    const playAudio = async () => {
+      try {
+        if (audioRef.current) {
+          await audioRef.current.play();
+        }
+      } catch (error) {
+        console.error('Audio autoplay failed:', error);
+      }
+    };
+    
+    playAudio();
+
+    // Cleanup on unmount
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+  };
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
@@ -142,6 +183,24 @@ function HomePage() {
       <Grid item>
         <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleViewGameClick}>View Game</Button>
       </Grid>
+
+      {/* Audio control button - positioned absolutely in bottom right */}
+      <IconButton
+        onClick={toggleMute}
+        sx={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          backgroundColor: 'var(--primary-color)',
+          color: 'white',
+          '&:hover': {
+            backgroundColor: 'var(--primary-color)',
+            opacity: 0.8,
+          }
+        }}
+      >
+        {isMuted ? <VolumeOffIcon /> : <VolumeUpIcon />}
+      </IconButton>
 
       {/* Dialog to prompt user*/}
       <Dialog maxWidth="lg" open={isDialogOpen} onClose={handleCloseDialog}>
