@@ -28,12 +28,12 @@ function HomePage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const hasInteractedRef = useRef(false);
 
+  // Setup audio element only once when component mounts
   useEffect(() => {
-    console.log('Setting up audio with current state:', { isPlaying, isMuted });
-    
-    // Create audio element
+    console.log('Creating audio element');
     audioRef.current = new Audio('/audio/metal.mp3');
     audioRef.current.loop = true;
+    audioRef.current.volume = 1.0; // Set volume to maximum
 
     // Log when audio is loaded
     audioRef.current.addEventListener('loadeddata', () => {
@@ -50,6 +50,25 @@ function HomePage() {
       });
     });
 
+    // Cleanup on unmount
+    return () => {
+      console.log('Cleaning up audio resources');
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []); // Empty dependency array as this should only run once
+
+  // Handle user interactions and playback
+  useEffect(() => {
+    console.log('Setting up audio with current state:', { isPlaying, isMuted });
+    
+    if (!audioRef.current) return;
+
+    // Update muted state
+    audioRef.current.muted = isMuted;
+    
     // Function to start audio
     const startAudio = async () => {
       console.log('Attempting to start audio...');
@@ -105,25 +124,13 @@ function HomePage() {
     document.addEventListener('keypress', handleFirstInteraction);
     document.addEventListener('scroll', handleFirstInteraction);
 
-    // Cleanup on unmount
+    // Cleanup event listeners
     return () => {
-      console.log('Cleaning up audio resources');
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
       document.removeEventListener('click', handleFirstInteraction);
       document.removeEventListener('keypress', handleFirstInteraction);
       document.removeEventListener('scroll', handleFirstInteraction);
     };
-  }, [isPlaying]);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      console.log('Updating mute state:', { isMuted });
-      audioRef.current.muted = isMuted;
-    }
-  }, [isMuted]);
+  }, [isPlaying, isMuted]); // Add both isPlaying and isMuted as dependencies
 
   const toggleMute = () => {
     console.log('Toggle mute clicked. Current state:', { isMuted, isPlaying });
