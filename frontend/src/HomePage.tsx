@@ -29,28 +29,71 @@ function HomePage() {
   const hasInteractedRef = useRef(false);
 
   useEffect(() => {
+    console.log('Setting up audio with current state:', { isPlaying, isMuted });
+    
     // Create audio element
     audioRef.current = new Audio('/audio/metal.mp3');
     audioRef.current.loop = true;
 
+    // Log when audio is loaded
+    audioRef.current.addEventListener('loadeddata', () => {
+      console.log('Audio file loaded successfully');
+    });
+
+    // Log audio errors
+    audioRef.current.addEventListener('error', (e) => {
+      console.error('Audio loading error:', {
+        error: e,
+        src: audioRef.current?.src,
+        networkState: audioRef.current?.networkState,
+        readyState: audioRef.current?.readyState
+      });
+    });
+
     // Function to start audio
     const startAudio = async () => {
+      console.log('Attempting to start audio...');
       try {
         if (audioRef.current && !isPlaying) {
+          console.log('Audio element state before play:', {
+            currentTime: audioRef.current.currentTime,
+            paused: audioRef.current.paused,
+            muted: audioRef.current.muted,
+            volume: audioRef.current.volume,
+            src: audioRef.current.src
+          });
+
           await audioRef.current.play();
+          console.log('Audio playback started successfully');
           setIsPlaying(true);
+          
           // Remove the event listeners after successful playback
           document.removeEventListener('click', handleFirstInteraction);
           document.removeEventListener('keypress', handleFirstInteraction);
           document.removeEventListener('scroll', handleFirstInteraction);
         }
       } catch (error) {
-        console.error('Audio playback failed:', error);
+        console.error('Audio playback failed:', {
+          error,
+          audioElement: {
+            src: audioRef.current?.src,
+            readyState: audioRef.current?.readyState,
+            networkState: audioRef.current?.networkState,
+            paused: audioRef.current?.paused,
+            muted: audioRef.current?.muted
+          }
+        });
       }
     };
 
     // Handler for first interaction
-    const handleFirstInteraction = () => {
+    const handleFirstInteraction = (e: Event) => {
+      console.log('User interaction detected:', {
+        type: e.type,
+        hasInteracted: hasInteractedRef.current,
+        target: e.target
+      });
+      
       if (!hasInteractedRef.current) {
         hasInteractedRef.current = true;
         startAudio();
@@ -64,6 +107,7 @@ function HomePage() {
 
     // Cleanup on unmount
     return () => {
+      console.log('Cleaning up audio resources');
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
@@ -76,11 +120,13 @@ function HomePage() {
 
   useEffect(() => {
     if (audioRef.current) {
+      console.log('Updating mute state:', { isMuted });
       audioRef.current.muted = isMuted;
     }
   }, [isMuted]);
 
   const toggleMute = () => {
+    console.log('Toggle mute clicked. Current state:', { isMuted, isPlaying });
     setIsMuted(!isMuted);
   };
 
