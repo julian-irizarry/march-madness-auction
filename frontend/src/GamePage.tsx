@@ -160,7 +160,11 @@ function GamePage() {
         if (wsData.all_teams) {
             setAllTeams(wsData.all_teams);
         }
-    }, [wsData.players, wsData.bid, wsData.countdown, wsData.team, wsData.log, wsData.remaining, wsData.all_teams]);
+        if (error) {
+            setLog(error);
+            setOpenSnackbar(true);
+        }
+    }, [wsData.players, wsData.bid, wsData.countdown, wsData.team, wsData.log, wsData.remaining, wsData.all_teams, error]);
 
     return (
         <div id="outer-container">

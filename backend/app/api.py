@@ -86,7 +86,9 @@ async def create_game(create_model: CreateModel) -> dict:
 
 @app.post("/join-game/")
 async def join_game(join_model: JoinModel):
-    if join_model.gameId not in gameTracker.games:
+    # Check if game exists in database
+    game = gameTracker.db.query(Game).filter_by(id=join_model.gameId).first()
+    if not game:
         raise HTTPException(status_code=404, detail="Game ID not found")
     if join_model.player in gameTracker.get_all_players(join_model.gameId):
         raise HTTPException(status_code=400, detail="Player name already taken in this game")
@@ -103,7 +105,9 @@ async def join_game(join_model: JoinModel):
 
 @app.post("/view-game/")
 async def join_game(join_model: ViewModel):
-    if join_model.gameId not in gameTracker.games:
+    # Check if game exists in database
+    game = gameTracker.db.query(Game).filter_by(id=join_model.gameId).first()
+    if not game:
         raise HTTPException(status_code=404, detail="Game ID not found")
     
     # Broadcast updated player list to all connected clients
@@ -118,7 +122,7 @@ async def start_countdown(game_id: str):
     while True:
         gameTracker.decrement_countdown(game_id)
         await manager.broadcast(game_id, {
-            "countdown": gameTracker.games[game_id].countdown
+            "countdown": gameTracker.get_current_countdown(game_id)
         })
         await asyncio.sleep(1)  # Wait for 1 second between each decrement
         if gameTracker.get_current_countdown(game_id) == 0:
@@ -175,7 +179,9 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
 
 @app.post("/bid/")
 async def bid(bid_model: BidModel):
-    if bid_model.gameId not in gameTracker.games:
+    # Check if game exists in database
+    game = gameTracker.db.query(Game).filter_by(id=bid_model.gameId).first()
+    if not game:
         raise HTTPException(status_code=404, detail="Game ID not found")
 
     gameTracker.place_bid(bid_model)
