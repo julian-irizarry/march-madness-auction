@@ -203,7 +203,7 @@ function GamePage() {
                             {/* Display bracket */}
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                 {/* backgroundColor: "rgba(0, 0, 0, 0)" */}
-                                <Card sx={{ height: "525px", width: "100%", padding: "5px", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "black", boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)" }}>
+                                <Card sx={{ height: "555px", width: "100%", padding: "5px", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "black", boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)" }}>
                                     {allTeams.length > 0 ?
                                         <Bracket all_teams={allTeams} selected_team={team} />
                                         : <Typography>No teams available</Typography>

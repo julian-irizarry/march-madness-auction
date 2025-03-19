@@ -221,7 +221,7 @@ function Bracket(props: BracketProps) {
   return (
     <>
       {/* Display all 4 regional brackets */}
-      <Grid container spacing={0} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", overflowY: "auto", maxHeight: "70vh", paddingBottom: 3 }}>
+      <Grid container spacing={0} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", overflowY: "auto", maxHeight: "70vh", paddingBottom: 1 }}>
 
         <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
           <img src={imageSrc} alt="Central Game" style={{ position: "absolute", top: "70%", left: "50%", maxWidth: "250px" ,transform: "translate(-50%, 20%)",zIndex: 2 }} />
