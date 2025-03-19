@@ -1,6 +1,9 @@
 import React from "react";
-import { Card, Typography, Grid, Divider, Paper } from "@mui/material";
+import { Box, Card, Typography, Grid, Divider } from "@mui/material";
 import { GenerateRegionBracketData, IntegrateMatchResults, TeamInfo, Match } from "./Utils"
+import imageSrc from "./images/march_madness_logo.png";
+import BBImageSrc from "./images/basketball.png";
+
 
 interface MatchProps {
   match: Match
@@ -113,7 +116,7 @@ interface RegionProps {
   region_name: string;
   region_teams: TeamInfo[];
   reverse: boolean
-  selected_team: TeamInfo | null
+  selected_team?: TeamInfo
   match_results?: Match[] | null
 }
 
@@ -139,30 +142,45 @@ function Region(props: RegionProps) {
 
   return (
     // Display regional bracket
-    <Grid container spacing={2} sx={{ marginTop: 3, marginBottom: 3, display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
+    <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
       {roundsToRender.map(([round, matchArr]) => (
         <Grid item key={round}>
 
           {/* Column for each round */}
-          <Grid container direction="column" spacing={10 * (5 - matchArr.length)} justifyContent="center" alignItems="center">
-            {matchArr.map((val) => (
-              <Grid item key={`${round}_${val.id}`}>
+          <Grid container direction="column" rowSpacing={10 * (5 - matchArr.length)} sx={{ display: "flex", justifyContent: "center", alignItems: "center", margin: matchArr.length === 8 ? 0 : undefined }}>
+            {matchArr.map((val) => {
 
-                {/* Display region name above final 8 */}
-                {
-                  matchArr.length === 1 ?
+              // highlight match if current team is a participant or seed 15/16 bundle 
+              const toHighlight = !!(
+                props.selected_team &&
+                val.participants[0] &&
+                val.participants[1] &&
+                (
+                  props.selected_team.shortName === val.participants[0].shortName ||
+                  props.selected_team.shortName === val.participants[1].shortName ||
+                  (props.selected_team.region === "bundle" &&
+                    (props.selected_team.seed === val.participants[0].seed ||
+                      props.selected_team.seed === val.participants[1].seed))
+                )
+              );
+
+              return (
+                <Grid item key={`${round}_${val.id}`}>
+
+                  {/* Display region name above final 8 */}
+                  {matchArr.length === 1 && (
                     <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
-                      <Typography variant="body2" justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "10px" }}>
+                      <Typography variant="body2" justifyContent="center" sx={{ color: "black", fontSize: "10px" }}>
                         {props.region_name}
                       </Typography>
                     </Grid>
-                    : <></>
-                }
+                  )}
 
-                {/* Display match */}
-                <MatchComponent match={val} reverse={props.reverse} highlight={!!(props.selected_team && val.participants[0] && val.participants[1] && (props.selected_team.shortName === val.participants[0].shortName || props.selected_team.shortName === val.participants[1].shortName))} />
-              </Grid>
-            ))}
+                  {/* Display match */}
+                  <MatchComponent match={val} reverse={props.reverse} highlight={toHighlight} />
+                </Grid>
+              );
+            })}
           </Grid>
         </Grid>
       ))}
@@ -203,15 +221,22 @@ function Bracket(props: BracketProps) {
   return (
     <>
       {/* Display all 4 regional brackets */}
-      <Grid container spacing={0} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", overflowY: "auto", maxHeight: "70vh" }}>
+      <Grid container spacing={0} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", overflowY: "auto", maxHeight: "70vh", paddingBottom: 1 }}>
+
+        <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+          <img src={imageSrc} alt="Central Game" style={{ position: "absolute", top: "70%", left: "50%", maxWidth: "200px" ,transform: "translate(-50%, 160%)",zIndex: 2 }} />
+        </Box>
+
+        <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+          <img src={imageSrc} alt="Central Game" style={{ position: "absolute", top: "70%", left: "50%", maxWidth: "200px" ,transform: "translate(-50%, 1100%)",zIndex: 2 }} />
+        </Box>
+
         {Array.from(region_sorted_teams.entries()).map(([key, val], index) => (
 
           <React.Fragment key={key}>
             {/* Display regional bracket */}
             <Grid item xs={6}>
-              <Paper elevation={0} sx={{ borderRadius: 0 }}>
-                <Region region_name={key} region_teams={val} reverse={index % 2 === 1} selected_team={(props.selected_team && props.selected_team.region === key) ? props.selected_team : null} match_results={region_sorted_match_results.size > 0 ? region_sorted_match_results.get(key) : null}/>
-              </Paper>
+              <Region region_name={key} region_teams={val} reverse={index % 2 === 1} selected_team={props.selected_team} match_results={region_sorted_match_results.size > 0 ? region_sorted_match_results.get(key) : null} />
             </Grid>
 
             {/* Display the final matches in the middle */}
@@ -224,7 +249,7 @@ function Bracket(props: BracketProps) {
                   {/* West vs Midwest final four match */}
                   <Grid item xs={2}>
                     <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
-                      <Typography variant="body2" justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "10px" }}>
+                      <Typography variant="body2" justifyContent="center" sx={{ color: "black", fontSize: "10px" }}>
                         FINAL FOUR
                       </Typography>
                     </Grid>
@@ -240,7 +265,7 @@ function Bracket(props: BracketProps) {
                   {/* Final championship match */}
                   <Grid item xs={2}>
                     <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
-                      <Typography variant="body2" justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "10px" }}>
+                      <Typography variant="body2" justifyContent="center" sx={{ color: "black", fontSize: "10px" }}>
                         CHAMPIONSHIP
                       </Typography>
                     </Grid>
@@ -256,7 +281,7 @@ function Bracket(props: BracketProps) {
                   {/* East vs South final four match */}
                   <Grid item xs={2}>
                     <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
-                      <Typography variant="body2" justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "10px" }}>
+                      <Typography variant="body2" justifyContent="center" sx={{ color: "black", fontSize: "10px" }}>
                         FINAL FOUR
                       </Typography>
                     </Grid>

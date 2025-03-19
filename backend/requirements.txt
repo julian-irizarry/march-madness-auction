@@ -2,3 +2,4 @@ fastapi
 uvicorn[standard]
 requests
 pydantic==2.6.4
+sqlalchemy==2.0.27 

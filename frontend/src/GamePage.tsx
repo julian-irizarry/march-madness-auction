@@ -1,7 +1,7 @@
 import { Typography, List, ListItem, Chip } from "@mui/joy";
 import { Grid, Paper, Card, Fab, Snackbar, Alert } from "@mui/material";
 import { useLocation } from "react-router-dom";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
 import Bid from "./Bid";
 import Bracket from "./Bracket";
@@ -12,6 +12,121 @@ import { ReactComponent as UserIcon } from "./icons/user.svg";
 import "./css/App.css";
 import "./css/Fonts.css";
 
+// Add more specific types for WebSocket messages
+type WebSocketMessage = {
+    players?: Map<string, PlayerInfo>;
+    bid?: number;
+    countdown?: number;
+    team?: TeamInfo;
+    log?: string;
+    remaining?: TeamInfo[];
+    all_teams?: TeamInfo[];
+};
+
+// Extract WebSocket logic to a custom hook
+function useGameWebSocket(gameId: string) {
+    const [wsData, setWsData] = useState<WebSocketMessage>({});
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const ws = new WebSocket(`ws://${BACKEND_URL}/ws/${gameId}`);
+
+        ws.onerror = (error) => {
+            setError('WebSocket connection error');
+            console.error('WebSocket error:', error);
+        };
+
+        ws.onclose = () => {
+            setError('WebSocket connection closed');
+        };
+
+        ws.onmessage = (event) => {
+            if (event.data === "gameStarted") {
+                // ignore
+            }
+            else {
+                try {
+                    const data: WebSocketMessage = JSON.parse(event.data);
+                    console.log("DATA", data);
+                    if ("players" in data && data.players) {
+                        const players = new Map<string, PlayerInfo>();
+                        Object.entries(data.players).forEach(([key, temp_player]: [string, any]) => {
+                            players.set(key, {
+                                name: temp_player.name,
+                                gameId: temp_player.gameId,
+                                balance: parseInt(temp_player.balance),
+                                points: parseInt(temp_player.points),
+                                teams: Object.values(temp_player.teams).map((temp_team: any) => {
+                                    return {
+                                        shortName: temp_team.shortName,
+                                        urlName: temp_team.urlName,
+                                        seed: temp_team.seed,
+                                        region: temp_team.region,
+                                        purchasePrice: temp_team.purchasePrice
+                                    };
+                                }),
+                            });
+                        });
+                        setWsData((prev: WebSocketMessage) => ({ ...prev, players }));
+                    }
+                    else if ("bid" in data) {
+                        setWsData((prev: WebSocketMessage) => ({ ...prev, bid: data["bid"] }));
+                    }
+                    else if ("countdown" in data) {
+                        setWsData((prev: WebSocketMessage) => ({ ...prev, countdown: data["countdown"] }));
+                    }
+                    else if ("team" in data && data.team) {
+                        const team = data.team as TeamInfo;
+                        setWsData((prev: WebSocketMessage) => ({
+                            ...prev, team: {
+                                shortName: team.shortName,
+                                urlName: team.urlName,
+                                seed: team.seed,
+                                region: team.region
+                            }
+                        }));
+                    }
+                    else if ("log" in data) {
+                        setWsData((prev: WebSocketMessage) => ({ ...prev, log: data["log"] }));
+                    }
+                    else if ("remaining" in data && data.remaining) {
+                        const remaining_teams: TeamInfo[] = data.remaining.map((temp_team: { [key: string]: any }, i: number) => {
+                            return {
+                                shortName: temp_team["shortName"],
+                                urlName: temp_team["urlName"],
+                                seed: temp_team["seed"],
+                                region: temp_team["region"]
+                            };
+                        });
+                        setWsData((prev: WebSocketMessage) => ({ ...prev, remaining: remaining_teams }));
+                    }
+                    else if ("all_teams" in data && data.all_teams) {
+                        const all_teams: TeamInfo[] = data.all_teams.map((temp_team: { [key: string]: any }, i: number) => {
+                            return {
+                                shortName: temp_team["shortName"],
+                                urlName: temp_team["urlName"],
+                                seed: temp_team["seed"],
+                                region: temp_team["region"]
+                            };
+                        })
+                        setWsData((prev: WebSocketMessage) => ({ ...prev, all_teams }));
+                    }
+                } catch (error) {
+                    console.error('Error parsing WebSocket message:', error);
+                    setError('Invalid message format received');
+                }
+            }
+        };
+        return () => {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.close();
+            }
+        };
+    }, [gameId]);
+
+    return { wsData, error };
+}
+
 function GamePage() {
     const location = useLocation();
     const { gameId, playerName } = location.state || {};
@@ -19,7 +134,7 @@ function GamePage() {
     const [currentHighestBid, setCurrentHighestBid] = useState<number>(0);
     const [countdown, setCountdown] = useState(10);
     const [playerInfos, setPlayerInfos] = useState<Map<string, PlayerInfo>>(new Map());
-    const [team, setTeam] = useState<TeamInfo>({ shortName: "", urlName:"", seed: -1, region: "" });
+    const [team, setTeam] = useState<TeamInfo>({ shortName: "", urlName: "", seed: -1, region: "" });
     const [remainingTeams, setRemainingTeams] = useState<TeamInfo[]>([]);
     const [allTeams, setAllTeams] = useState<TeamInfo[]>([]);
     const [log, setLog] = useState<string>("");
@@ -31,102 +146,53 @@ function GamePage() {
 
     const baseColor = "#FFD700";
 
-    const wsRef = useRef<WebSocket | null>(null); // Use useRef to hold the WebSocket connection
-    useEffect(() => {
-        const ws = new WebSocket(`ws://${BACKEND_URL}/ws/${gameId}`);
-        wsRef.current = ws;
+    const { wsData, error } = useGameWebSocket(gameId);
 
-        ws.onmessage = (event) => {
-            if (event.data === "gameStarted") {
-                // ignore
-            }
-            else {
-                const data = JSON.parse(event.data);
-                console.log("DATA", data);
-                if ("players" in data) {
-                    const players = new Map<string, PlayerInfo>();
-                    Object.entries(data.players).forEach(([key, temp_player]: [string, any]) => {
-                        players.set(key, {
-                            name: temp_player.name,
-                            gameId: temp_player.gameId,
-                            balance: parseInt(temp_player.balance),
-                            teams: temp_player.teams,
-                        });
-                    });
-                    setPlayerInfos(players);
-                }
-                else if ("bid" in data) {
-                    setCurrentHighestBid(data["bid"]);
-                }
-                else if ("countdown" in data) {
-                    setCountdown(data["countdown"]);
-                }
-                else if ("team" in data) {
-                    setTeam({
-                        shortName: data["team"]["shortName"],
-                        urlName: data["team"]["urlName"],
-                        seed: parseInt(data["team"]["seed"]),
-                        region: data["team"]["region"]
-                    });
-                }
-                else if ("log" in data) {
-                    setLog(data["log"]);
-                    setOpenSnackbar(true);
-                }
-                else if ("remaining" in data) {
-                    const remaining_teams: TeamInfo[] = data["remaining"].map((temp_team: { [key: string]: any }, i: number) => {
-                        return {
-                            shortName: temp_team["shortName"],
-                            urlName: temp_team["urlName"],
-                            seed: parseInt(temp_team["seed"]),
-                            region: temp_team["region"]
-                        };
-                    });
-                    setRemainingTeams(remaining_teams);
-                }
-                else if ("all_teams" in data) {
-                    const all_teams: TeamInfo[] = data["all_teams"].map((temp_team: { [key: string]: any }, i: number) => {
-                        return {
-                            shortName: temp_team["shortName"],
-                            urlName: temp_team["urlName"],
-                            seed: parseInt(temp_team["seed"]),
-                            region: temp_team["region"]
-                        };
-                    })
-                    setAllTeams(all_teams);
-                }
-            }
-        };
-        return () => ws.close();
-    }, [gameId]);
+    // resets current highest bid when a new team is auctioned
+    useEffect(() => {
+        if (wsData.team) {
+            setCurrentHighestBid(0);
+        }
+    }, [wsData.team]);
+
+    useEffect(() => {
+        if (wsData.players !== undefined) {
+            setPlayerInfos(wsData.players);
+        }
+        if (wsData.bid !== undefined) {
+            setCurrentHighestBid(wsData.bid);
+        }
+        if (wsData.countdown !== undefined) {
+            setCountdown(wsData.countdown);
+        }
+        if (wsData.team !== undefined) {
+            setTeam(wsData.team);
+        }
+        if (wsData.log !== undefined) {
+            setLog(wsData.log);
+            setOpenSnackbar(true);
+        }
+        if (wsData.remaining !== undefined) {
+            setRemainingTeams(wsData.remaining);
+        }
+        if (wsData.all_teams !== undefined) {
+            setAllTeams(wsData.all_teams);
+        }
+    }, [wsData.players, wsData.bid, wsData.countdown, wsData.team, wsData.log, wsData.remaining, wsData.all_teams, error]);
 
     return (
         <div id="outer-container">
-            <Paper elevation={1} sx={{ height: "720px", width: "1400px", padding: "10px", backgroundColor: "#fcfcfc" }}>
-                <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", height: "calc(100vh - 60px)", minHeight: "100%" }}>
+            {/* backgroundColor: "rgba(0, 0, 0, 0)" */}
+            <Paper elevation={1} sx={{ height: "720px", width: "1400px", padding: "10px", backgroundColor: "white" }} >
+                <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", height: "calc(100vh - 170px)", minHeight: "100%" }}>
                     {/* Left side */}
                     <Grid item xs={10}>
                         <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
 
-                            {/* Team to bid on */}
-                            <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                    <Grid item>
-                                        <Typography justifyContent="center" sx={{ color: "var(--tertiary-color)", fontFamily: "threeDim2", fontSize: "60px", marginTop: "-20px", marginBottom: "-20px" }}>
-                                            {team.shortName}
-                                        </Typography>
-                                    </Grid>
-                                    <Grid item>
-                                        <Typography justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "40px", marginTop: "-38px", marginBottom: "-20px" }}>
-                                            {team.seed ? `(${team.seed})` : ""}
-                                        </Typography>
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-
                             {/* Display bracket */}
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Card sx={{ height: "540px", width: "100%", padding: "10px", backgroundColor: "white" }}>
+                                {/* backgroundColor: "rgba(0, 0, 0, 0)" */}
+                                <Card sx={{ height: "555px", width: "100%", padding: "5px", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "black", boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)" }}>
                                     {allTeams.length > 0 ?
                                         <Bracket all_teams={allTeams} selected_team={team} />
                                         : <Typography>No teams available</Typography>
@@ -134,52 +200,67 @@ function GamePage() {
                                 </Card>
                             </Grid>
 
+                            {/* Team to bid on */}
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Card sx={{ height: "70px", width: "100%", padding: "10px", backgroundColor: "white" }}>
-                                    <Grid container sx={{ justifyContent: "center", alignItems: "center" }}>
-
-                                        {/* Spacing */}
-                                        <Grid item xs={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} />
-
-                                        {/* Countdown timer */}
-                                        <Grid item xs={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                            <Card sx={{ border: 5, height: "50px", width: "50px", backgroundColor: "black", borderRadius: 0, borderColor: "white" }}>
-                                                <Typography sx={{ color: countdown <= 5 ? "red" : "white", textAlign: "center", fontFamily: "clock", fontSize: "45px", my: "-10px" }}>
-                                                    {countdown.toString().padStart(2, "0")}
-                                                </Typography>
-                                            </Card>
-                                        </Grid>
-
-                                        {/* Bid */}
-                                        <Grid item xs={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                            <Grid container spacing={2} sx={{ justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
-                                                <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                                    <Typography level="h4" sx={{ justifyContent: "center", my: "-10px" }}>
-                                                        Current bid: ${currentHighestBid.toFixed(2)}
-                                                    </Typography>
+                                <Grid container sx={{ justifyContent: "center", alignItems: "center", margin: 0 }}>
+                                    <Grid item xs={8} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                        <Card sx={{ height: "135px", width: "100%", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "black", boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)" }}>
+                                            <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                                <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                                    <Grid item>
+                                                        <Typography justifyContent="center" sx={{ backgroundImage: "linear-gradient(to bottom,rgb(218, 4, 4) 10%, rgb(175, 2, 2) 40%, rgb(48, 1, 1) 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "doubleFeature", fontSize: "50px", marginTop: "0px", marginBottom: "-10px" }}>
+                                                            {team.shortName}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <Typography justifyContent="center" sx={{ backgroundImage: "linear-gradient(to bottom,rgb(218, 4, 4) 10%, rgb(175, 2, 2) 40%, rgb(48, 1, 1) 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "doubleFeature", fontSize: "40px", marginTop: "-20px", marginBottom: "-20px" }}>
+                                                            {team.seed ? `(${team.seed})` : ""}
+                                                        </Typography>
+                                                    </Grid>
                                                 </Grid>
-                                                <Grid item xs={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                                    <Bid gameId={gameId} player={playerName} currentHighestBid={currentHighestBid} team={`${team.shortName} (${team.seed})`} />
+                                                {/* Countdown timer */}
+                                                <Grid item sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}>
+                                                    <Card sx={{ border: 5, height: "50px", width: "50px", backgroundColor: "black", borderRadius: 0, borderColor: "white" }}>
+                                                        <Typography sx={{ color: countdown <= 5 ? "red" : "white", textAlign: "center", fontFamily: "clock", fontSize: "45px", my: "-10px" }}>
+                                                            {countdown.toString().padStart(2, "0")}
+                                                        </Typography>
+                                                    </Card>
+                                                </Grid>
+
+                                                {/* Bid */}
+                                                <Grid item xs={4} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                                    <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
+                                                        <Grid item sx={{ display: "flex", justifyContent: "left", alignItems: "center" }}>
+                                                            <Typography sx={{ justifyContent: "center", fontSize: "20px" }}>
+                                                                Current bid: ${currentHighestBid.toFixed(2)}
+                                                            </Typography>
+                                                        </Grid>
+                                                        <Grid sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                                            <Bid
+                                                                gameId={gameId}
+                                                                player={playerName}
+                                                                currentHighestBid={currentHighestBid}
+                                                                team={`${team.shortName} (${team.seed})`}
+                                                                balance={playerInfos.get(playerName)?.balance || 0}
+                                                            />
+                                                        </Grid>
+                                                    </Grid>
                                                 </Grid>
                                             </Grid>
-                                        </Grid>
-
-                                        {/* Spacing */}
-                                        <Grid item xs={2} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} />
-
+                                        </Card>
                                     </Grid>
-                                </Card>
+                                </Grid>
                             </Grid>
                         </Grid>
                     </Grid>
 
                     {/* Right side */}
-                    <Grid item xs={2}>
+                    <Grid item xs={2} sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
                         <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
 
                             {/* Player */}
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Card sx={{ height: 200, overflowY: "auto", width: "100%", backgroundColor: "white" }}>
+                                <Card sx={{ height: 200, overflow: "auto", overflowY: "auto", width: "100%", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "black", boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)" }}>
                                     <List sx={{ width: "100%" }}>
                                         {playerInfos.size > 0 ?
                                             Array.from(playerInfos.entries()).map(([player, player_info], i) => {
@@ -192,7 +273,7 @@ function GamePage() {
                                                         <ListItem>
                                                             {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={playerColor} width="20px" height="20px" />}
                                                             <Chip sx={{ padding: "0 20px", backgroundColor: "var(--off-white-color)" }}>
-                                                                <Typography sx={{ color: playerColor }}>
+                                                                <Typography sx={{ color: playerColor, backgroundImage: "linear-gradient(to bottom,rgb(218, 4, 4) 10%, rgb(175, 2, 2) 40%, rgb(48, 1, 1) 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "doubleFeature" }}>
                                                                     {player}
                                                                 </Typography>
                                                                 <Typography sx={{ fontSize: "12px" }}>
@@ -201,9 +282,9 @@ function GamePage() {
                                                                 <Typography sx={{ fontSize: "12px" }}>
                                                                     Teams:
                                                                 </Typography>
-                                                                {player_info["teams"].map((temp_team: string, teamIndex: number) => (
+                                                                {player_info["teams"].map((temp_team: TeamInfo, teamIndex: number) => (
                                                                     <Typography key={teamIndex} sx={{ marginLeft: "10px", fontSize: "12px" }}>
-                                                                        - {temp_team}
+                                                                        - {temp_team.shortName} (${temp_team.purchasePrice})
                                                                     </Typography>
                                                                 ))}
                                                             </Chip>
@@ -219,27 +300,36 @@ function GamePage() {
 
                             {/* Remaining Teams */}
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Card sx={{ maxHeight: 510, overflowY: "auto", width: "100%", backgroundColor: "white" }}>
-                                    <List sx={{ minWidth: 100, maxWidth: 300 }}>
+                                <Card sx={{ maxHeight: 505, overflowY: "auto", width: "100%", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "black", boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)" }}>
+                                    <Grid container spacing={1} sx={{ flexWrap: "wrap", padding: 1 }}>
                                         {remainingTeams.length > 0 ?
                                             remainingTeams.map((temp_team, i) => {
+                                                const teamLogo = temp_team.region !== "region" ? `https://i.turner.ncaa.com/sites/default/files/images/logos/schools/bgl/${temp_team.urlName}.svg` : "";
+
                                                 return (
-                                                    <React.Fragment key={i}>
-                                                        <ListItem>
-                                                            <Chip sx={{ backgroundColor: "var(--off-white-color)" }}>
-                                                                <Typography sx={{ color: "black", fontSize: "12px" }}>
-                                                                    {temp_team.shortName} ({temp_team.seed})
-                                                                </Typography>
-                                                            </Chip>
-                                                        </ListItem>
-                                                    </React.Fragment>
+                                                    <Grid item key={i} xs="auto">
+                                                        <Chip sx={{ backgroundColor: "var(--off-white-color)" }}>
+                                                            {/* {temp_team.region !== "region" && (
+                                                                <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center", marginRight: 1 }}>
+                                                                    <img src={teamLogo} alt={`${temp_team.shortName} logo`} style={{ width: "10px", height: "10px" }} />
+                                                                </Grid>
+                                                            )} */}
+                                                            <Typography sx={{ color: "black", fontSize: "12px" }}>
+                                                                {temp_team.region !== "region" && (
+                                                                    <img src={teamLogo} alt={`${temp_team.shortName} logo`} style={{ width: "10px", height: "10px", paddingRight: 4 }} />
+                                                                )}
+                                                                {temp_team.shortName} ({temp_team.seed})
+                                                            </Typography>
+                                                        </Chip>
+                                                    </Grid>
                                                 );
                                             })
                                             : <Typography>No teams available</Typography>
                                         }
-                                    </List>
+                                    </Grid>
                                 </Card>
                             </Grid>
+
                         </Grid>
                     </Grid>
 

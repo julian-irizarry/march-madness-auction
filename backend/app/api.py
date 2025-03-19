@@ -1,15 +1,29 @@
 import asyncio
 import random
 import string
+import pickle
+import os
 from typing import List
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.websockets import WebSocketState
 from dotenv import load_dotenv
-import os
 
 from app import GameTracker, GAME_ID_NUM_CHAR, CreateModel, JoinModel, ViewModel, BidModel
 from app.types.types import jsonify_dict, jsonify_list
+
+# Define path for saving state
+STATE_FILE = f"app/game_state.pkl"
+
+# Helper functions to save and load state
+def save_state() -> None:
+    with open(STATE_FILE, "wb") as f:
+        pickle.dump(gameTracker.games, f)
+
+def load_state() -> None:
+    if os.path.exists(STATE_FILE):
+        with open(STATE_FILE, "rb") as f:
+            gameTracker.games = pickle.load(f)
 
 # ================== SETUP APP ==================
 
@@ -42,6 +56,7 @@ async def create_game(create_model: CreateModel) -> dict:
     new_game_id: str = "".join(random.choices(string.ascii_uppercase + string.digits, k=GAME_ID_NUM_CHAR))
     gameTracker.add_game(gameId=new_game_id, creator=create_model.player)
     game_connections[new_game_id] = []  # Initialize the list of WebSocket connections for this game
+    save_state()  # Save state after creating a game
     return {"id": new_game_id}
 
 
@@ -53,6 +68,7 @@ async def join_game(join_model: JoinModel):
         raise HTTPException(status_code=400, detail="Player name already taken in this game")
 
     gameTracker.add_player(gameId=join_model.gameId, player=join_model.player)
+    save_state()  # Save state after adding a player
 
     if join_model.gameId in game_connections:
         for ws in game_connections[join_model.gameId]:
@@ -62,13 +78,15 @@ async def join_game(join_model: JoinModel):
 
 
 @app.post("/view-game/")
-async def join_game(join_model: ViewModel):
-    if join_model.gameId not in gameTracker.games:
+async def join_game(view_model: ViewModel):
+    if view_model.gameId not in gameTracker.games:
         raise HTTPException(status_code=404, detail="Game ID not found")
     
-    if join_model.gameId in game_connections:
-        for ws in game_connections[join_model.gameId]:
-            await ws.send_json({"players": jsonify_dict(gameTracker.get_all_players(join_model.gameId))})
+    gameTracker.calculate_player_points(view_model.gameId)
+    
+    if view_model.gameId in game_connections:
+        for ws in game_connections[view_model.gameId]:
+            await ws.send_json({"players": jsonify_dict(gameTracker.get_all_players(view_model.gameId))})
 
     return {"detail": "Viewed game successfully"}
 
@@ -88,6 +106,8 @@ async def finalize_bid(game_id: str):
     # give team to last bidder
     winner:BidModel = gameTracker.finalize_bid(game_id)
     purchase_msg = f"No one bought {winner.team}!" if not winner.player else f"{winner.player} bought {winner.team} for ${winner.bid:.2f}!"
+
+    gameTracker.calculate_player_points(game_id)
 
     for ws in game_connections[game_id]:
         await ws.send_json({"log": purchase_msg})
@@ -193,11 +213,14 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
     async def listen_for_messages():
         try:
             while True:
-                message = await websocket.receive_text()
-                if message == "startGame" and websocket in game_connections[game_id][:1]:
-                    for participant_ws in game_connections[game_id]:
-                        await participant_ws.send_text("gameStarted")
-                    break  # Exit the loop if the game starts
+                if websocket.application_state == WebSocketState.CONNECTED:
+                    message = await websocket.receive_text()
+                    if message == "startGame" and websocket in game_connections[game_id][:1]:
+                        for participant_ws in game_connections[game_id]:
+                            await participant_ws.send_text("gameStarted")
+                        break  # Exit the loop if the game starts
+                else:
+                    break  # Stop sending if the connection is no longer active
         except WebSocketDisconnect:
             # Handle the WebSocket disconnection
             if websocket in game_connections[game_id]:
@@ -233,6 +256,7 @@ async def bid(bid_model: BidModel):
         raise HTTPException(status_code=404, detail="Game ID not found")
 
     gameTracker.place_bid(bid_model)
+    save_state()  # Save state after placing a bid
 
     if bid_model.gameId in game_connections:
         for ws in game_connections[bid_model.gameId]:
