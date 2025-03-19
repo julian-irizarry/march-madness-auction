@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, IconButton } from "@mui/joy";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Alert } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Alert, Box } from "@mui/material";
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -63,12 +63,12 @@ function HomePage() {
   // Handle user interactions and playback
   useEffect(() => {
     console.log('Setting up audio with current state:', { isPlaying, isMuted });
-    
+
     if (!audioRef.current) return;
 
     // Update muted state
     audioRef.current.muted = isMuted;
-    
+
     // Function to start audio
     const startAudio = async () => {
       console.log('Attempting to start audio...');
@@ -85,7 +85,7 @@ function HomePage() {
           await audioRef.current.play();
           console.log('Audio playback started successfully');
           setIsPlaying(true);
-          
+
           // Remove the event listeners after successful playback
           document.removeEventListener('click', handleFirstInteraction);
           document.removeEventListener('keypress', handleFirstInteraction);
@@ -112,7 +112,7 @@ function HomePage() {
         hasInteracted: hasInteractedRef.current,
         target: e.target
       });
-      
+
       if (!hasInteractedRef.current) {
         hasInteractedRef.current = true;
         startAudio();
@@ -278,32 +278,87 @@ function HomePage() {
       </IconButton>
 
       {/* Dialog to prompt user*/}
-      <Dialog maxWidth="lg" open={isDialogOpen} onClose={handleCloseDialog}>
+      <Dialog
+        maxWidth="lg"
+        open={isDialogOpen}
+        onClose={handleCloseDialog}
+        sx={{ overflow: "visible" }} // Prevents internal clipping
+      >
+        {/* Container for content to ensure spacing */}
+        <Box sx={{ position: "relative", paddingTop: "60px" }}>
 
-        {/* Dialog title */}
-        <DialogTitle sx={{ textAlign: "center", fontFamily: "doubleFeature", }}>
-          <b>{`${dialogMode} GAME`}</b>
-        </DialogTitle>
+          {/* Dialog Title positioned outside the box */}
+          <DialogTitle
+            sx={{
+              position: "fixed",
+              top: "42%", // Adjust as needed
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              textAlign: "center",
+              fontFamily: "doubleFeature",
+              fontSize: "3rem",
+              background: "linear-gradient(to bottom, red 10%, darkred 40%, black 90%)", // Gradient effect
+              WebkitBackgroundClip: "text", // Applies gradient to text
+              WebkitTextFillColor: "transparent", // Makes the text show the gradient
+              whiteSpace: "nowrap",
+              zIndex: 1301, // Keeps it above other elements
+            }}
+          >
+            <b>{`${dialogMode} GAME`}</b>
+          </DialogTitle>
 
-        <DialogContent>
-          {/* Display game error is any */}
-          {dialogError ? <Alert severity="error">{dialogError}</Alert> : <></>}
+          <DialogContent sx={{ overflow: "visible" }}> {/* Ensure content doesn't clip */}
+            {/* Display game error if any */}
+            {dialogError ? <Alert severity="error">{dialogError}</Alert> : null}
 
-          {/* Enter user name to create or join game */}
-          {(dialogMode === DIALOG_MODE.CREATE || dialogMode === DIALOG_MODE.JOIN) ? <TextField fullWidth label="Your Name" value={playerName} onChange={(e) => setPlayerName(e.target.value)} margin="dense" /> : <></>}
+            {/* Enter user name to create or join game */}
+            {(dialogMode === DIALOG_MODE.CREATE || dialogMode === DIALOG_MODE.JOIN) && (
+              <TextField
+                fullWidth
+                label="Your Name"
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                margin="dense"
+              />
+            )}
 
-          {/* Enter game id to join */}
-          {(dialogMode === DIALOG_MODE.JOIN || dialogMode === DIALOG_MODE.VIEW) ? <TextField fullWidth label="Game ID" value={gameId} onChange={(e) => setGameId(e.target.value)} margin="dense" /> : <></>}
-        </DialogContent>
+            {/* Enter game ID to join */}
+            {(dialogMode === DIALOG_MODE.JOIN || dialogMode === DIALOG_MODE.VIEW) && (
+              <TextField
+                fullWidth
+                label="Game ID"
+                value={gameId}
+                onChange={(e) => setGameId(e.target.value)}
+                margin="dense"
+              />
+            )}
+          </DialogContent>
 
-        <DialogActions sx={{ justifyContent: "center" }}>
-          <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleCloseDialog}>Cancel</Button>
+          <DialogActions sx={{ justifyContent: "center" }}>
+            <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleCloseDialog}>
+              Cancel
+            </Button>
 
-          {dialogMode === DIALOG_MODE.CREATE ? <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleCreateGame}>Create</Button> : <></>}
-          {dialogMode === DIALOG_MODE.JOIN ? <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleJoinGame}>Join</Button> : <></>}
-          {dialogMode === DIALOG_MODE.VIEW ? <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleViewGame}>View</Button> : <></>}
-        </DialogActions>
+            {dialogMode === DIALOG_MODE.CREATE && (
+              <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleCreateGame}>
+                Create
+              </Button>
+            )}
+            {dialogMode === DIALOG_MODE.JOIN && (
+              <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleJoinGame}>
+                Join
+              </Button>
+            )}
+            {dialogMode === DIALOG_MODE.VIEW && (
+              <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleViewGame}>
+                View
+              </Button>
+            )}
+          </DialogActions>
+
+        </Box>
       </Dialog>
+
     </Grid>
   );
 }
