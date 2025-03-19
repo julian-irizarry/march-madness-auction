@@ -13,7 +13,7 @@ from app import GameTracker, GAME_ID_NUM_CHAR, CreateModel, JoinModel, ViewModel
 from app.types.types import jsonify_dict, jsonify_list
 
 # Define path for saving state
-STATE_FILE = "/app/data_state.pkl"
+STATE_FILE = f"/app/data/game_state.pkl"
 
 # Helper functions to save and load state
 def save_state() -> None:
