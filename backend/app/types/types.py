@@ -40,13 +40,15 @@ class TeamInfo(BaseModel):
     urlName: str
     seed: int
     region: str
-
+    purchasePrice: float|None = None
+    points: int|None = None
 
 class PlayerInfo(BaseModel):
     name: str
     gameId: str
     balance: int = INITIAL_BALANCE
-    teams: List[str] = []
+    points: int = 0
+    teams: dict[str, TeamInfo] = {}
 
 
 class GameInfo(BaseModel):
@@ -55,7 +57,7 @@ class GameInfo(BaseModel):
     currentBid: float = INITIAL_BID
     countdown: float = INITIAL_COUNTDOWN
     currentTeam: TeamInfo = None
-    teams: List[TeamInfo] = []
+    teams: dict[str, TeamInfo] = {}
     log: List[BidModel] = []
 
 

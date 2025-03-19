@@ -55,7 +55,16 @@ function useGameWebSocket(gameId: string) {
                                 name: temp_player.name,
                                 gameId: temp_player.gameId,
                                 balance: parseInt(temp_player.balance),
-                                teams: temp_player.teams,
+                                points: parseInt(temp_player.points),
+                                teams: Object.values(temp_player.teams).map((temp_team: any) => {
+                                    return {
+                                        shortName: temp_team.shortName,
+                                        urlName: temp_team.urlName,
+                                        seed: temp_team.seed,
+                                        region: temp_team.region,
+                                        purchasePrice: temp_team.purchasePrice
+                                    };
+                                }),
                             });
                         });
                         setWsData((prev: WebSocketMessage) => ({ ...prev, players }));
@@ -71,7 +80,7 @@ function useGameWebSocket(gameId: string) {
                         setWsData((prev: WebSocketMessage) => ({ ...prev, team: {
                             shortName: team.shortName,
                             urlName: team.urlName,
-                            seed: team.seed.toString(),
+                            seed: team.seed,
                             region: team.region
                         } }));
                     }
@@ -123,7 +132,7 @@ function GamePage() {
     const [currentHighestBid, setCurrentHighestBid] = useState<number>(0);
     const [countdown, setCountdown] = useState(10);
     const [playerInfos, setPlayerInfos] = useState<Map<string, PlayerInfo>>(new Map());
-    const [team, setTeam] = useState<TeamInfo>({ shortName: "", urlName:"", seed: "", region: "" });
+    const [team, setTeam] = useState<TeamInfo>({ shortName: "", urlName:"", seed: -1, region: "" });
     const [remainingTeams, setRemainingTeams] = useState<TeamInfo[]>([]);
     const [allTeams, setAllTeams] = useState<TeamInfo[]>([]);
     const [log, setLog] = useState<string>("");
@@ -169,7 +178,7 @@ function GamePage() {
     return (
         <div id="outer-container">
             <Paper elevation={1} sx={{ height: "720px", width: "1400px", padding: "10px", backgroundColor: "#fcfcfc" }}>
-                <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", height: "calc(100vh - 60px)", minHeight: "100%" }}>
+                <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", height: "calc(100vh - 170px)", minHeight: "100%" }}>
                     {/* Left side */}
                     <Grid item xs={10}>
                         <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -246,12 +255,12 @@ function GamePage() {
                     </Grid>
 
                     {/* Right side */}
-                    <Grid item xs={2}>
+                    <Grid item xs={2} sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
                         <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
 
                             {/* Player */}
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Card sx={{ height: 200, overflowY: "auto", width: "100%", backgroundColor: "white" }}>
+                                <Card sx={{ height: 200, overflow: "auto", overflowY: "auto", width: "100%", backgroundColor: "white" }}>
                                     <List sx={{ width: "100%" }}>
                                         {playerInfos.size > 0 ?
                                             Array.from(playerInfos.entries()).map(([player, player_info], i) => {
@@ -273,9 +282,9 @@ function GamePage() {
                                                                 <Typography sx={{ fontSize: "12px" }}>
                                                                     Teams:
                                                                 </Typography>
-                                                                {player_info["teams"].map((temp_team: string, teamIndex: number) => (
+                                                                {player_info["teams"].map((temp_team: TeamInfo, teamIndex: number) => (
                                                                     <Typography key={teamIndex} sx={{ marginLeft: "10px", fontSize: "12px" }}>
-                                                                        - {temp_team}
+                                                                        - {temp_team.shortName} (${temp_team.purchasePrice})
                                                                     </Typography>
                                                                 ))}
                                                             </Chip>

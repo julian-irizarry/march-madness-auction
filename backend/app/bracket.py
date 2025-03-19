@@ -4,7 +4,7 @@ import requests
 from app.types.types import TeamInfo, MatchInfo
 
 
-def get_teams(year: int, month: str, days: tuple[str, str]) -> list[TeamInfo]:
+def get_teams(year: int, month: str, days: tuple[str, str]) -> dict[str, TeamInfo]:
     """
     Generate Team Name, Seed, and Region. Uses an api indexing the dates of the first rounds of 64 to fill csv.
 
@@ -47,7 +47,7 @@ def get_teams(year: int, month: str, days: tuple[str, str]) -> list[TeamInfo]:
                 teams[home_team_info.shortName] = home_team_info
         else:
             print(f"ERROR READING URL: {url}: {response.status_code}")
-    return list(teams.values())
+    return teams
 
 
 def get_matches(year: int, month: str, days: tuple[str, str]) -> list[MatchInfo]:

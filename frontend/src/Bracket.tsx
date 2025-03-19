@@ -139,12 +139,12 @@ function Region(props: RegionProps) {
 
   return (
     // Display regional bracket
-    <Grid container spacing={2} sx={{ marginTop: 3, marginBottom: 3, display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
+    <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
       {roundsToRender.map(([round, matchArr]) => (
         <Grid item key={round}>
 
           {/* Column for each round */}
-          <Grid container direction="column" spacing={10 * (5 - matchArr.length)} justifyContent="center" alignItems="center">
+          <Grid container direction="column" rowSpacing={10 * (5 - matchArr.length)} sx={{ display: "flex", justifyContent: "center", alignItems: "center", margin: matchArr.length === 8 ? 0 : undefined }}>
             {matchArr.map((val) => (
               <Grid item key={`${round}_${val.id}`}>
 
@@ -203,15 +203,13 @@ function Bracket(props: BracketProps) {
   return (
     <>
       {/* Display all 4 regional brackets */}
-      <Grid container spacing={0} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", overflowY: "auto", maxHeight: "70vh" }}>
+      <Grid container spacing={0} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", overflowY: "auto", maxHeight: "70vh", paddingBottom: 3 }}>
         {Array.from(region_sorted_teams.entries()).map(([key, val], index) => (
 
           <React.Fragment key={key}>
             {/* Display regional bracket */}
             <Grid item xs={6}>
-              <Paper elevation={0} sx={{ borderRadius: 0 }}>
-                <Region region_name={key} region_teams={val} reverse={index % 2 === 1} selected_team={(props.selected_team && props.selected_team.region === key) ? props.selected_team : null} match_results={region_sorted_match_results.size > 0 ? region_sorted_match_results.get(key) : null}/>
-              </Paper>
+              <Region region_name={key} region_teams={val} reverse={index % 2 === 1} selected_team={(props.selected_team && props.selected_team.region === key) ? props.selected_team : null} match_results={region_sorted_match_results.size > 0 ? region_sorted_match_results.get(key) : null} />
             </Grid>
 
             {/* Display the final matches in the middle */}

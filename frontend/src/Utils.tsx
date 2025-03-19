@@ -1,25 +1,28 @@
 export const BACKEND_URL = `${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}`;
 console.log("BACKEND_URL", BACKEND_URL)
 
+export interface TeamInfo {
+    shortName: string
+    urlName: string
+    seed: number
+    region: string
+    purchasePrice?: number
+    points?: number
+}
+
 export interface PlayerInfo {
     name: string
     gameId: string
     balance: number
-    teams: string[]
-}
-
-export interface TeamInfo {
-    shortName: string
-    urlName: string
-    seed: string
-    region: string
+    points: number
+    teams: TeamInfo[]
 }
 
 export interface Match {
-    id: number;
-    nextMatchId: number | null;
-    roundName: string;
-    participants: TeamInfo[];
+    id: number
+    nextMatchId: number | null
+    roundName: string
+    participants: TeamInfo[]
     winner?: string
 }
 
