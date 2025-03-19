@@ -1,0 +1,66 @@
+name: Push and Clean Docker Images in AWS ECR Repo
+
+on:
+  push:
+    tags: [ 'v*.*.*' ]
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, closed]
+
+jobs:
+  Build:
+    name: Manage ECR image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set Docker image tag
+        id: set-image-tag
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "IMAGE_TAG=pr-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          else
+            echo "IMAGE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
+          fi
+      - name: Delete old backend image if exists
+        run: |
+          aws ecr batch-delete-image --repository-name ${{ secrets.REPO_NAME }} --image-ids imageTag=backend.${{ env.IMAGE_TAG }} || echo "No existing backend image to delete."
+      - name: Build, tag, and push the backend image to Amazon ECR
+        if: ${{ github.event_name != 'pull_request' || github.event.action == 'opened' || github.event.action == 'synchronize' }}
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+          IMAGE_TAG: backend.${{ env.IMAGE_TAG }}
+        run: |
+          docker build --build-arg FRONTEND_HOST=mmauctiongame.com --build-arg FRONTEND_PORT=3000 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f docker/Dockerfile.backend .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      - name: Delete old frontend image if exists
+        run: |
+          aws ecr batch-delete-image --repository-name ${{ secrets.REPO_NAME }} --image-ids imageTag=frontend.${{ env.IMAGE_TAG }} || echo "No existing frontend image to delete."
+      - name: Build, tag, and push the frontend image to Amazon ECR
+        if: ${{ github.event_name != 'pull_request' || github.event.action == 'opened' || github.event.action == 'synchronize' }}
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+          IMAGE_TAG: frontend.${{ env.IMAGE_TAG }}
+        run: |
+          docker build --build-arg REACT_APP_BACKEND_HOST=mmauctiongame.com --build-arg REACT_APP_BACKEND_PORT=8000 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f docker/Dockerfile.frontend .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
