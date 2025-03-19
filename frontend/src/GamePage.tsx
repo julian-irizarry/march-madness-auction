@@ -27,7 +27,7 @@ type WebSocketMessage = {
 function useGameWebSocket(gameId: string) {
     const [wsData, setWsData] = useState<WebSocketMessage>({});
     const [error, setError] = useState<string | null>(null);
-    
+
     useEffect(() => {
         const ws = new WebSocket(`ws://${BACKEND_URL}/ws/${gameId}`);
 
@@ -77,12 +77,14 @@ function useGameWebSocket(gameId: string) {
                     }
                     else if ("team" in data && data.team) {
                         const team = data.team as TeamInfo;
-                        setWsData((prev: WebSocketMessage) => ({ ...prev, team: {
-                            shortName: team.shortName,
-                            urlName: team.urlName,
-                            seed: team.seed,
-                            region: team.region
-                        } }));
+                        setWsData((prev: WebSocketMessage) => ({
+                            ...prev, team: {
+                                shortName: team.shortName,
+                                urlName: team.urlName,
+                                seed: team.seed,
+                                region: team.region
+                            }
+                        }));
                     }
                     else if ("log" in data) {
                         setWsData((prev: WebSocketMessage) => ({ ...prev, log: data["log"] }));
@@ -132,7 +134,7 @@ function GamePage() {
     const [currentHighestBid, setCurrentHighestBid] = useState<number>(0);
     const [countdown, setCountdown] = useState(10);
     const [playerInfos, setPlayerInfos] = useState<Map<string, PlayerInfo>>(new Map());
-    const [team, setTeam] = useState<TeamInfo>({ shortName: "", urlName:"", seed: -1, region: "" });
+    const [team, setTeam] = useState<TeamInfo>({ shortName: "", urlName: "", seed: -1, region: "" });
     const [remainingTeams, setRemainingTeams] = useState<TeamInfo[]>([]);
     const [allTeams, setAllTeams] = useState<TeamInfo[]>([]);
     const [log, setLog] = useState<string>("");
@@ -236,11 +238,11 @@ function GamePage() {
                                                     </Typography>
                                                 </Grid>
                                                 <Grid item xs={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                                    <Bid 
-                                                        gameId={gameId} 
-                                                        player={playerName} 
-                                                        currentHighestBid={currentHighestBid} 
-                                                        team={`${team.shortName} (${team.seed})`} 
+                                                    <Bid
+                                                        gameId={gameId}
+                                                        player={playerName}
+                                                        currentHighestBid={currentHighestBid}
+                                                        team={`${team.shortName} (${team.seed})`}
                                                         balance={playerInfos.get(playerName)?.balance || 0}
                                                     />
                                                 </Grid>
@@ -303,26 +305,25 @@ function GamePage() {
                             {/* Remaining Teams */}
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                 <Card sx={{ maxHeight: 505, overflowY: "auto", width: "100%", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "var(--secondary-color)" }}>
-                                    <List sx={{ minWidth: 100, maxWidth: 300 }}>
+                                    <Grid container spacing={1} sx={{ flexWrap: "wrap", padding: 1 }}>
                                         {remainingTeams.length > 0 ?
                                             remainingTeams.map((temp_team, i) => {
                                                 return (
-                                                    <React.Fragment key={i}>
-                                                        <ListItem>
-                                                            <Chip sx={{ backgroundColor: "var(--off-white-color)" }}>
-                                                                <Typography sx={{ color: "black", fontSize: "12px" }}>
-                                                                    {temp_team.shortName} ({temp_team.seed})
-                                                                </Typography>
-                                                            </Chip>
-                                                        </ListItem>
-                                                    </React.Fragment>
+                                                    <Grid item key={i} xs="auto">
+                                                        <Chip sx={{ backgroundColor: "var(--off-white-color)" }}>
+                                                            <Typography sx={{ color: "black", fontSize: "12px" }}>
+                                                                {temp_team.shortName} ({temp_team.seed})
+                                                            </Typography>
+                                                        </Chip>
+                                                    </Grid>
                                                 );
                                             })
                                             : <Typography>No teams available</Typography>
                                         }
-                                    </List>
+                                    </Grid>
                                 </Card>
                             </Grid>
+
                         </Grid>
                     </Grid>
 
