@@ -146,6 +146,13 @@ function GamePage() {
 
     const { wsData, error } = useGameWebSocket(gameId);
 
+    // resets current highest bid when a new team is auctioned
+    useEffect(() => {
+        if (wsData.team) {
+            setCurrentHighestBid(0);
+        }
+    }, [wsData.team]);
+
     useEffect(() => {
         if (wsData.players) {
             setPlayerInfos(wsData.players);
