@@ -208,7 +208,7 @@ function GamePage() {
                                             <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                                 <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                                     <Grid item>
-                                                        <Typography justifyContent="center" sx={{ backgroundImage: "linear-gradient(to bottom,rgb(218, 4, 4) 10%, rgb(175, 2, 2) 40%, rgb(48, 1, 1) 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "doubleFeature", fontSize: "50px", marginTop: "0px", marginBottom: "-15px" }}>
+                                                        <Typography justifyContent="center" sx={{ backgroundImage: "linear-gradient(to bottom,rgb(218, 4, 4) 10%, rgb(175, 2, 2) 40%, rgb(48, 1, 1) 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "doubleFeature", fontSize: "50px", marginTop: "0px", marginBottom: "-10px" }}>
                                                             {team.shortName}
                                                         </Typography>
                                                     </Grid>
@@ -228,9 +228,9 @@ function GamePage() {
                                                 </Grid>
 
                                                 {/* Bid */}
-                                                <Grid item xs={8} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                                <Grid item xs={4} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                                     <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
-                                                        <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                                        <Grid item sx={{ display: "flex", justifyContent: "left", alignItems: "center" }}>
                                                             <Typography sx={{ justifyContent: "center", fontSize: "20px" }}>
                                                                 Current bid: ${currentHighestBid.toFixed(2)}
                                                             </Typography>
