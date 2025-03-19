@@ -147,26 +147,26 @@ function GamePage() {
     const { wsData, error } = useGameWebSocket(gameId);
 
     useEffect(() => {
-        if (wsData.players) {
+        if (wsData.players !== undefined) {
             setPlayerInfos(wsData.players);
         }
-        if (wsData.bid) {
+        if (wsData.bid !== undefined) {
             setCurrentHighestBid(wsData.bid);
         }
-        if (wsData.countdown) {
+        if (wsData.countdown !== undefined) {
             setCountdown(wsData.countdown);
         }
-        if (wsData.team) {
+        if (wsData.team !== undefined) {
             setTeam(wsData.team);
         }
-        if (wsData.log) {
+        if (wsData.log !== undefined) {
             setLog(wsData.log);
             setOpenSnackbar(true);
         }
-        if (wsData.remaining) {
+        if (wsData.remaining !== undefined) {
             setRemainingTeams(wsData.remaining);
         }
-        if (wsData.all_teams) {
+        if (wsData.all_teams !== undefined) {
             setAllTeams(wsData.all_teams);
         }
         if (error) {
@@ -185,23 +185,25 @@ function GamePage() {
 
                             {/* Team to bid on */}
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                    <Grid item>
-                                        <Typography justifyContent="center" sx={{ color: "var(--tertiary-color)", fontFamily: "threeDim2", fontSize: "60px", marginTop: "-20px", marginBottom: "-20px" }}>
-                                            {team.shortName}
-                                        </Typography>
+                                <Card sx={{ paddingTop: "10px", paddingBottom: "5px", paddingLeft: "50px", paddingRight: "50px", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "var(--secondary-color)" }}>
+                                    <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                        <Grid item>
+                                            <Typography justifyContent="center" sx={{ color: "var(--tertiary-color)", fontFamily: "threeDim2", fontSize: "60px", marginTop: "-20px", marginBottom: "-20px" }}>
+                                                {team.shortName}
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item>
+                                            <Typography justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "40px", marginTop: "-38px", marginBottom: "-20px" }}>
+                                                {team.seed ? `(${team.seed})` : ""}
+                                            </Typography>
+                                        </Grid>
                                     </Grid>
-                                    <Grid item>
-                                        <Typography justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "40px", marginTop: "-38px", marginBottom: "-20px" }}>
-                                            {team.seed ? `(${team.seed})` : ""}
-                                        </Typography>
-                                    </Grid>
-                                </Grid>
+                                </Card>
                             </Grid>
 
                             {/* Display bracket */}
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Card sx={{ height: "540px", width: "100%", padding: "10px", backgroundColor: "white" }}>
+                                <Card sx={{ height: "525px", width: "100%", padding: "10px", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "var(--secondary-color)" }}>
                                     {allTeams.length > 0 ?
                                         <Bracket all_teams={allTeams} selected_team={team} />
                                         : <Typography>No teams available</Typography>
@@ -210,7 +212,7 @@ function GamePage() {
                             </Grid>
 
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Card sx={{ height: "70px", width: "100%", padding: "10px", backgroundColor: "white" }}>
+                                <Card sx={{ height: "70px", width: "100%", padding: "10px", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "var(--secondary-color)" }}>
                                     <Grid container sx={{ justifyContent: "center", alignItems: "center" }}>
 
                                         {/* Spacing */}
@@ -260,7 +262,7 @@ function GamePage() {
 
                             {/* Player */}
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Card sx={{ height: 200, overflow: "auto", overflowY: "auto", width: "100%", backgroundColor: "white" }}>
+                                <Card sx={{ height: 200, overflow: "auto", overflowY: "auto", width: "100%", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "var(--secondary-color)" }}>
                                     <List sx={{ width: "100%" }}>
                                         {playerInfos.size > 0 ?
                                             Array.from(playerInfos.entries()).map(([player, player_info], i) => {
@@ -300,7 +302,7 @@ function GamePage() {
 
                             {/* Remaining Teams */}
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Card sx={{ maxHeight: 510, overflowY: "auto", width: "100%", backgroundColor: "white" }}>
+                                <Card sx={{ maxHeight: 505, overflowY: "auto", width: "100%", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "var(--secondary-color)" }}>
                                     <List sx={{ minWidth: 100, maxWidth: 300 }}>
                                         {remainingTeams.length > 0 ?
                                             remainingTeams.map((temp_team, i) => {

@@ -50,9 +50,6 @@ class GameTracker:
 
     def get_random_team(self, gameId: str) -> TeamInfo:
         team: TeamInfo = random.choice(list(self.games[gameId].teams.values()))
-        for temp_team in self.games[gameId].teams.values():
-            if temp_team.seed == 16:
-                team = temp_team
 
         # bundle seeds 15 and 16
         bundle: list[TeamInfo] = []
