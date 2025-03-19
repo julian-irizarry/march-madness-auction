@@ -1,15 +1,30 @@
 import asyncio
 import random
 import string
+import pickle
+import os
 from typing import List
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.websockets import WebSocketState
 from dotenv import load_dotenv
-import os
 
 from app import GameTracker, GAME_ID_NUM_CHAR, CreateModel, JoinModel, ViewModel, BidModel
 from app.types.types import jsonify_dict, jsonify_list
+
+# Define path for saving state
+STATE_FILE = "/app/data_state.pkl"
+
+# Helper functions to save and load state
+def save_state() -> None:
+    with open(STATE_FILE, "wb") as f:
+        # Save the games dictionary contained in gameTracker
+        pickle.dump(gameTracker.games, f)
+
+def load_state() -> None:
+    if os.path.exists(STATE_FILE):
+        with open(STATE_FILE, "rb") as f:
+            gameTracker.games = pickle.load(f)
 
 # ================== SETUP APP ==================
 
@@ -42,6 +57,7 @@ async def create_game(create_model: CreateModel) -> dict:
     new_game_id: str = "".join(random.choices(string.ascii_uppercase + string.digits, k=GAME_ID_NUM_CHAR))
     gameTracker.add_game(gameId=new_game_id, creator=create_model.player)
     game_connections[new_game_id] = []  # Initialize the list of WebSocket connections for this game
+    save_state()  # Save state after creating a game
     return {"id": new_game_id}
 
 
@@ -53,6 +69,7 @@ async def join_game(join_model: JoinModel):
         raise HTTPException(status_code=400, detail="Player name already taken in this game")
 
     gameTracker.add_player(gameId=join_model.gameId, player=join_model.player)
+    save_state()  # Save state after adding a player
 
     if join_model.gameId in game_connections:
         for ws in game_connections[join_model.gameId]:
@@ -240,6 +257,7 @@ async def bid(bid_model: BidModel):
         raise HTTPException(status_code=404, detail="Game ID not found")
 
     gameTracker.place_bid(bid_model)
+    save_state()  # Save state after placing a bid
 
     if bid_model.gameId in game_connections:
         for ws in game_connections[bid_model.gameId]:
