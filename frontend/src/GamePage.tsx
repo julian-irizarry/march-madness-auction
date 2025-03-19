@@ -189,24 +189,6 @@ function GamePage() {
                     <Grid item xs={10}>
                         <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
 
-                            {/* Team to bid on */}
-                            <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                <Card sx={{ paddingTop: "10px", paddingBottom: "5px", paddingLeft: "50px", paddingRight: "50px", background: "white", border: 1, borderRadius: 1, borderColor: "black", boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)" }}>
-                                    <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                        <Grid item>
-                                            <Typography justifyContent="center" sx={{ backgroundImage: "linear-gradient(to bottom,rgb(218, 4, 4) 10%, rgb(175, 2, 2) 40%, rgb(48, 1, 1) 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "doubleFeature", fontSize: "60px", marginTop: "-20px", marginBottom: "-20px" }}>
-                                                {team.shortName}
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item>
-                                            <Typography justifyContent="center" sx={{ backgroundImage: "linear-gradient(to bottom,rgb(218, 4, 4) 10%, rgb(175, 2, 2) 40%, rgb(48, 1, 1) 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "doubleFeature", fontSize: "40px", marginTop: "-38px", marginBottom: "-20px" }}>
-                                                {team.seed ? `(${team.seed})` : ""}
-                                            </Typography>
-                                        </Grid>
-                                    </Grid>
-                                </Card>
-                            </Grid>
-
                             {/* Display bracket */}
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                 {/* backgroundColor: "rgba(0, 0, 0, 0)" */}
@@ -218,11 +200,24 @@ function GamePage() {
                                 </Card>
                             </Grid>
 
+                            {/* Team to bid on */}
                             <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                 <Grid container sx={{ justifyContent: "center", alignItems: "center", margin: 0 }}>
-                                    <Grid item xs={5} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                        <Card sx={{ height: "70px", width: "100%", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "black", boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)" }}>
+                                    <Grid item xs={8} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                        <Card sx={{ height: "135px", width: "100%", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "black", boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)" }}>
                                             <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                                <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                                    <Grid item>
+                                                        <Typography justifyContent="center" sx={{ backgroundImage: "linear-gradient(to bottom,rgb(218, 4, 4) 10%, rgb(175, 2, 2) 40%, rgb(48, 1, 1) 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "doubleFeature", fontSize: "50px", marginTop: "0px", marginBottom: "-15px" }}>
+                                                            {team.shortName}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <Typography justifyContent="center" sx={{ backgroundImage: "linear-gradient(to bottom,rgb(218, 4, 4) 10%, rgb(175, 2, 2) 40%, rgb(48, 1, 1) 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "doubleFeature", fontSize: "40px", marginTop: "-20px", marginBottom: "-20px" }}>
+                                                            {team.seed ? `(${team.seed})` : ""}
+                                                        </Typography>
+                                                    </Grid>
+                                                </Grid>
                                                 {/* Countdown timer */}
                                                 <Grid item sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}>
                                                     <Card sx={{ border: 5, height: "50px", width: "50px", backgroundColor: "black", borderRadius: 0, borderColor: "white" }}>
@@ -234,7 +229,7 @@ function GamePage() {
 
                                                 {/* Bid */}
                                                 <Grid item xs={8} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                                    <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column"}}> 
+                                                    <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
                                                         <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                                             <Typography sx={{ justifyContent: "center", fontSize: "20px" }}>
                                                                 Current bid: ${currentHighestBid.toFixed(2)}
@@ -249,7 +244,7 @@ function GamePage() {
                                                                 balance={playerInfos.get(playerName)?.balance || 0}
                                                             />
                                                         </Grid>
-                                                </Grid>
+                                                    </Grid>
                                                 </Grid>
                                             </Grid>
                                         </Card>
@@ -321,7 +316,7 @@ function GamePage() {
                                                             )} */}
                                                             <Typography sx={{ color: "black", fontSize: "12px" }}>
                                                                 {temp_team.region !== "region" && (
-                                                                        <img src={teamLogo} alt={`${temp_team.shortName} logo`} style={{ width: "10px", height: "10px", paddingRight: 4 }} />
+                                                                    <img src={teamLogo} alt={`${temp_team.shortName} logo`} style={{ width: "10px", height: "10px", paddingRight: 4 }} />
                                                                 )}
                                                                 {temp_team.shortName} ({temp_team.seed})
                                                             </Typography>

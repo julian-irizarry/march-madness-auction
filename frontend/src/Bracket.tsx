@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Card, Typography, Grid, Divider } from "@mui/material";
 import { GenerateRegionBracketData, IntegrateMatchResults, TeamInfo, Match } from "./Utils"
-import imageSrc from "./images/march_madness_logo_auction.png";
+import imageSrc from "./images/march_madness_logo.png";
 import BBImageSrc from "./images/basketball.png";
 
 
@@ -224,11 +224,11 @@ function Bracket(props: BracketProps) {
       <Grid container spacing={0} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", overflowY: "auto", maxHeight: "70vh", paddingBottom: 1 }}>
 
         <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
-          <img src={imageSrc} alt="Central Game" style={{ position: "absolute", top: "70%", left: "50%", maxWidth: "250px" ,transform: "translate(-50%, 20%)",zIndex: 2 }} />
+          <img src={imageSrc} alt="Central Game" style={{ position: "absolute", top: "70%", left: "50%", maxWidth: "200px" ,transform: "translate(-50%, 160%)",zIndex: 2 }} />
         </Box>
 
         <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
-          <img src={imageSrc} alt="Central Game" style={{ position: "absolute", top: "70%", left: "50%", maxWidth: "250px" ,transform: "translate(-50%, 600%)",zIndex: 2 }} />
+          <img src={imageSrc} alt="Central Game" style={{ position: "absolute", top: "70%", left: "50%", maxWidth: "200px" ,transform: "translate(-50%, 1100%)",zIndex: 2 }} />
         </Box>
 
         {Array.from(region_sorted_teams.entries()).map(([key, val], index) => (
