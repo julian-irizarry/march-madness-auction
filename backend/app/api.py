@@ -13,12 +13,11 @@ from app import GameTracker, GAME_ID_NUM_CHAR, CreateModel, JoinModel, ViewModel
 from app.types.types import jsonify_dict, jsonify_list
 
 # Define path for saving state
-STATE_FILE = f"/app/data/game_state.pkl"
+STATE_FILE = f"app/game_state.pkl"
 
 # Helper functions to save and load state
 def save_state() -> None:
     with open(STATE_FILE, "wb") as f:
-        # Save the games dictionary contained in gameTracker
         pickle.dump(gameTracker.games, f)
 
 def load_state() -> None:

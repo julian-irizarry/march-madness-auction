@@ -228,14 +228,6 @@ function Bracket(props: BracketProps) {
         </Box>
 
         <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
-          <img src={BBImageSrc} alt="Basketball" style={{ position: "absolute", top: "70%", left: "50%", maxWidth: "100px" ,transform: "translate(-50%, 370%)",zIndex: 2 }} />
-        </Box>
-
-        <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
-          <img src={BBImageSrc} alt="Basketball" style={{ position: "absolute", top: "70%", left: "50%", maxWidth: "100px" ,transform: "translate(-50%, 700%)",zIndex: 2 }} />
-        </Box>
-
-        <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
           <img src={imageSrc} alt="Central Game" style={{ position: "absolute", top: "70%", left: "50%", maxWidth: "250px" ,transform: "translate(-50%, 600%)",zIndex: 2 }} />
         </Box>
 
