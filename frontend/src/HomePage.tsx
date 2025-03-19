@@ -235,28 +235,28 @@ function HomePage() {
   };
 
   return (
-    <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", height: "calc(100vh - 170px)", minHeight: "100%" }}>
+    <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", height: "calc(100vh - 170px)", minHeight: "100%", padding: 0, margin: 0 }}>
       <Grid container spacing={2} sx={{ justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
 
         {/* Create game button */}
-        <Grid item>
-          <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleCreateGameClick}>Create Game</Button>
+        <Grid item xs={4} sx={{ display: "flex", justifyContent: "right", alignItems: "right" }}>
+          <Button sx={{ backgroundColor: "var(--primary-color)", color: "white", width: "150px" }} onClick={handleCreateGameClick}>Create Game</Button>
         </Grid>
 
         {/* March Madness logo */}
-        <Grid item>
+        <Grid item xs={4} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
           <img src={imageSrc} alt="Central Game" style={{ maxWidth: "450px", margin: "20px 0" }} />
         </Grid>
 
         {/* Join game button */}
-        <Grid item>
-          <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleJoinGameClick}>Join Game</Button>
+        <Grid item xs={4} sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}>
+          <Button sx={{ backgroundColor: "var(--primary-color)", color: "white", width: "150px" }} onClick={handleJoinGameClick}>Join Game</Button>
         </Grid>
       </Grid>
 
       {/* View game button */}
       <Grid item>
-        <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleViewGameClick}>View Game</Button>
+        <Button sx={{ backgroundColor: "var(--primary-color)", color: "white", width: "150px" }} onClick={handleViewGameClick}>View Game</Button>
       </Grid>
 
       {/* Audio control button - positioned absolutely in bottom right */}
@@ -282,24 +282,32 @@ function HomePage() {
         maxWidth="lg"
         open={isDialogOpen}
         onClose={handleCloseDialog}
-        sx={{ overflow: "visible" }} // Prevents internal clipping
+        sx={{
+          overflow: "visible",
+          zIndex: 1300,
+        }}
+        BackdropProps={{
+          style: {
+            backgroundColor: "rgba(255, 255, 255, 0.64)", // Pale white background with 30% opacity
+          }
+        }}
       >
         {/* Container for content to ensure spacing */}
-        <Box sx={{ position: "relative", paddingTop: "60px" }}>
+        <Box sx={{ position: "relative", overflow: "visible" }}>
 
           {/* Dialog Title positioned outside the box */}
           <DialogTitle
             sx={{
               position: "fixed",
-              top: "42%", // Adjust as needed
+              top: "250px",
               left: "50%",
-              transform: "translate(-50%, -50%)",
+              transform: "translateX(-50%)",
               textAlign: "center",
               fontFamily: "doubleFeature",
               fontSize: "3rem",
-              background: "linear-gradient(to bottom, red 10%, darkred 40%, black 90%)", // Gradient effect
-              WebkitBackgroundClip: "text", // Applies gradient to text
-              WebkitTextFillColor: "transparent", // Makes the text show the gradient
+              backgroundImage: "linear-gradient(to bottom,rgb(218, 4, 4) 10%, rgb(175, 2, 2) 40%, rgb(48, 1, 1) 90%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
               whiteSpace: "nowrap",
               zIndex: 1301, // Keeps it above other elements
             }}
@@ -307,50 +315,55 @@ function HomePage() {
             <b>{`${dialogMode} GAME`}</b>
           </DialogTitle>
 
-          <DialogContent sx={{ overflow: "visible" }}> {/* Ensure content doesn't clip */}
+          <DialogContent sx={{ overflow: "visible", display: "flex", flexDirection: "column", marginTop: "20px" }}> 
             {/* Display game error if any */}
             {dialogError ? <Alert severity="error">{dialogError}</Alert> : null}
 
             {/* Enter user name to create or join game */}
             {(dialogMode === DIALOG_MODE.CREATE || dialogMode === DIALOG_MODE.JOIN) && (
-              <TextField
-                fullWidth
-                label="Your Name"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                margin="dense"
-              />
+              <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <TextField
+                  label="Your Name"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  margin="dense"
+                  sx={{ width: 200 }}
+                />
+              </Grid>
             )}
 
             {/* Enter game ID to join */}
             {(dialogMode === DIALOG_MODE.JOIN || dialogMode === DIALOG_MODE.VIEW) && (
-              <TextField
-                fullWidth
-                label="Game ID"
-                value={gameId}
-                onChange={(e) => setGameId(e.target.value)}
-                margin="dense"
-              />
+              <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <TextField
+                  label="Game ID"
+                  value={gameId}
+                  onChange={(e) => setGameId(e.target.value)}
+                  margin="dense"
+                  sx={{ width: 200 }}
+                />
+              </Grid>
             )}
           </DialogContent>
 
+
           <DialogActions sx={{ justifyContent: "center" }}>
-            <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleCloseDialog}>
+            <Button sx={{ backgroundColor: "var(--primary-color)", color: "white", width: "100px" }} onClick={handleCloseDialog}>
               Cancel
             </Button>
 
             {dialogMode === DIALOG_MODE.CREATE && (
-              <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleCreateGame}>
+              <Button sx={{ backgroundColor: "var(--primary-color)", color: "white", width: "100px" }} onClick={handleCreateGame}>
                 Create
               </Button>
             )}
             {dialogMode === DIALOG_MODE.JOIN && (
-              <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleJoinGame}>
+              <Button sx={{ backgroundColor: "var(--primary-color)", color: "white", width: "100px" }} onClick={handleJoinGame}>
                 Join
               </Button>
             )}
             {dialogMode === DIALOG_MODE.VIEW && (
-              <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleViewGame}>
+              <Button sx={{ backgroundColor: "var(--primary-color)", color: "white", width: "100px" }} onClick={handleViewGame}>
                 View
               </Button>
             )}

@@ -1,6 +1,9 @@
 import React from "react";
-import { Card, Typography, Grid, Divider } from "@mui/material";
+import { Box, Card, Typography, Grid, Divider } from "@mui/material";
 import { GenerateRegionBracketData, IntegrateMatchResults, TeamInfo, Match } from "./Utils"
+import imageSrc from "./images/march_madness_logo_auction.png";
+import BBImageSrc from "./images/basketball.png";
+
 
 interface MatchProps {
   match: Match
@@ -167,7 +170,7 @@ function Region(props: RegionProps) {
                   {/* Display region name above final 8 */}
                   {matchArr.length === 1 && (
                     <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
-                      <Typography variant="body2" justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "10px" }}>
+                      <Typography variant="body2" justifyContent="center" sx={{ color: "black", fontSize: "10px" }}>
                         {props.region_name}
                       </Typography>
                     </Grid>
@@ -219,6 +222,23 @@ function Bracket(props: BracketProps) {
     <>
       {/* Display all 4 regional brackets */}
       <Grid container spacing={0} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", overflowY: "auto", maxHeight: "70vh", paddingBottom: 3 }}>
+
+        <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+          <img src={imageSrc} alt="Central Game" style={{ position: "absolute", top: "70%", left: "50%", maxWidth: "250px" ,transform: "translate(-50%, 20%)",zIndex: 2 }} />
+        </Box>
+
+        <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+          <img src={BBImageSrc} alt="Basketball" style={{ position: "absolute", top: "70%", left: "50%", maxWidth: "100px" ,transform: "translate(-50%, 370%)",zIndex: 2 }} />
+        </Box>
+
+        <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+          <img src={BBImageSrc} alt="Basketball" style={{ position: "absolute", top: "70%", left: "50%", maxWidth: "100px" ,transform: "translate(-50%, 700%)",zIndex: 2 }} />
+        </Box>
+
+        <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+          <img src={imageSrc} alt="Central Game" style={{ position: "absolute", top: "70%", left: "50%", maxWidth: "250px" ,transform: "translate(-50%, 600%)",zIndex: 2 }} />
+        </Box>
+
         {Array.from(region_sorted_teams.entries()).map(([key, val], index) => (
 
           <React.Fragment key={key}>
@@ -237,7 +257,7 @@ function Bracket(props: BracketProps) {
                   {/* West vs Midwest final four match */}
                   <Grid item xs={2}>
                     <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
-                      <Typography variant="body2" justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "10px" }}>
+                      <Typography variant="body2" justifyContent="center" sx={{ color: "black", fontSize: "10px" }}>
                         FINAL FOUR
                       </Typography>
                     </Grid>
@@ -253,7 +273,7 @@ function Bracket(props: BracketProps) {
                   {/* Final championship match */}
                   <Grid item xs={2}>
                     <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
-                      <Typography variant="body2" justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "10px" }}>
+                      <Typography variant="body2" justifyContent="center" sx={{ color: "black", fontSize: "10px" }}>
                         CHAMPIONSHIP
                       </Typography>
                     </Grid>
@@ -269,7 +289,7 @@ function Bracket(props: BracketProps) {
                   {/* East vs South final four match */}
                   <Grid item xs={2}>
                     <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
-                      <Typography variant="body2" justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "10px" }}>
+                      <Typography variant="body2" justifyContent="center" sx={{ color: "black", fontSize: "10px" }}>
                         FINAL FOUR
                       </Typography>
                     </Grid>
