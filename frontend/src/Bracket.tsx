@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Typography, Grid, Divider, Paper } from "@mui/material";
+import { Card, Typography, Grid, Divider } from "@mui/material";
 import { GenerateRegionBracketData, IntegrateMatchResults, TeamInfo, Match } from "./Utils"
 
 interface MatchProps {
@@ -113,7 +113,7 @@ interface RegionProps {
   region_name: string;
   region_teams: TeamInfo[];
   reverse: boolean
-  selected_team: TeamInfo | null
+  selected_team?: TeamInfo
   match_results?: Match[] | null
 }
 
@@ -145,24 +145,39 @@ function Region(props: RegionProps) {
 
           {/* Column for each round */}
           <Grid container direction="column" rowSpacing={10 * (5 - matchArr.length)} sx={{ display: "flex", justifyContent: "center", alignItems: "center", margin: matchArr.length === 8 ? 0 : undefined }}>
-            {matchArr.map((val) => (
-              <Grid item key={`${round}_${val.id}`}>
+            {matchArr.map((val) => {
 
-                {/* Display region name above final 8 */}
-                {
-                  matchArr.length === 1 ?
+              // highlight match if current team is a participant or seed 15/16 bundle 
+              const toHighlight = !!(
+                props.selected_team &&
+                val.participants[0] &&
+                val.participants[1] &&
+                (
+                  props.selected_team.shortName === val.participants[0].shortName ||
+                  props.selected_team.shortName === val.participants[1].shortName ||
+                  (props.selected_team.region === "bundle" &&
+                    (props.selected_team.seed === val.participants[0].seed ||
+                      props.selected_team.seed === val.participants[1].seed))
+                )
+              );
+
+              return (
+                <Grid item key={`${round}_${val.id}`}>
+
+                  {/* Display region name above final 8 */}
+                  {matchArr.length === 1 && (
                     <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
                       <Typography variant="body2" justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "10px" }}>
                         {props.region_name}
                       </Typography>
                     </Grid>
-                    : <></>
-                }
+                  )}
 
-                {/* Display match */}
-                <MatchComponent match={val} reverse={props.reverse} highlight={!!(props.selected_team && val.participants[0] && val.participants[1] && (props.selected_team.shortName === val.participants[0].shortName || props.selected_team.shortName === val.participants[1].shortName))} />
-              </Grid>
-            ))}
+                  {/* Display match */}
+                  <MatchComponent match={val} reverse={props.reverse} highlight={toHighlight} />
+                </Grid>
+              );
+            })}
           </Grid>
         </Grid>
       ))}
@@ -209,7 +224,7 @@ function Bracket(props: BracketProps) {
           <React.Fragment key={key}>
             {/* Display regional bracket */}
             <Grid item xs={6}>
-              <Region region_name={key} region_teams={val} reverse={index % 2 === 1} selected_team={(props.selected_team && props.selected_team.region === key) ? props.selected_team : null} match_results={region_sorted_match_results.size > 0 ? region_sorted_match_results.get(key) : null} />
+              <Region region_name={key} region_teams={val} reverse={index % 2 === 1} selected_team={props.selected_team} match_results={region_sorted_match_results.size > 0 ? region_sorted_match_results.get(key) : null} />
             </Grid>
 
             {/* Display the final matches in the middle */}
