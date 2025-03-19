@@ -190,12 +190,12 @@ function GamePage() {
                                 <Card sx={{ paddingTop: "10px", paddingBottom: "5px", paddingLeft: "50px", paddingRight: "50px", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "var(--secondary-color)" }}>
                                     <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                         <Grid item>
-                                            <Typography justifyContent="center" sx={{ color: "var(--tertiary-color)", fontFamily: "threeDim2", fontSize: "60px", marginTop: "-20px", marginBottom: "-20px" }}>
+                                            <Typography justifyContent="center" sx={{ background: "linear-gradient(to bottom, red 10%, darkred 40%, black 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "doubleFeature", fontSize: "60px", marginTop: "-20px", marginBottom: "-20px" }}>
                                                 {team.shortName}
                                             </Typography>
                                         </Grid>
                                         <Grid item>
-                                            <Typography justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "40px", marginTop: "-38px", marginBottom: "-20px" }}>
+                                            <Typography justifyContent="center" sx={{ background: "linear-gradient(to bottom, red 10%, darkred 40%, black 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "doubleFeature", fontSize: "40px", marginTop: "-38px", marginBottom: "-20px" }}>
                                                 {team.seed ? `(${team.seed})` : ""}
                                             </Typography>
                                         </Grid>
@@ -277,7 +277,7 @@ function GamePage() {
                                                         <ListItem>
                                                             {i === 0 ? <CrownIcon fill={baseColor} width="20px" height="20px" /> : <UserIcon fill={playerColor} width="20px" height="20px" />}
                                                             <Chip sx={{ padding: "0 20px", backgroundColor: "var(--off-white-color)" }}>
-                                                                <Typography sx={{ color: playerColor }}>
+                                                                <Typography sx={{ color: playerColor, background: "linear-gradient(to bottom, red 10%, darkred 40%, black 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "doubleFeature" }}>
                                                                     {player}
                                                                 </Typography>
                                                                 <Typography sx={{ fontSize: "12px" }}>
