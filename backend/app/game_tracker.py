@@ -5,6 +5,7 @@ from app.types.types import (
     TeamInfo,
     GameInfo,
     BidModel,
+    GameStatus,
     INITIAL_BID,
     INITIAL_COUNTDOWN,
 )
@@ -12,9 +13,9 @@ from app.bracket import get_teams, get_matches
 
 
 def missingPlayInPostProcess(teams: dict[str, TeamInfo]):
-    teams["Xavier/Texas"] = TeamInfo(
-        shortName="Xavier/Texas", urlName="", seed=11, region="Midwest"
-    )
+    # teams["Xavier/Texas"] = TeamInfo(
+    #     shortName="Xavier/Texas", urlName="", seed=11, region="Midwest"
+    # )
     return teams
 
 
@@ -127,6 +128,21 @@ class GameTracker:
 
     def decrement_countdown(self, gameId: str) -> None:
         self.games[gameId].countdown -= 1
+
+    def get_status(self, gameId: str) -> GameStatus:
+        return self.games[gameId].status
+    
+    def start_game(self, gameId: str) -> bool:
+        if self.games[gameId].status == GameStatus.NOT_STARTED:
+            self.games[gameId].status = GameStatus.STARTED
+            return True
+        return False
+    
+    def end_game(self, gameId: str) -> bool:
+        if self.games[gameId].status == GameStatus.STARTED and len(self.get_remaining_teams(gameId)) == 0:
+            self.games[gameId].status = GameStatus.ENDED
+            return True
+        return False
 
     def calculate_player_points(self, gameId: str) -> None:
         """

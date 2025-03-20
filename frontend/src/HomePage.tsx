@@ -6,7 +6,7 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
-import { BACKEND_URL } from "./Utils"
+import { BACKEND_URL, GameStatus } from "./Utils"
 import imageSrc from "./images/march_madness_logo_auction.png";
 import "./css/Fonts.css";
 
@@ -193,13 +193,18 @@ function HomePage() {
         body: JSON.stringify({ gameId: gameId, player: playerName }),
       });
 
+      const responseData = await response.json();
       if (response.ok) {
-        navigate("/lobby", { state: { gameId: gameId, isCreator: false, playerName: playerName } });
+        if (responseData.game_status === GameStatus.NOT_STARTED) {
+          navigate("/lobby", { state: { gameId: gameId, isCreator: false, playerName: playerName } });
+        }
+        else if (responseData.game_status === GameStatus.STARTED) {
+          navigate("/game", { state: {gameId: gameId, isCreator: false, playerName: playerName } });
+        }
         setIsDialogOpen(false);
       }
       // Handle error response
       else {
-        const responseData = await response.json();
         console.error("Error joining game:", responseData.detail);
         setDialogError(responseData.detail);
       }

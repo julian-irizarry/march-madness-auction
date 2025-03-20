@@ -1,5 +1,6 @@
 from typing import List
 from pydantic import BaseModel
+from enum import Enum, auto
 
 GAME_ID_NUM_CHAR = 6
 INITIAL_COUNTDOWN = 10
@@ -51,6 +52,12 @@ class PlayerInfo(BaseModel):
     teams: dict[str, TeamInfo] = {}
 
 
+class GameStatus(Enum):
+    NOT_STARTED = auto()
+    STARTED = auto()
+    ENDED = auto()
+
+
 class GameInfo(BaseModel):
     creator: str
     players: dict[str, PlayerInfo] = {}
@@ -59,6 +66,7 @@ class GameInfo(BaseModel):
     currentTeam: TeamInfo = None
     teams: dict[str, TeamInfo] = {}
     log: List[BidModel] = []
+    status: GameStatus = GameStatus.NOT_STARTED
 
 
 class MatchInfo(BaseModel):

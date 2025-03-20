@@ -311,7 +311,7 @@ function GamePage() {
                                                         <Chip sx={{ backgroundColor: "var(--off-white-color)" }}>
                                                             <Typography sx={{ color: "black", fontSize: "12px" }}>
                                                                 {temp_team.region !== "region" && teamLogo && (
-                                                                    <img src={teamLogo} style={{ width: "10px", height: "10px", paddingRight: 4 }} />
+                                                                    <img src={teamLogo} alt={""} style={{ width: "10px", height: "10px", paddingRight: 4 }} />
                                                                 )}
                                                                 {temp_team.shortName} ({temp_team.seed})
                                                             </Typography>

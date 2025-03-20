@@ -10,7 +10,7 @@ from starlette.websockets import WebSocketState
 from dotenv import load_dotenv
 
 from app import GameTracker, GAME_ID_NUM_CHAR, CreateModel, JoinModel, ViewModel, BidModel
-from app.types.types import jsonify_dict, jsonify_list
+from app.types.types import jsonify_dict, jsonify_list, GameStatus
 
 # Define path for saving state
 STATE_FILE = f"app/game_state.pkl"
@@ -74,7 +74,10 @@ async def join_game(join_model: JoinModel):
         for ws in game_connections[join_model.gameId]:
             await ws.send_json({"players": jsonify_dict(gameTracker.get_all_players(join_model.gameId))})
 
-    return {"detail": "Joined game successfully"}
+    return {
+        "detail": "Joined game successfully",
+        "game_status": gameTracker.games[join_model.gameId].status.name
+    }
 
 
 @app.post("/view-game/")
@@ -109,6 +112,11 @@ async def finalize_bid(game_id: str):
 
     gameTracker.calculate_player_points(game_id)
 
+    # determine if end of game
+    game_ended = False
+    if gameTracker.end_game(game_id):
+        game_ended = True
+
     for ws in game_connections[game_id]:
         await ws.send_json({"log": purchase_msg})
         await ws.send_json({"team": gameTracker.get_current_team(game_id).model_dump()})
@@ -116,6 +124,8 @@ async def finalize_bid(game_id: str):
         await ws.send_json({"countdown": gameTracker.get_current_countdown(game_id)})
         await ws.send_json({"players": jsonify_dict(gameTracker.get_all_players(game_id))})
         await ws.send_json({"remaining": jsonify_list(gameTracker.get_remaining_teams(game_id))})
+        if game_ended:
+            await ws.send_json({"game_status": gameTracker.get_status(game_id).name})
 
 
 @app.websocket("/ws/{game_id}")
@@ -216,8 +226,10 @@ async def websocket_endpoint(websocket: WebSocket, game_id: str):
                 if websocket.application_state == WebSocketState.CONNECTED:
                     message = await websocket.receive_text()
                     if message == "startGame" and websocket in game_connections[game_id][:1]:
+                        gameTracker.start_game(game_id)
                         for participant_ws in game_connections[game_id]:
                             await participant_ws.send_text("gameStarted")
+                            await participant_ws.send_json({"game_status": gameTracker.get_status(game_id).name})
                         break  # Exit the loop if the game starts
                 else:
                     break  # Stop sending if the connection is no longer active

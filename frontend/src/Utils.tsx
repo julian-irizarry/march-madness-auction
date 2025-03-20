@@ -26,6 +26,12 @@ export interface Match {
     winner?: string
 }
 
+export enum GameStatus {
+    NOT_STARTED = "NOT_STARTED",
+    STARTED = "STARTED",
+    ENDED = "ENDED"
+}
+
 export function GenerateRegionBracketData(regionTeams: TeamInfo[]): Match[] {
     let matchId = 1;
     const matches: Match[] = [];
