@@ -309,14 +309,9 @@ function GamePage() {
                                                 return (
                                                     <Grid item key={i} xs="auto">
                                                         <Chip sx={{ backgroundColor: "var(--off-white-color)" }}>
-                                                            {/* {temp_team.region !== "region" && (
-                                                                <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center", marginRight: 1 }}>
-                                                                    <img src={teamLogo} alt={`${temp_team.shortName} logo`} style={{ width: "10px", height: "10px" }} />
-                                                                </Grid>
-                                                            )} */}
                                                             <Typography sx={{ color: "black", fontSize: "12px" }}>
-                                                                {temp_team.region !== "region" && (
-                                                                    <img src={teamLogo} alt={`${temp_team.shortName} logo`} style={{ width: "10px", height: "10px", paddingRight: 4 }} />
+                                                                {temp_team.region !== "region" && teamLogo && (
+                                                                    <img src={teamLogo} style={{ width: "10px", height: "10px", paddingRight: 4 }} />
                                                                 )}
                                                                 {temp_team.shortName} ({temp_team.seed})
                                                             </Typography>

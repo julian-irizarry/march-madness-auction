@@ -27,24 +27,27 @@ def get_teams(year: int, month: str, days: tuple[str, str]) -> dict[str, TeamInf
             data = response.json()
 
             for game in data.get("games", []):  # Adjust the path based on the actual data structure
-                away_team = game.get("game").get("away")
-                home_team = game.get("game").get("home")
+                away_team:dict = game.get("game").get("away")
+                home_team:dict = game.get("game").get("home")
                 region = game.get("game").get("bracketRegion")
 
-                away_team_info = TeamInfo(
-                    shortName=away_team.get("names").get("short"),
-                    urlName=away_team.get("names").get("seo"),
-                    seed=away_team.get("seed"),
-                    region=region
-                )
-                home_team_info = TeamInfo(
-                    shortName=home_team.get("names").get("short"),
-                    urlName=home_team.get("names").get("seo"),
-                    seed=home_team.get("seed"),
-                    region=region
-                )
-                teams[away_team_info.shortName] = away_team_info
-                teams[home_team_info.shortName] = home_team_info
+                if away_team.get("seed"):
+                    away_team_info = TeamInfo(
+                        shortName=away_team.get("names").get("short"),
+                        urlName=away_team.get("names").get("seo"),
+                        seed=away_team.get("seed"),
+                        region=region
+                    )
+                    teams[away_team_info.shortName] = away_team_info
+
+                if home_team.get("seed"):
+                    home_team_info = TeamInfo(
+                        shortName=home_team.get("names").get("short"),
+                        urlName=home_team.get("names").get("seo"),
+                        seed=home_team.get("seed"),
+                        region=region
+                    )
+                    teams[home_team_info.shortName] = home_team_info
         else:
             print(f"ERROR READING URL: {url}: {response.status_code}")
     return teams

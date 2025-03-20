@@ -44,7 +44,7 @@ app.add_middleware(
 game_connections: dict[str, List[WebSocket]] = {}
 
 # Track Player Teams and Balance. Will turn into a database maybe
-gameTracker: GameTracker = GameTracker(year=2024, month="03", day=("21", "22"))
+gameTracker: GameTracker = GameTracker(year=2025, month="03", day=("20", "21"))
 
 # Dictionary to store countdown timer tasks
 countdown_tasks: dict[str, asyncio.Task] = {}
@@ -78,7 +78,7 @@ async def join_game(join_model: JoinModel):
 
 
 @app.post("/view-game/")
-async def join_game(view_model: ViewModel):
+async def view_game(view_model: ViewModel):
     if view_model.gameId not in gameTracker.games:
         raise HTTPException(status_code=404, detail="Game ID not found")
     
