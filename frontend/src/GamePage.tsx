@@ -168,7 +168,7 @@ function GamePage() {
         if (wsData.team !== undefined) {
             setTeam(wsData.team);
         }
-        if (wsData.log !== undefined) {
+        if (wsData.log !== undefined && wsData.log !== log) {
             setLog(wsData.log);
             setOpenSnackbar(true);
         }
@@ -209,7 +209,7 @@ function GamePage() {
                                 <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
 
                                     {/* Player balance */}
-                                    <Grid item xs={3} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                    <Grid item xs={2} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                         <Card sx={{ height: "100px", width: "100%", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "black", boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)", display: "flex", justifyContent: "center", alignItems: "center", margin: 1 }}>
                                             <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                                 <Grid item>
@@ -222,13 +222,13 @@ function GamePage() {
                                     </Grid>
 
                                     {/* Bid on team */}
-                                    <Grid item xs={9} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                    <Grid item xs={10} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                         <Card sx={{ height: "100px", width: "100%", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "black", boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)", margin: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
                                             <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                                 {/* Countdown timer */}
                                                 <Grid item xs={2} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                                                    <Card sx={{ border: 5, height: "80px", width: "80px", backgroundColor: "black", borderRadius: 0, borderColor: "white" }}>
-                                                        <Typography sx={{ color: countdown <= 5 ? "red" : "white", textAlign: "center", fontFamily: "clock", fontSize: "80px", my: "-20px" }}>
+                                                    <Card sx={{ border: 5, height: "50px", width: "50px", backgroundColor: "black", borderRadius: 0, borderColor: "white" }}>
+                                                        <Typography sx={{ color: countdown <= 5 ? "red" : "white", textAlign: "center", fontFamily: "clock", fontSize: "50px", my: "-12px" }}>
                                                             {countdown.toString().padStart(2, "0")}
                                                         </Typography>
                                                     </Card>
@@ -255,7 +255,7 @@ function GamePage() {
                                                 </Grid>
 
                                                 {/* Bid */}
-                                                <Grid item xs={4} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                                <Grid item xs={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                                     <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
                                                         <Grid item sx={{ display: "flex", justifyContent: "left", alignItems: "center" }}>
                                                             <Typography sx={{ justifyContent: "center", fontSize: "20px" }}>

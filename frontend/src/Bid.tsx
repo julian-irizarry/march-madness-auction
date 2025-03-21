@@ -1,26 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Input } from '@mui/joy';
-import { Grid } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { debounce } from 'lodash';
 
-import { BACKEND_URL } from "./Utils"
+import { BACKEND_URL } from "./Utils";
 
 import './css/App.css';
 
 interface BidProps {
-  gameId: string
-  player: string
-  currentHighestBid: number
-  team: string
-  balance: number
+  gameId: string;
+  player: string;
+  currentHighestBid: number;
+  team: string;
+  balance: number;
 }
 
 function Bid(props: BidProps) {
   const [bid, setBid] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // This useEffect hook updates the bid state whenever currentHighestBid changes.
-  // It sets the bid to be one more than the currentHighestBid, ensuring it's always higher.
+  // Update the bid whenever currentHighestBid changes.
   useEffect(() => {
     setBid((props.currentHighestBid + 1).toString());
   }, [props.currentHighestBid]);
@@ -30,17 +29,17 @@ function Bid(props: BidProps) {
     setBid(value);
   }, 300);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = async (customBid?: number) => {
     if (isSubmitting) return;
 
-    const bidNumber = parseInt(bid, 10);
+    const bidNumber = customBid !== undefined ? customBid : parseInt(bid, 10);
+
     // Validate bid
     if (isNaN(bidNumber)) {
       alert('Please enter a valid number for your bid.');
       return;
     }
-    
+
     if (bidNumber <= props.currentHighestBid) {
       alert('Your bid must be higher than the current highest bid.');
       return;
@@ -58,7 +57,12 @@ function Bid(props: BidProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ gameId: props.gameId, player: props.player, bid: bidNumber, team: props.team }),
+        body: JSON.stringify({
+          gameId: props.gameId,
+          player: props.player,
+          bid: bidNumber,
+          team: props.team,
+        }),
       });
 
       if (!response.ok) {
@@ -72,10 +76,16 @@ function Bid(props: BidProps) {
     }
   };
 
+  const increaseBid = (amount: number) => {
+    const newBid = props.currentHighestBid + amount;
+    setBid(newBid.toString());
+    handleSubmit(newBid);
+  };
+
   return (
     <>
-      <Grid container spacing={0.5} direction="row" alignItems="center">
-        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Grid container direction="row" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+        <Grid item xs={3} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Input
             type="number"
             value={bid}
@@ -86,13 +96,48 @@ function Bid(props: BidProps) {
             disabled={isSubmitting}
           />
         </Grid>
-        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Grid item xs={3} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Button 
             sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} 
-            onClick={handleSubmit}
+            onClick={() => handleSubmit()}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Submitting...' : 'Place Bid'}
+            <Typography sx={{ fontSize: "12px" }}>
+              {isSubmitting ? 'Submitting...' : 'Place Bid'}
+            </Typography>
+          </Button>
+        </Grid>
+        <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Button 
+            sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} 
+            onClick={() => increaseBid(1)}
+            disabled={isSubmitting}
+          >
+            <Typography sx={{ fontSize: "12px" }}>
+              {isSubmitting ? 'Submitting...' : '+1'}
+            </Typography>
+          </Button>
+        </Grid>
+        <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Button 
+            sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} 
+            onClick={() => increaseBid(5)}
+            disabled={isSubmitting}
+          >
+            <Typography sx={{ fontSize: "12px" }}>
+              {isSubmitting ? 'Submitting...' : '+5'}
+            </Typography>
+          </Button>
+        </Grid>
+        <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Button 
+            sx={{ backgroundColor: 'var(--primary-color)', color: 'white' }} 
+            onClick={() => increaseBid(10)}
+            disabled={isSubmitting}
+          >
+            <Typography sx={{ fontSize: "12px" }}>
+              {isSubmitting ? 'Submitting...' : '+10'}
+            </Typography>
           </Button>
         </Grid>
       </Grid>
