@@ -138,6 +138,7 @@ function GamePage() {
     const [remainingTeams, setRemainingTeams] = useState<TeamInfo[]>([]);
     const [allTeams, setAllTeams] = useState<TeamInfo[]>([]);
     const [log, setLog] = useState<string>("");
+    const [balanceFlash, setBalanceFlash] = useState(false);
 
     const [openSnackbar, setOpenSnackbar] = React.useState(false);
     const handleCloseSnackbar = () => {
@@ -157,6 +158,14 @@ function GamePage() {
 
     useEffect(() => {
         if (wsData.players !== undefined) {
+            const newBalance = wsData.players.get(playerName)?.balance || 0;
+            const prevBalance = playerInfos.get(playerName)?.balance || 0;
+
+            if (newBalance < prevBalance) {
+                setBalanceFlash(true);
+                setTimeout(() => setBalanceFlash(false), 500);
+            }
+
             setPlayerInfos(wsData.players);
         }
         if (wsData.bid !== undefined) {
@@ -171,6 +180,7 @@ function GamePage() {
         if (wsData.log !== undefined && wsData.log !== log) {
             setLog(wsData.log);
             setOpenSnackbar(true);
+            setTimeout(() => setOpenSnackbar(false), 3000);
         }
         if (wsData.remaining !== undefined) {
             setRemainingTeams(wsData.remaining);
@@ -213,7 +223,7 @@ function GamePage() {
                                         <Card sx={{ height: "100px", width: "100%", backgroundColor: "white", border: 1, borderRadius: 1, borderColor: "black", boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)", display: "flex", justifyContent: "center", alignItems: "center", margin: 1 }}>
                                             <Grid container sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                                                 <Grid item>
-                                                    <Typography sx={{ justifyContent: "center", fontSize: "20px" }}>
+                                                    <Typography sx={{ justifyContent: "center", fontSize: "20px", transition: "color 0.2s ease-in-out", color: balanceFlash ? "red" : "black" }}>
                                                         Balance: ${playerInfos.get(playerName)?.balance || 0}
                                                     </Typography>
                                                 </Grid>
