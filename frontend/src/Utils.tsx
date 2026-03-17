@@ -1,4 +1,13 @@
-export const BACKEND_URL = `${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}`;
+const backendHost = import.meta.env.VITE_BACKEND_HOST || "127.0.0.1";
+const backendPort = import.meta.env.VITE_BACKEND_PORT || "8000";
+const browserHostname = typeof window !== "undefined" ? window.location.hostname : "127.0.0.1";
+const resolvedBackendHost = backendHost === "0.0.0.0" ? browserHostname : backendHost;
+const pageProtocol = typeof window !== "undefined" ? window.location.protocol : "http:";
+
+export const BACKEND_URL = `${resolvedBackendHost}:${backendPort}`;
+export const BACKEND_HTTP_URL = `${pageProtocol}//${BACKEND_URL}`;
+export const BACKEND_WS_URL = `${pageProtocol === "https:" ? "wss:" : "ws:"}//${BACKEND_URL}`;
+
 console.log("BACKEND_URL", BACKEND_URL)
 
 export interface TeamInfo {
@@ -26,10 +35,56 @@ export interface Match {
     winner?: string
 }
 
+export function normalizeTeamKey(team: Pick<TeamInfo, "shortName" | "urlName" | "region" | "seed">) {
+    if (team.region === "bundle" && team.seed > 0) {
+        return `bundle:${team.seed}`;
+    }
+
+    return (team.urlName || team.shortName || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "");
+}
+
+function scoreBracketTeamCandidate(team: TeamInfo) {
+    let score = 0;
+
+    if (!team.shortName.includes("/")) {
+        score += 4;
+    }
+
+    if (!team.shortName.toLowerCase().includes("bundle")) {
+        score += 2;
+    }
+
+    score -= team.shortName.length / 100;
+
+    return score;
+}
+
 export function GenerateRegionBracketData(regionTeams: TeamInfo[]): Match[] {
     let matchId = 1;
     const matches: Match[] = [];
     const roundMatches: { [round: number]: Match[] } = {};
+    const bestTeamBySeed = new Map<number, TeamInfo>();
+
+    [...regionTeams]
+        .sort((left, right) => left.seed - right.seed)
+        .forEach((team) => {
+            const existing = bestTeamBySeed.get(team.seed);
+
+            if (!existing || scoreBracketTeamCandidate(team) > scoreBracketTeamCandidate(existing)) {
+                bestTeamBySeed.set(team.seed, team);
+            }
+        });
+
+    const seededTeams = Array.from(bestTeamBySeed.values())
+        .sort((left, right) => left.seed - right.seed)
+        .slice(0, 16);
+    const bracketSeedOrder = [1, 16, 8, 9, 5, 12, 4, 13, 6, 11, 3, 14, 7, 10, 2, 15];
+    const teamsBySeed = new Map(seededTeams.map((team) => [team.seed, team]));
+    const firstRoundTeams = bracketSeedOrder
+        .map((seed) => teamsBySeed.get(seed))
+        .filter((team): team is TeamInfo => Boolean(team));
 
     const createMatch = (
         participants: TeamInfo[],
@@ -51,9 +106,9 @@ export function GenerateRegionBracketData(regionTeams: TeamInfo[]): Match[] {
     };
 
     // First round: 8 matches
-    for (let i = 0; i < regionTeams.length; i += 2) {
+    for (let i = 0; i < firstRoundTeams.length; i += 2) {
         createMatch(
-            [regionTeams[i], regionTeams[15 - i]],
+            [firstRoundTeams[i], firstRoundTeams[i + 1]],
             1,
             null // Next match ID to be set later
         );

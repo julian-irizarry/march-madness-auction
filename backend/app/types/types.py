@@ -1,5 +1,12 @@
+from enum import Enum
 from typing import List
 from pydantic import BaseModel
+
+
+class GamePhase(str, Enum):
+    LOBBY = "lobby"
+    AUCTION = "auction"
+    ENDED = "ended"
 
 GAME_ID_NUM_CHAR = 6
 INITIAL_COUNTDOWN = 10
@@ -43,6 +50,15 @@ class TeamInfo(BaseModel):
     purchasePrice: float|None = None
     points: int|None = None
 
+
+class SaleRecord(BaseModel):
+    team: str
+    seed: int
+    region: str
+    buyer: str          # empty string if nobody bought
+    price: int          # 0 if nobody bought
+    numBids: int        # how many bids were placed on this team
+
 class PlayerInfo(BaseModel):
     name: str
     gameId: str
@@ -59,6 +75,8 @@ class GameInfo(BaseModel):
     currentTeam: TeamInfo = None
     teams: dict[str, TeamInfo] = {}
     log: List[BidModel] = []
+    auctionHistory: List[SaleRecord] = []
+    phase: GamePhase = GamePhase.LOBBY
 
 
 class MatchInfo(BaseModel):

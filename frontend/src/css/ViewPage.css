@@ -1,0 +1,257 @@
+.view-page__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.view-page__grid--full {
+  grid-column: 1 / -1;
+}
+
+/* Stat card */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  padding: 20px 22px;
+  border: 1px solid rgba(255, 243, 232, 0.08);
+  border-radius: 18px;
+  background: rgba(6, 8, 11, 0.94);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("../images/cracked_texture.png") center / cover no-repeat;
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+.stat-card__title {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 16px;
+  color: #fff3e8;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Summary row */
+.view-page__summary {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.summary-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 20px;
+  border: 1px solid rgba(255, 243, 232, 0.08);
+  border-radius: 12px;
+  background: rgba(6, 8, 11, 0.8);
+}
+
+.summary-chip__value {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--bloodbath-ember);
+}
+
+.summary-chip__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bloodbath-copy-muted);
+}
+
+/* Tables */
+.stat-table {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.stat-table th {
+  padding: 8px 10px;
+  text-align: left;
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bloodbath-copy-muted);
+  border-bottom: 1px solid rgba(255, 243, 232, 0.1);
+}
+
+.stat-table td {
+  padding: 8px 10px;
+  color: var(--bloodbath-copy);
+  border-bottom: 1px solid rgba(255, 243, 232, 0.04);
+}
+
+.stat-table tr:last-child td {
+  border-bottom: none;
+}
+
+.stat-table__rank {
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--bloodbath-gold);
+  width: 30px;
+}
+
+.stat-table__name {
+  font-weight: 600;
+}
+
+.stat-table__number {
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.stat-table__ember {
+  color: var(--bloodbath-ember);
+}
+
+.stat-table__electric {
+  color: var(--bloodbath-electric);
+}
+
+.stat-table__gold {
+  color: var(--bloodbath-gold);
+}
+
+/* Player teams sub-list */
+.stat-table__teams {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.stat-table__team-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 107, 74, 0.12);
+  font-size: 0.75rem;
+  color: var(--bloodbath-copy-muted);
+}
+
+/* Auction history */
+.auction-history {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+/* Live badge */
+.view-page__live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: rgba(255, 107, 74, 0.15);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bloodbath-ember);
+}
+
+.view-page__live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bloodbath-ember);
+  animation: live-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Refresh button */
+.view-page__refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid rgba(124, 198, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(124, 198, 255, 0.08);
+  color: var(--bloodbath-electric);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.view-page__refresh-btn:hover {
+  background: rgba(124, 198, 255, 0.14);
+}
+
+.view-page__refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Header */
+.view-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.view-page__header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.view-page__game-id {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--bloodbath-copy-muted);
+}
+
+/* Empty/loading states */
+.view-page__empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--bloodbath-copy-muted);
+  font-size: 1rem;
+}
+
+.view-page__loading {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--bloodbath-copy-muted);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+}

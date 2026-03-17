@@ -1,0 +1,808 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Rajdhani:wght@500;600;700&display=swap");
+
+@font-face {
+  font-family: "Scary Brusher";
+  src: url("../fonts/Scary Brusher.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.bid-panel-shell {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) - 10px);
+  transform: translateX(-50%);
+  width: min(1040px, calc(100vw - 360px));
+  z-index: 1300;
+  pointer-events: none;
+  --bid-panel-shell-rgb: 255, 86, 38;
+  --bid-panel-team-accent: #49a7ff;
+  --bid-panel-team-accent-rgb: 73, 167, 255;
+  --bid-panel-team-accent-highlight: #b2dbff;
+}
+
+.bid-panel {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1280 / 520;
+  filter: drop-shadow(0 26px 48px rgba(0, 0, 0, 0.55));
+}
+
+.bid-panel__frame,
+.bid-panel__content {
+  position: absolute;
+  inset: 0;
+}
+
+.bid-panel__frame {
+  width: 100%;
+  height: 100%;
+}
+
+.bid-panel__content {
+  display: block;
+  box-sizing: border-box;
+  padding: 0 clamp(78px, 8vw, 112px) clamp(20px, 3vw, 30px);
+  pointer-events: none;
+}
+
+.bid-panel__safe-area {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: clamp(112px, 12.6vw, 138px) 0 clamp(38px, 4.8vw, 52px);
+}
+
+.bid-panel__timer-anchor {
+  position: absolute;
+  left: 50%;
+  top: clamp(66px, 4.8vw, 78px);
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.bid-panel__timer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: clamp(166px, 17vw, 224px);
+  height: clamp(56px, 5.6vw, 70px);
+  padding: 0 clamp(18px, 2vw, 26px);
+  background: transparent;
+  box-shadow:
+    0 0 0 1px rgba(255, 117, 68, 0.14),
+    inset 0 1px 0 rgba(255, 241, 228, 0.08),
+    0 0 22px rgba(var(--bid-panel-shell-rgb), 0.18);
+  clip-path: polygon(16% 0, 84% 0, 100% 44%, 92% 100%, 8% 100%, 0 44%);
+}
+
+.bid-panel__timer-value {
+  color: #ffd79c;
+  font-family: "clock", "Rajdhani", sans-serif;
+  font-size: clamp(2.15rem, 3.6vw, 3rem);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-shadow:
+    0 0 14px rgba(255, 195, 110, 0.24),
+    0 0 22px rgba(var(--bid-panel-shell-rgb), 0.12);
+}
+
+.bid-panel__timer--urgent {
+  background: transparent;
+  box-shadow:
+    0 0 0 1px rgba(255, 113, 82, 0.22),
+    inset 0 1px 0 rgba(255, 223, 212, 0.08),
+    0 0 26px rgba(255, 86, 55, 0.34);
+  animation:
+    bid-panel-timer-pulse 0.72s ease-in-out infinite,
+    bid-panel-timer-flicker 1.2s linear infinite;
+}
+
+.bid-panel__timer--urgent .bid-panel__timer-value {
+  color: #ff9d7b;
+  text-shadow:
+    0 0 12px rgba(255, 133, 107, 0.4),
+    0 0 24px rgba(255, 70, 38, 0.34);
+}
+
+.bid-panel__body {
+  display: grid;
+  justify-items: center;
+  gap: clamp(10px, 1vw, 14px);
+  width: min(100%, 612px);
+  min-width: 0;
+  margin: 0 auto;
+}
+
+.bid-panel__headline-stack {
+  display: grid;
+  justify-items: center;
+  gap: clamp(3px, 0.6vw, 6px);
+  width: min(100%, 560px);
+  min-width: 0;
+  text-align: center;
+}
+
+.bid-panel__headline-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 1vw, 14px);
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.bid-panel__headline-row--compact {
+  gap: 0;
+}
+
+.bid-panel__logo-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: clamp(50px, 5.2vw, 78px);
+  height: clamp(50px, 5.2vw, 78px);
+}
+
+.bid-panel__logo-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  background: radial-gradient(circle, rgba(var(--bid-panel-team-accent-rgb), 0.24), transparent 68%);
+  filter: blur(10px);
+  opacity: 0.84;
+}
+
+.bid-panel__logo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 12px rgba(var(--bid-panel-team-accent-rgb), 0.3))
+    drop-shadow(0 8px 14px rgba(0, 0, 0, 0.3));
+}
+
+.bid-panel__logo-fallback {
+  position: relative;
+  color: #f7ece1;
+  font-family: "threeDim", "Rajdhani", sans-serif;
+  font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+  letter-spacing: 0.08em;
+}
+
+.bid-panel__eyebrow,
+.bid-panel__current-status {
+  font-family: "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.bid-panel__eyebrow {
+  color: rgba(252, 248, 245, 0.854);
+  font-size: 0.82rem;
+}
+
+.bid-panel__title {
+  margin: 0;
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.08em;
+  min-width: 0;
+  max-width: 100%;
+  color: #f8ddd8;
+  font-family: "Scary Brusher", "Rajdhani", sans-serif;
+  font-size: clamp(2.6rem, 4.5vw, 4.35rem);
+  font-weight: 400;
+  line-height: 0.84;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.06),
+    0 0 18px rgba(255, 212, 196, 0.12),
+    0 16px 28px rgba(0, 0, 0, 0.24);
+}
+
+.bid-panel__title-text {
+  display: inline-block;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.bid-panel__seed {
+  display: inline-block;
+  margin-left: 0.04em;
+  color: #f6e8dd;
+  font-family: "Scary Brusher", "Rajdhani", sans-serif;
+  font-size: 0.46em;
+  font-weight: 400;
+  line-height: 1;
+  transform: translateY(-0.26em);
+}
+
+.bid-panel__current {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  max-width: 100%;
+  padding-top: 1px;
+}
+
+.bid-panel__current-label {
+  color: #f0c98c;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: clamp(1.02rem, 1.55vw, 1.4rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bid-panel__current-value {
+  color: #ffd768;
+  font-family: "Rajdhani", sans-serif;
+  font-size: clamp(1.72rem, 2.5vw, 2.35rem);
+  font-weight: 700;
+  line-height: 0.95;
+  text-shadow: 0 0 18px rgba(255, 209, 88, 0.16);
+}
+
+.bid-panel__current-status {
+  color: rgba(255, 233, 216, 0.62);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.bid-panel__controls-wrap {
+  width: min(100%, 490px);
+  padding: 0 8px 2px;
+  margin: 0 auto;
+  pointer-events: auto;
+}
+
+.bid-panel-shell--idle .bid-panel__title {
+  color: #f1e7e0;
+  font-size: clamp(2.2rem, 4vw, 3.65rem);
+}
+
+.bid-panel-controls {
+  display: grid;
+  gap: 5px;
+  width: 100%;
+}
+
+.bid-panel-controls__steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+  width: min(100%, 372px);
+  margin: 0 auto;
+}
+
+.bid-panel-controls__step,
+.bid-panel-controls__submit {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  isolation: isolate;
+}
+
+.bid-panel-controls__step {
+  min-height: 34px;
+  padding: 0 6px;
+  border: 1px solid rgba(255, 194, 152, 0.18);
+  background:
+    linear-gradient(180deg, rgba(57, 44, 32, 0.98), rgba(23, 18, 14, 0.98));
+  color: #f8dfba;
+  clip-path: polygon(12% 0, 100% 0, 100% 76%, 90% 100%, 0 100%, 0 24%);
+  box-shadow:
+    0 10px 18px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 242, 228, 0.04);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.bid-panel-controls__step::before,
+.bid-panel-controls__submit::before,
+.bid-panel-controls__field::before,
+.bid-panel-controls__balance::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  pointer-events: none;
+}
+
+.bid-panel-controls__step::before {
+  clip-path: inherit;
+  background:
+    radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.14), transparent 32%),
+    linear-gradient(180deg, rgba(255, 138, 90, 0.1), rgba(255, 138, 90, 0));
+  opacity: 0.78;
+}
+
+.bid-panel-controls__step:hover:not(:disabled),
+.bid-panel-controls__step:focus-visible:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(255, 178, 135, 0.34);
+  box-shadow:
+    0 14px 24px rgba(0, 0, 0, 0.3),
+    0 0 18px rgba(var(--bid-panel-shell-rgb), 0.08),
+    inset 0 1px 0 rgba(255, 242, 228, 0.06);
+}
+
+.bid-panel-controls__step--max {
+  background:
+    linear-gradient(180deg, rgba(94, 58, 22, 0.98), rgba(54, 33, 12, 0.98));
+  color: #ffd475;
+}
+
+.bid-panel-controls__mainline {
+  display: grid;
+  grid-template-columns: minmax(0, 126px) minmax(0, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+
+.bid-panel-controls__entry {
+  min-width: 0;
+}
+
+.bid-panel-controls__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 211, 181, 0.14);
+  background:
+    linear-gradient(180deg, rgba(7, 10, 15, 0.98), rgba(2, 4, 7, 0.98));
+  clip-path: polygon(10% 0, 100% 0, 100% 76%, 92% 100%, 0 100%, 0 22%);
+  box-shadow:
+    0 12px 22px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.bid-panel-controls__field::before {
+  clip-path: inherit;
+  background:
+    linear-gradient(180deg, rgba(255, 131, 80, 0.12), rgba(255, 131, 80, 0)),
+    radial-gradient(circle at 18% 30%, rgba(255, 255, 255, 0.08), transparent 18%);
+}
+
+.bid-panel-controls__currency {
+  color: rgba(255, 236, 221, 0.82);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.bid-panel-controls__input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff7f0;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.bid-panel-controls__input::placeholder {
+  color: rgba(255, 245, 237, 0.22);
+}
+
+.bid-panel-controls__submit {
+  min-height: 40px;
+  border: 1px solid #c41e1e;
+  background:
+    linear-gradient(180deg, rgba(255, 120, 96, 0.08), rgba(255, 120, 96, 0)),
+    url("../images/cracked_texture.png"),
+    #c41e1e;
+  background-size: 100% 100%, cover, 100% 100%;
+  background-position: center, center, center;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-blend-mode: screen, multiply, normal;
+  color: #fff3e8;
+  clip-path: polygon(6% 0, 100% 0, 100% 74%, 94% 100%, 0 100%, 0 22%);
+  box-shadow:
+    0 14px 26px rgba(97, 20, 10, 0.3),
+    0 0 26px rgba(var(--bid-panel-shell-rgb), 0.24),
+    inset 0 1px 0 rgba(255, 239, 222, 0.18),
+    inset 0 -1px 0 rgba(110, 17, 8, 0.4);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: clamp(1.04rem, 1.55vw, 1.24rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+}
+
+.bid-panel-controls__submit::before {
+  clip-path: inherit;
+  background:
+    linear-gradient(180deg, rgba(255, 232, 220, 0.08), rgba(255, 232, 220, 0)),
+    url("../images/cracked_texture.png");
+  background-size: 100% 100%, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  background-blend-mode: screen, overlay;
+  mix-blend-mode: screen;
+  opacity: 0.24;
+}
+
+.bid-panel-controls__submit:hover:not(:disabled),
+.bid-panel-controls__submit:focus-visible:not(:disabled) {
+  transform: translateY(-1px);
+  filter: saturate(1.04) brightness(1.03);
+  box-shadow:
+    0 16px 28px rgba(97, 20, 10, 0.34),
+    0 0 34px rgba(var(--bid-panel-shell-rgb), 0.3),
+    inset 0 1px 0 rgba(255, 239, 222, 0.2),
+    inset 0 -1px 0 rgba(110, 17, 8, 0.42);
+}
+
+.bid-panel-controls__footer {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  margin-top: -1px;
+}
+
+.bid-panel-controls__helper {
+  color: rgba(255, 229, 209, 0.54);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.bid-panel-controls__balance {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 138px;
+  min-height: 26px;
+  padding: 0 14px 1px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 196, 151, 0.2);
+  background:
+    linear-gradient(180deg, rgba(42, 28, 20, 0.98), rgba(11, 9, 10, 0.98));
+  clip-path: polygon(12% 0, 88% 0, 96% 100%, 4% 100%);
+  box-shadow:
+    0 10px 18px rgba(0, 0, 0, 0.28),
+    0 0 18px rgba(var(--bid-panel-shell-rgb), 0.08),
+    inset 0 1px 0 rgba(255, 241, 231, 0.08);
+  transform: translateY(2px);
+}
+
+.bid-panel-controls__balance::before {
+  background: linear-gradient(180deg, rgba(255, 170, 122, 0.08), rgba(255, 170, 122, 0));
+}
+
+.bid-panel-controls__balance-label {
+  color: rgba(242, 214, 191, 0.76);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.bid-panel-controls__balance-value {
+  color: #f9e2bf;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.bid-panel-controls__step:disabled,
+.bid-panel-controls__submit:disabled,
+.bid-panel-controls__input:disabled {
+  opacity: 0.46;
+  cursor: not-allowed;
+}
+
+@keyframes bid-panel-timer-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.96;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+}
+
+@keyframes bid-panel-timer-flicker {
+  0%,
+  18%,
+  24%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  22% {
+    opacity: 0.9;
+  }
+}
+
+@media (max-width: 1199px) {
+  .bid-panel-shell {
+    width: min(980px, calc(100vw - 64px));
+  }
+
+  .bid-panel__content {
+    padding-left: clamp(44px, 5vw, 80px);
+    padding-right: clamp(44px, 5vw, 80px);
+  }
+
+  .bid-panel__safe-area {
+    padding-top: clamp(100px, 11.2vw, 122px);
+    padding-bottom: clamp(34px, 4.2vw, 46px);
+  }
+
+  .bid-panel__body {
+    width: min(100%, 580px);
+  }
+}
+
+@media (max-width: 899px) {
+  .bid-panel-shell {
+    width: calc(100vw - 18px);
+  }
+
+  .bid-panel {
+    aspect-ratio: 2.08 / 1;
+  }
+
+  .bid-panel__content {
+    padding: 0 28px 18px;
+  }
+
+  .bid-panel__safe-area {
+    padding-top: 94px;
+    padding-bottom: 28px;
+  }
+
+  .bid-panel__timer-anchor {
+    top: 38px;
+  }
+
+  .bid-panel__timer {
+    min-width: 152px;
+    height: 50px;
+  }
+
+  .bid-panel__timer-value {
+    font-size: 2rem;
+  }
+
+  .bid-panel__title {
+    font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+  }
+
+  .bid-panel__logo-wrap {
+    width: 58px;
+    height: 58px;
+  }
+
+  .bid-panel__headline-stack {
+    width: min(100%, 500px);
+  }
+
+  .bid-panel__controls-wrap {
+    width: min(100%, 452px);
+  }
+
+  .bid-panel-controls__step {
+    min-height: 32px;
+    font-size: 0.82rem;
+  }
+
+  .bid-panel-controls__field,
+  .bid-panel-controls__submit {
+    min-height: 36px;
+  }
+
+  .bid-panel-controls__submit {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 699px) {
+  .bid-panel-shell {
+    width: calc(100vw - 8px);
+    bottom: -8px;
+  }
+
+  .bid-panel {
+    aspect-ratio: 1.48 / 1;
+  }
+
+  .bid-panel__content {
+    padding: 0 18px 16px;
+  }
+
+  .bid-panel__safe-area {
+    padding-top: 82px;
+    padding-bottom: 22px;
+  }
+
+  .bid-panel__timer-anchor {
+    top: 32px;
+  }
+
+  .bid-panel__timer {
+    min-width: 132px;
+    height: 44px;
+  }
+
+  .bid-panel__timer-value {
+    font-size: 1.7rem;
+  }
+
+  .bid-panel__body {
+    width: min(100%, 100%);
+    gap: 10px;
+  }
+
+  .bid-panel__logo-wrap {
+    width: 46px;
+    height: 46px;
+  }
+
+  .bid-panel__title {
+    font-size: clamp(1.9rem, 7.4vw, 2.8rem);
+  }
+
+  .bid-panel__title-text {
+    white-space: normal;
+  }
+
+  .bid-panel__current {
+    gap: 8px;
+  }
+
+  .bid-panel__current-label {
+    font-size: 1rem;
+  }
+
+  .bid-panel__current-value {
+    font-size: 1.8rem;
+  }
+
+  .bid-panel__eyebrow,
+  .bid-panel__current-status,
+  .bid-panel-controls__helper {
+    font-size: 0.52rem;
+    letter-spacing: 0.14em;
+  }
+
+  .bid-panel-controls {
+    gap: 7px;
+  }
+
+  .bid-panel-controls__steps {
+    width: min(100%, 328px);
+    gap: 5px;
+  }
+
+  .bid-panel-controls__mainline {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .bid-panel-controls__step {
+    min-height: 30px;
+    font-size: 0.74rem;
+  }
+
+  .bid-panel-controls__field,
+  .bid-panel-controls__submit {
+    min-height: 34px;
+  }
+
+  .bid-panel-controls__field {
+    padding: 0 12px;
+  }
+
+  .bid-panel-controls__submit {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .bid-panel {
+    aspect-ratio: 1.34 / 1;
+  }
+
+  .bid-panel__content {
+    padding: 0 14px 14px;
+  }
+
+  .bid-panel__safe-area {
+    padding-top: 72px;
+    padding-bottom: 16px;
+  }
+
+  .bid-panel__timer-anchor {
+    top: 28px;
+  }
+
+  .bid-panel__timer {
+    min-width: 112px;
+    height: 38px;
+  }
+
+  .bid-panel__timer-value {
+    font-size: 1.42rem;
+  }
+
+  .bid-panel__headline-row {
+    gap: 6px;
+  }
+
+  .bid-panel__logo-wrap {
+    width: 38px;
+    height: 38px;
+  }
+
+  .bid-panel__title {
+    font-size: clamp(1.45rem, 8vw, 2.1rem);
+  }
+
+  .bid-panel-controls__step {
+    min-height: 28px;
+    font-size: 0.66rem;
+  }
+
+  .bid-panel-controls__field,
+  .bid-panel-controls__submit {
+    min-height: 30px;
+  }
+
+  .bid-panel-controls__currency {
+    font-size: 1rem;
+  }
+
+  .bid-panel-controls__input {
+    font-size: 1rem;
+  }
+
+  .bid-panel-controls__submit {
+    font-size: 0.8rem;
+  }
+
+  .bid-panel-controls__balance {
+    min-width: 118px;
+    min-height: 24px;
+  }
+
+  .bid-panel-controls__balance-label {
+    font-size: 0.64rem;
+  }
+
+  .bid-panel-controls__balance-value {
+    font-size: 0.94rem;
+  }
+}

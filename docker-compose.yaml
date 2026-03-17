@@ -1,11 +1,11 @@
-version: '3'
 services:
   frontend:
     env_file:
       - .env
     image: frontend:1.0
     environment:
-      - NODE_OPTIONS=--openssl-legacy-provider
+      - VITE_BACKEND_HOST=${VITE_BACKEND_HOST}
+      - VITE_BACKEND_PORT=${VITE_BACKEND_PORT}
     build:
       context: .
       dockerfile: docker/Dockerfile.frontend
@@ -25,5 +25,5 @@ services:
     volumes:
       - ./backend/:/app
     ports:
-      - "${REACT_APP_BACKEND_PORT}:${REACT_APP_BACKEND_PORT}"
+      - "${VITE_BACKEND_PORT}:${VITE_BACKEND_PORT}"
     command: ["/bin/bash", "/app/start_backend_server.sh"]

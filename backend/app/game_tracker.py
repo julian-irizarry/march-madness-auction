@@ -4,6 +4,8 @@ from app.types.types import (
     PlayerInfo,
     TeamInfo,
     GameInfo,
+    GamePhase,
+    SaleRecord,
     BidModel,
     INITIAL_BID,
     INITIAL_COUNTDOWN,
@@ -11,22 +13,22 @@ from app.types.types import (
 from app.bracket import get_teams, get_matches
 
 
-def missingPlayInPostProcess(teams: dict[str, TeamInfo]):
-    teams["Xavier/Texas"] = TeamInfo(
-        shortName="Xavier/Texas", urlName="", seed=11, region="Midwest"
-    )
-    return teams
-
-
 class GameTracker:
     def __init__(self, year: int, month: str, day: tuple[str, str]):
+        self.year = year
+        self.month = month
+        self.day = day
         self.games: dict[str, GameInfo] = {}
         self.teams_master = get_teams(year, month, day)
-        missingPlayInPostProcess(self.teams_master)
         teams_list = list(self.teams_master.items())
         teams_list.sort(key=lambda x: int(x[1].seed))
         self.teams_master = {key: value for key, value in teams_list}
         self.match_results = []
+
+    def refresh_match_results(self) -> int:
+        """Re-fetch match results from NCAA API and return the count."""
+        self.match_results = get_matches(self.year, self.month, self.day)
+        return len(self.match_results)
 
     def add_game(self, gameId: str, creator: str) -> None:
         creator_info = PlayerInfo(name=creator, gameId=gameId)
@@ -96,8 +98,10 @@ class GameTracker:
 
     def finalize_bid(self, gameId: str) -> BidModel:
         winner: BidModel
+        current_team = self.games[gameId].currentTeam
+        num_bids = len(self.games[gameId].log)
 
-        if len(self.games[gameId].log) > 0:
+        if num_bids > 0:
             winner = self.games[gameId].log[-1]
             self.update_player(gameId, winner.player, winner.bid, winner.team)
         else:
@@ -105,14 +109,29 @@ class GameTracker:
                 gameId="",
                 player="",
                 bid=-1,
-                team=self.games[gameId].currentTeam.shortName,
+                team=current_team.shortName,
             )
 
-        # pick random new team to auction
-        self.games[gameId].currentTeam = self.get_random_team(gameId)
-        self.games[gameId].currentBid = INITIAL_BID  # reset bid
-        self.games[gameId].countdown = INITIAL_COUNTDOWN  # reset countdown
+        # Record the sale
+        self.games[gameId].auctionHistory.append(SaleRecord(
+            team=current_team.shortName,
+            seed=current_team.seed,
+            region=current_team.region,
+            buyer=winner.player,
+            price=max(0, winner.bid),
+            numBids=num_bids,
+        ))
+
         self.games[gameId].log = []  # reset log
+
+        # pick random new team to auction, or end the game
+        if len(self.games[gameId].teams) > 0:
+            self.games[gameId].currentTeam = self.get_random_team(gameId)
+            self.games[gameId].currentBid = INITIAL_BID
+            self.games[gameId].countdown = INITIAL_COUNTDOWN
+        else:
+            self.games[gameId].currentTeam = None
+            self.games[gameId].phase = GamePhase.ENDED
 
         return winner
 
@@ -121,6 +140,11 @@ class GameTracker:
 
     def get_current_bid(self, gameId: str) -> float:
         return self.games[gameId].currentBid
+
+    def get_current_bidder(self, gameId: str) -> str:
+        if self.games[gameId].log:
+            return self.games[gameId].log[-1].player
+        return ""
 
     def get_current_countdown(self, gameId: str) -> float:
         return self.games[gameId].countdown

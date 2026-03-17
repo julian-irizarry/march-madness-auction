@@ -1,0 +1,643 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Rajdhani:wght@500;600;700&display=swap");
+
+@font-face {
+  font-family: "Scary Brusher";
+  src: url("../fonts/Scary Brusher.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bloodbath-border: rgba(255, 221, 206, 0.1);
+  --bloodbath-border-strong: rgba(255, 123, 87, 0.28);
+  --bloodbath-copy: #f6ede3;
+  --bloodbath-copy-muted: rgba(246, 237, 227, 0.72);
+  --bloodbath-ember: #ff6b4a;
+  --bloodbath-electric: #7cc6ff;
+  --bloodbath-gold: #ffd989;
+  --bloodbath-shadow: 0 24px 42px rgba(0, 0, 0, 0.34);
+}
+
+.bloodbath-page {
+  position: relative;
+  min-height: 100vh;
+  padding: 24px clamp(18px, 2.6vw, 32px) 30px;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 16% 14%, rgba(167, 17, 10, 0.28), transparent 20%),
+    radial-gradient(circle at 84% 18%, rgba(71, 143, 221, 0.12), transparent 18%),
+    radial-gradient(circle at 50% 82%, rgba(255, 117, 73, 0.14), transparent 28%),
+    linear-gradient(180deg, rgba(4, 5, 8, 0.88), rgba(5, 8, 11, 0.96)),
+    url("../images/background3.png") center / cover no-repeat;
+  color: var(--bloodbath-copy);
+}
+
+.bloodbath-page::before,
+.bloodbath-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bloodbath-page::before {
+  background: url("../images/cracked_texture.png") center / cover no-repeat;
+  opacity: 0.08;
+}
+
+.bloodbath-page::after {
+  background:
+    url("../images/auction_blood_splatter.svg") right clamp(14px, 4vw, 64px) top clamp(20px, 5vw, 64px) / min(38vw, 420px) auto no-repeat,
+    url("../images/auction_blood_splatter.svg") left -20px bottom -26px / min(34vw, 340px) auto no-repeat;
+  opacity: 0.18;
+  mix-blend-mode: screen;
+}
+
+.bloodbath-page__inner {
+  position: relative;
+  z-index: 1;
+  width: min(1440px, 100%);
+  margin: 0 auto;
+}
+
+.bloodbath-panel {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(19, 24, 31, 0.96), rgba(7, 10, 14, 0.96)),
+    rgba(9, 12, 17, 0.96);
+  border: 1px solid var(--bloodbath-border);
+  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+  box-shadow:
+    var(--bloodbath-shadow),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  isolation: isolate;
+}
+
+.bloodbath-panel::before,
+.bloodbath-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bloodbath-panel::before {
+  background:
+    linear-gradient(180deg, rgba(255, 107, 74, 0.07), transparent 20%, transparent 78%, rgba(72, 149, 235, 0.08)),
+    url("../images/cracked_texture.png") center / cover no-repeat;
+  opacity: 0.12;
+}
+
+.bloodbath-panel::after {
+  inset: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+
+.bloodbath-panel__inner {
+  position: relative;
+  z-index: 1;
+  padding: clamp(22px, 2.8vw, 34px);
+  box-sizing: border-box;
+}
+
+.bloodbath-simple-home,
+.bloodbath-simple-lobby {
+  display: grid;
+  gap: 18px;
+}
+
+.bloodbath-simple-home__brand,
+.bloodbath-simple-lobby__brand {
+  display: flex;
+  justify-content: center;
+}
+
+.bloodbath-simple-home__brand .graveyard-bracket__brand,
+.bloodbath-simple-lobby__brand .graveyard-bracket__brand {
+  align-items: center;
+  text-align: center;
+}
+
+.bloodbath-simple-home__brand .graveyard-bracket__brand-main,
+.bloodbath-simple-lobby__brand .graveyard-bracket__brand-main {
+  font-size: clamp(2.8rem, 5vw, 4.4rem);
+}
+
+.bloodbath-simple-home__brand .graveyard-bracket__brand-accent,
+.bloodbath-simple-lobby__brand .graveyard-bracket__brand-accent {
+  font-size: clamp(1.2rem, 2vw, 2rem);
+}
+
+.bloodbath-simple-home__stage {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.bloodbath-simple-home__stage .bloodbath-panel__inner {
+  min-height: clamp(470px, 70vh, 640px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 30px;
+}
+
+.bloodbath-simple-home__row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(320px, 520px) minmax(180px, 1fr);
+  gap: 22px;
+  align-items: center;
+}
+
+.bloodbath-simple-home__action {
+  display: flex;
+}
+
+.bloodbath-simple-home__action--left {
+  justify-content: flex-end;
+}
+
+.bloodbath-simple-home__action--right {
+  justify-content: flex-start;
+}
+
+.bloodbath-simple-home__logo-block {
+  display: flex;
+  justify-content: center;
+}
+
+.bloodbath-home__logo-shell--simple {
+  width: min(100%, 500px);
+  padding: clamp(24px, 4vw, 34px) clamp(18px, 3vw, 28px);
+  border: 1px solid rgba(255, 214, 194, 0.14);
+  background:
+    linear-gradient(180deg, rgba(15, 18, 24, 0.96), rgba(8, 11, 15, 0.96)),
+    rgba(8, 11, 15, 0.92);
+  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+  box-shadow:
+    0 18px 30px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.bloodbath-home__logo {
+  display: block;
+  width: min(100%, 400px);
+  margin: 0 auto;
+  filter:
+    drop-shadow(0 0 18px rgba(255, 115, 77, 0.18))
+    drop-shadow(0 14px 24px rgba(0, 0, 0, 0.28));
+}
+
+.bloodbath-simple-home__footer {
+  display: flex;
+  justify-content: center;
+}
+
+.bloodbath-audio-toggle,
+.bloodbath-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 221, 206, 0.12);
+  color: #fff4ea;
+  cursor: pointer;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  box-shadow:
+    0 12px 22px rgba(0, 0, 0, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.94rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.bloodbath-button--large {
+  min-width: 180px;
+  min-height: 58px;
+  padding: 0 28px;
+  font-size: 1rem;
+}
+
+.bloodbath-audio-toggle:hover,
+.bloodbath-audio-toggle:focus-visible,
+.bloodbath-button:hover,
+.bloodbath-button:focus-visible {
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.bloodbath-button--primary {
+  background:
+    linear-gradient(180deg, rgba(124, 28, 22, 0.98), rgba(53, 14, 13, 0.98)),
+    rgba(53, 14, 13, 0.98);
+  border-color: rgba(255, 135, 100, 0.24);
+}
+
+.bloodbath-button--primary:hover,
+.bloodbath-button--primary:focus-visible {
+  border-color: rgba(255, 135, 100, 0.38);
+  box-shadow:
+    0 16px 28px rgba(0, 0, 0, 0.28),
+    0 0 18px rgba(255, 107, 74, 0.1),
+    inset 0 0 0 1px rgba(255, 168, 138, 0.06);
+}
+
+.bloodbath-button--secondary {
+  background:
+    linear-gradient(180deg, rgba(16, 20, 27, 0.98), rgba(8, 11, 15, 0.96)),
+    rgba(8, 11, 15, 0.96);
+}
+
+.bloodbath-button--secondary:hover,
+.bloodbath-button--secondary:focus-visible {
+  border-color: rgba(124, 198, 255, 0.26);
+  box-shadow:
+    0 16px 28px rgba(0, 0, 0, 0.28),
+    0 0 18px rgba(74, 163, 255, 0.08),
+    inset 0 0 0 1px rgba(124, 198, 255, 0.05);
+}
+
+.bloodbath-audio-toggle {
+  position: fixed;
+  right: clamp(18px, 3vw, 30px);
+  bottom: clamp(18px, 3vw, 28px);
+  z-index: 12;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 138px;
+  min-height: 64px;
+  padding: 12px 16px 11px;
+  background:
+    linear-gradient(180deg, rgba(57, 17, 15, 0.98), rgba(17, 11, 12, 0.96)),
+    rgba(17, 11, 12, 0.96);
+  border-color: rgba(255, 126, 95, 0.22);
+}
+
+.bloodbath-audio-toggle__label {
+  color: rgba(255, 229, 210, 0.62);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.bloodbath-audio-toggle__value {
+  color: #ffd39c;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bloodbath-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(3, 5, 8, 0.78);
+  backdrop-filter: blur(10px);
+}
+
+.bloodbath-dialog {
+  width: min(100%, 620px);
+}
+
+.bloodbath-dialog__shell {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(16, 21, 29, 0.98), rgba(8, 11, 15, 0.98)),
+    rgba(8, 11, 15, 0.98);
+  border: 1px solid rgba(255, 221, 206, 0.12);
+  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+  box-shadow:
+    0 28px 40px rgba(0, 0, 0, 0.42),
+    0 0 26px rgba(255, 107, 74, 0.08);
+}
+
+.bloodbath-dialog__shell::before,
+.bloodbath-dialog__shell::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.bloodbath-dialog__shell::before {
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 107, 74, 0.08), transparent 24%, transparent 84%, rgba(74, 163, 255, 0.08)),
+    url("../images/cracked_texture.png") center / cover no-repeat;
+  opacity: 0.14;
+}
+
+.bloodbath-dialog__shell::after {
+  inset: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+
+.bloodbath-dialog__header,
+.bloodbath-dialog__form {
+  position: relative;
+  z-index: 1;
+}
+
+.bloodbath-dialog__header {
+  padding: 28px 30px 16px;
+  border-bottom: 1px solid rgba(255, 221, 206, 0.08);
+}
+
+.bloodbath-dialog__title {
+  margin: 0;
+  color: #fff4ea;
+  font-family: "Scary Brusher", "Rajdhani", sans-serif;
+  font-size: clamp(2.1rem, 4vw, 3.3rem);
+  font-weight: 400;
+  line-height: 0.88;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.bloodbath-dialog__form {
+  display: grid;
+  gap: 18px;
+  padding: 24px 30px 30px;
+}
+
+.bloodbath-dialog__error {
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 120, 99, 0.22);
+  background: rgba(67, 17, 16, 0.78);
+  color: #ffd3c7;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+
+.bloodbath-field {
+  display: grid;
+  gap: 8px;
+}
+
+.bloodbath-field__label {
+  color: rgba(255, 230, 213, 0.74);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.bloodbath-field__input {
+  min-height: 54px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 221, 206, 0.12);
+  background:
+    linear-gradient(180deg, rgba(15, 19, 25, 0.98), rgba(9, 11, 16, 0.98)),
+    rgba(9, 11, 16, 0.98);
+  color: #fff4ea;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.bloodbath-field__input:focus {
+  outline: none;
+  border-color: rgba(124, 198, 255, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(124, 198, 255, 0.08),
+    0 0 18px rgba(74, 163, 255, 0.08);
+}
+
+.bloodbath-dialog__actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.bloodbath-simple-lobby__stage {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+}
+
+.bloodbath-simple-lobby__grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+}
+
+.bloodbath-simple-lobby__column {
+  display: grid;
+  gap: 22px;
+}
+
+.bloodbath-simple-lobby__column--room {
+  justify-items: center;
+  text-align: center;
+}
+
+.bloodbath-simple-lobby__welcome {
+  display: grid;
+  gap: 8px;
+}
+
+.bloodbath-simple-lobby__title {
+  margin: 0;
+  color: #fff4ea;
+  font-family: "Scary Brusher", "Rajdhani", sans-serif;
+  font-size: clamp(2.4rem, 4vw, 3.8rem);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.bloodbath-simple-lobby__subtitle,
+.bloodbath-simple-lobby__waiting,
+.bloodbath-simple-lobby__empty {
+  color: var(--bloodbath-copy-muted);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.bloodbath-simple-lobby__player-list {
+  display: grid;
+  gap: 10px;
+}
+
+.bloodbath-simple-lobby__player-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 14px 13px;
+  border: 1px solid rgba(255, 221, 206, 0.1);
+  background:
+    linear-gradient(180deg, rgba(16, 20, 27, 0.98), rgba(8, 11, 15, 0.96)),
+    rgba(8, 11, 15, 0.96);
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  box-shadow:
+    0 12px 20px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.bloodbath-simple-lobby__player-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.bloodbath-simple-lobby__player-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 221, 206, 0.12);
+  border-radius: 999px;
+  background: rgba(11, 14, 19, 0.96);
+  flex: 0 0 auto;
+}
+
+.bloodbath-simple-lobby__player-name {
+  color: #fff4ea;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.bloodbath-simple-lobby__player-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 8px 4px;
+  border: 1px solid rgba(255, 214, 137, 0.22);
+  background: rgba(78, 56, 10, 0.94);
+  color: var(--bloodbath-gold);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.bloodbath-simple-lobby__room-code {
+  display: grid;
+  gap: 10px;
+  width: min(100%, 320px);
+}
+
+.bloodbath-simple-lobby__room-label {
+  color: var(--bloodbath-electric);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.bloodbath-simple-lobby__room-value {
+  display: block;
+  padding: 16px 18px 14px;
+  border: 1px solid rgba(255, 221, 206, 0.1);
+  background:
+    linear-gradient(180deg, rgba(24, 14, 15, 0.96), rgba(10, 11, 15, 0.96)),
+    rgba(10, 11, 15, 0.96);
+  color: #fff4ea;
+  font-family: "Rajdhani", sans-serif;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+
+.bloodbath-simple-lobby__action {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 1024px) {
+  .bloodbath-simple-home__row,
+  .bloodbath-simple-lobby__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bloodbath-simple-home__action,
+  .bloodbath-simple-home__action--left,
+  .bloodbath-simple-home__action--right {
+    justify-content: center;
+  }
+
+  .bloodbath-simple-home__stage .bloodbath-panel__inner {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .bloodbath-page {
+    padding-top: 18px;
+    padding-bottom: 92px;
+  }
+
+  .bloodbath-panel__inner {
+    padding: 18px;
+  }
+
+  .bloodbath-dialog__header,
+  .bloodbath-dialog__form {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .bloodbath-dialog__actions {
+    flex-direction: column;
+  }
+
+  .bloodbath-dialog__actions .bloodbath-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .bloodbath-simple-home__brand .graveyard-bracket__brand-main,
+  .bloodbath-simple-lobby__brand .graveyard-bracket__brand-main {
+    font-size: clamp(2.2rem, 10vw, 3rem);
+  }
+
+  .bloodbath-button--large {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .bloodbath-audio-toggle {
+    right: 14px;
+    left: 14px;
+    bottom: 14px;
+    width: auto;
+    align-items: center;
+  }
+}

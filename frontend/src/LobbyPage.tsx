@@ -1,43 +1,78 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Button, Typography, List, ListItem, Card, Chip } from "@mui/joy";
-import { Grid, Paper } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { BACKEND_URL } from "./Utils"
+import { BACKEND_HTTP_URL, BACKEND_WS_URL } from "./Utils";
 import imageSrc from "./images/march_madness_logo_auction.png";
-import { ReactComponent as CrownIcon } from "./icons/crown.svg";
-import { ReactComponent as UserIcon } from "./icons/user.svg";
+import CrownIcon from "./icons/crown.svg?react";
+import UserIcon from "./icons/user.svg?react";
+import "./css/Fonts.css";
+import "./css/Bracket.css";
+import "./css/BloodbathPages.css";
+
+const ROSTER_ICON_COLORS = ["#ff6b4a", "#49a7ff", "#ffd46f", "#69dd8f", "#ff8a57", "#7cc6ff"];
 
 function LobbyPage() {
   const navigate = useNavigate();
-
   const location = useLocation();
-  const { gameId, isCreator, playerName } = location.state || {};
+  const [gameId, setGameId] = useState<string>(location.state?.gameId || "");
+  const [isCreator, setIsCreator] = useState<boolean>(location.state?.isCreator || false);
+  const [playerName, setPlayerName] = useState<string>(location.state?.playerName || "");
 
   const [players, setPlayers] = useState<string[]>([]);
-  const baseColor = "#FFD700";
-  const wsRef = useRef<WebSocket | null>(null); // Use useRef to hold the WebSocket connection
+  const wsRef = useRef<WebSocket | null>(null);
+  const [sessionLoaded, setSessionLoaded] = useState<boolean>(!!location.state?.gameId);
+
+  // If no state from navigation, try to recover from session cookie
+  useEffect(() => {
+    if (location.state?.gameId) return;
+    const recover = async () => {
+      try {
+        const response = await fetch(`${BACKEND_HTTP_URL}/rejoin/`, { credentials: "include" });
+        if (response.ok) {
+          const data = await response.json();
+          const routeState = { gameId: data.gameId, isCreator: data.isCreator, playerName: data.playerName };
+          if (data.phase === "ended") {
+            navigate("/view", { state: { gameId: data.gameId } });
+            return;
+          }
+          if (data.phase === "auction") {
+            navigate("/game", { state: routeState });
+            return;
+          }
+          setGameId(data.gameId);
+          setIsCreator(data.isCreator);
+          setPlayerName(data.playerName);
+          setSessionLoaded(true);
+        } else {
+          navigate("/");
+        }
+      } catch {
+        navigate("/");
+      }
+    };
+    recover();
+  }, [location.state, navigate]);
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://${BACKEND_URL}/ws/${gameId}`);
+    if (!sessionLoaded || !gameId) return;
+
+    const ws = new WebSocket(`${BACKEND_WS_URL}/ws/${gameId}`);
     wsRef.current = ws;
 
     ws.onmessage = (event) => {
       if (event.data === "gameStarted") {
-        // Navigate to the game/bid page when the game starts
         navigate("/game", { state: { gameId, isCreator, playerName } });
+        return;
       }
-      else {
-        const data = JSON.parse(event.data);
 
-        if ("players" in data) {
-          setPlayers(Object.keys(data["players"]));
-        }
+      const data = JSON.parse(event.data);
+      if ("players" in data) {
+        setPlayers(Object.keys(data.players));
       }
     };
 
     return () => ws.close();
-  }, [navigate, gameId, playerName, isCreator]);
+  }, [navigate, gameId, isCreator, playerName, sessionLoaded]);
 
   const handleStartGameClick = () => {
     if (isCreator && wsRef.current) {
@@ -46,88 +81,79 @@ function LobbyPage() {
   };
 
   return (
-    <div id="outer-container">
-      <Paper elevation={1} sx={{ height: "720px", width: "1400px", padding: "10px", backgroundColor: "#fcfcfc" }}>
-        <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "row", height: "calc(100vh - 170px)", minHeight: "100%" }}>
+    <div className="bloodbath-page bloodbath-page--lobby">
+      <div className="bloodbath-page__inner">
+        <div className="bloodbath-simple-lobby">
+          <div className="bloodbath-simple-lobby__brand">
+            <div className="graveyard-bracket__brand">
+              <div className="graveyard-bracket__brand-main">Game</div>
+              <div className="graveyard-bracket__brand-accent">Lobby</div>
+            </div>
+          </div>
 
-          {/* Left side */}
-          <Grid item xs={4}>
-            <Grid container spacing={2} direction="column" alignItems="center">
+          <div className="bloodbath-panel bloodbath-simple-lobby__stage">
+            <div className="bloodbath-panel__inner">
+              <div className="bloodbath-simple-lobby__grid">
+                <section className="bloodbath-simple-lobby__column bloodbath-simple-lobby__column--players">
+                  <div className="bloodbath-simple-lobby__welcome">
+                    <h1 className="bloodbath-simple-lobby__title">{playerName ? `Welcome ${playerName}!` : "Welcome!"}</h1>
+                    <p className="bloodbath-simple-lobby__subtitle">You are {isCreator ? "the game creator" : "a participant"}.</p>
+                  </div>
 
-              {/* Player */}
-              <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <Typography level="h4" justifyContent="center" sx={{ color: "var(--tertiary-color)", fontSize: "30px" }}>
-                  {playerName ? `Welcome ${playerName}!` : ""}
-                </Typography>
-              </Grid>
-              <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <Typography level="h4" justifyContent="center" sx={{ color: "gray", fontSize: "20px" }}>
-                  You are {isCreator ? "the game creator" : "a participant"}.
-                </Typography>
-              </Grid>
+                  <div className="bloodbath-simple-lobby__player-list">
+                    {players.length > 0 ? (
+                      players.map((participant, index) => {
+                        const isHost = index === 0;
+                        const iconColor = ROSTER_ICON_COLORS[index % ROSTER_ICON_COLORS.length];
 
-              {/* List of players */}
-              <Grid item>
-                <List variant="outlined" sx={{ minWidth: 240, borderRadius: "sm" }}>
-                  {players.length > 0 ?
-                    players.map((participant, i) => {
-                      // Calculate hue based on index
-                      const hue = (i * 30) % 360; // Adjust 30 as needed to change the color spacing
-                      const participantColor = `hsl(${hue}, 70%, 50%)`; // Adjust saturation and lightness as needed
+                        return (
+                          <div className="bloodbath-simple-lobby__player-card" key={`${participant}_${index}`}>
+                            <div className="bloodbath-simple-lobby__player-main">
+                              <span className="bloodbath-simple-lobby__player-icon" aria-hidden="true">
+                                {isHost ? (
+                                  <CrownIcon fill="#ffd989" width="20px" height="20px" />
+                                ) : (
+                                  <UserIcon fill={iconColor} width="16px" height="16px" />
+                                )}
+                              </span>
+                              <span className="bloodbath-simple-lobby__player-name">{participant}</span>
+                            </div>
 
-                      return (
-                        <React.Fragment key={i}>
-                          <ListItem>
-                            {i === 0 ?
-                              <CrownIcon fill={baseColor} width="20px" height="20px" />
-                              : <UserIcon fill={participantColor} width="20px" height="20px" />
-                            }
-                            <Chip> {participant} </Chip>
-                          </ListItem>
-                        </React.Fragment>
-                      );
-                    })
-                    : <Typography>No players</Typography>
-                  }
-                </List>
-              </Grid>
-            </Grid>
-          </Grid>
+                            {isHost ? <span className="bloodbath-simple-lobby__player-badge">Host</span> : null}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="bloodbath-simple-lobby__empty">No players</div>
+                    )}
+                  </div>
+                </section>
 
-          {/* Right side */}
-          <Grid item xs={8}>
-            <Grid container spacing={2} direction="column" alignItems="center">
+                <section className="bloodbath-simple-lobby__column bloodbath-simple-lobby__column--room">
+                  <div className="bloodbath-home__logo-shell bloodbath-home__logo-shell--simple">
+                    <img src={imageSrc} alt="March Madness Auction logo" className="bloodbath-home__logo" />
+                  </div>
 
-              {/* March Madness logo */}
-              <Grid item>
-                <img src={imageSrc} alt="Central Game" style={{ maxWidth: "350px", margin: "20px 0" }} />
-              </Grid>
+                  <div className="bloodbath-simple-lobby__room-code">
+                    <span className="bloodbath-simple-lobby__room-label">Your Room Code</span>
+                    <strong className="bloodbath-simple-lobby__room-value">{gameId || "------"}</strong>
+                  </div>
 
-              {/* Game ID */}
-              <Grid container item spacing={2} sx={{ justifyContent: "center", alignItems: "center", flexDirection: "row" }} >
-                <Grid item>
-                  <Typography level="h4" sx={{ color: "var(--tertiary-color)" }}>Your Room Code:</Typography>
-                </Grid>
-
-                <Grid item>
-                  <Card variant="outlined">
-                    <Typography level="h4" sx={{ color: "var(--primary-color)" }}>{gameId}</Typography>
-                  </Card>
-                </Grid>
-              </Grid>
-
-              {/* Start game button */}
-              <Grid item>
-                {
-                  isCreator ? <Button sx={{ backgroundColor: "var(--primary-color)", color: "white" }} onClick={handleStartGameClick}>Start Game</Button>
-                    : <Typography level="h4" sx={{ color: "var(--tertiary-color)" }} >Waiting for the host to start the game...</Typography>
-                }
-              </Grid>
-            </Grid>
-          </Grid>
-
-        </Grid>
-      </Paper>
+                  <div className="bloodbath-simple-lobby__action">
+                    {isCreator ? (
+                      <button type="button" className="bloodbath-button bloodbath-button--primary bloodbath-button--large" onClick={handleStartGameClick}>
+                        Start Game
+                      </button>
+                    ) : (
+                      <div className="bloodbath-simple-lobby__waiting">Waiting for the host to start the game...</div>
+                    )}
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,1092 @@
+@font-face {
+  font-family: "Scary Brusher";
+  src: url("../fonts/Scary Brusher.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.game-page-shell {
+  padding-bottom: 360px;
+}
+
+.game-page__top-rail {
+  margin-bottom: 12px;
+}
+
+.game-page__top-rail .graveyard-bracket__brand-main {
+  font-size: clamp(2.35rem, 3.15vw, 3.55rem);
+}
+
+.game-page__top-rail .graveyard-bracket__brand-accent {
+  font-size: clamp(1.55rem, 2.1vw, 2.28rem);
+}
+
+.player-rail {
+  position: relative;
+  min-height: 320px;
+  max-height: 760px;
+  overflow-y: auto;
+  padding: 16px 8px 14px;
+  border: 1px solid rgba(255, 243, 232, 0.08);
+  border-radius: 22px;
+  background: rgba(6, 8, 11, 0.94);
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.28);
+}
+
+.player-rail::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("../images/cracked_texture.png") center / cover no-repeat;
+  opacity: 0.06;
+  pointer-events: none;
+}
+
+.player-rail__header {
+  position: relative;
+  z-index: 1;
+  padding: 2px 4px 14px;
+  border-bottom: 1px solid rgba(255, 243, 232, 0.08);
+}
+
+.player-rail__title {
+  margin: 0;
+  color: #fff3e8;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 0.95;
+}
+
+.player-rail__list {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 12px;
+}
+
+.player-rail__card {
+  display: block;
+  flex: 0 0 auto;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  margin: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.player-rail__card + .player-rail__card {
+  margin-top: 0;
+}
+
+.player-rail__card-shell {
+  position: relative;
+  overflow: hidden;
+  padding: 11px 10px 10px;
+  border: 1px solid rgba(255, 243, 232, 0.12);
+  border-radius: 0;
+  background: rgba(11, 14, 19, 0.96);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.24);
+  transition: border-color 150ms ease, background-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+}
+
+.player-rail__card-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("../images/cracked_texture.png") center / cover no-repeat;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.player-rail__card-shell::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  pointer-events: none;
+}
+
+.player-rail__card:hover .player-rail__card-shell,
+.player-rail__card:focus-visible .player-rail__card-shell {
+  border-color: rgba(255, 243, 232, 0.22);
+  box-shadow:
+    0 12px 22px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 1px rgba(255, 120, 88, 0.08);
+  transform: translateY(-1px);
+}
+
+.player-rail__card:focus-visible {
+  outline: none;
+}
+
+.player-rail__card--leader .player-rail__card-shell {
+  border-color: rgba(255, 99, 74, 0.34);
+  background: rgba(28, 11, 12, 0.96);
+}
+
+.player-rail__card--leader .player-rail__card-shell::after {
+  border-color: rgba(255, 116, 88, 0.12);
+}
+
+.player-rail__card--expanded .player-rail__card-shell {
+  border-color: rgba(255, 227, 214, 0.18);
+}
+
+.player-rail__card--self .player-rail__card-shell {
+  border-color: rgba(255, 212, 118, 0.7);
+  background: rgba(22, 17, 10, 0.96);
+  box-shadow:
+    0 12px 22px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 214, 127, 0.1);
+}
+
+.player-rail__card--self .player-rail__card-shell::after {
+  inset: 5px;
+  border-color: rgba(255, 233, 184, 0.28);
+  box-shadow:
+    0 0 1px rgba(255, 247, 228, 0.5),
+    0 0 3px rgba(255, 214, 127, 0.24),
+    0 0 8px rgba(214, 160, 34, 0.14);
+}
+
+.player-rail__card--self .player-rail__card-shell::before {
+  opacity: 0.1;
+}
+
+.player-rail__card--self .player-rail__name {
+  color: #fff5de;
+  text-shadow:
+    0 0 1px rgba(255, 245, 226, 0.78),
+    0 0 8px rgba(255, 198, 92, 0.12);
+}
+
+.player-rail__card--self .player-rail__badge {
+  border-color: rgba(255, 214, 112, 0.24);
+  background: rgba(88, 58, 8, 0.92);
+  color: #ffd989;
+}
+
+.player-rail__card--self:hover .player-rail__card-shell,
+.player-rail__card--self:focus-visible .player-rail__card-shell {
+  border-color: rgba(255, 223, 136, 0.7);
+  box-shadow:
+    0 14px 24px rgba(0, 0, 0, 0.34),
+    0 0 1px rgba(255, 248, 234, 0.72),
+    0 0 4px rgba(255, 215, 130, 0.34),
+    0 0 10px rgba(214, 160, 34, 0.22),
+    0 0 20px rgba(173, 119, 16, 0.14),
+    inset 0 0 0 1px rgba(255, 241, 197, 0.08);
+}
+
+.player-rail__summary {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.player-rail__identity {
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  width: 100%;
+}
+
+.player-rail__copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.player-rail__name-line,
+.player-rail__meta-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.player-rail__name-line {
+  margin-bottom: 5px;
+}
+
+.player-rail__name {
+  min-width: 0;
+  flex: 1;
+  color: #fff4ea;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.22rem;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  line-height: 1;
+  word-break: break-word;
+}
+
+.player-rail__balance {
+  color: #63ee6d;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 0.95;
+}
+
+.player-rail__balance--danger {
+  color: #ff5360;
+}
+
+.player-rail__badge,
+.player-rail__leader-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.player-rail__badge {
+  flex: 0 0 auto;
+  min-width: 78px;
+  padding: 5px 7px 4px;
+  border: 1px solid rgba(255, 108, 90, 0.14);
+  background: rgba(67, 13, 14, 0.92);
+  color: #ff7661;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.player-rail__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex: 0 0 auto;
+  padding-top: 2px;
+}
+
+.player-rail__leader-tag {
+  flex: 0 0 auto;
+  padding: 4px 7px 3px;
+  border: 1px solid rgba(255, 214, 112, 0.24);
+  background: rgba(78, 56, 10, 0.94);
+  color: #ffe4a3;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.player-rail__details {
+  max-height: 0;
+  margin-top: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 180ms ease, margin-top 180ms ease, opacity 140ms ease;
+}
+
+.player-rail__card--expanded .player-rail__details {
+  max-height: 640px;
+  margin-top: 10px;
+  opacity: 1;
+}
+
+.player-rail__details-inner {
+  border-top: 1px solid rgba(255, 243, 232, 0.08);
+  padding-top: 10px;
+}
+
+.player-rail__details-label {
+  margin-bottom: 6px;
+  color: #7fcaff;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-shadow: 0 0 8px rgba(127, 202, 255, 0.24);
+  text-transform: uppercase;
+}
+
+.player-rail__card:not(.player-rail__card--expanded) .player-rail__card-shell {
+  background-image: linear-gradient(90deg, rgba(255, 111, 82, 0.16), rgba(255, 111, 82, 0.16));
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px 2px;
+}
+
+.player-rail__card:not(.player-rail__card--expanded) .player-rail__card-shell::after {
+  box-shadow: inset -3px 0 0 rgba(255, 111, 82, 0.18);
+}
+
+.player-rail__team-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.player-rail__team-row + .player-rail__team-row {
+  border-top: 1px solid rgba(255, 243, 232, 0.06);
+}
+
+.player-rail__team-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.player-rail__team-logo-shell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(255, 243, 232, 0.12);
+  border-radius: 50%;
+  background: rgba(17, 22, 28, 0.96);
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.player-rail__team-logo {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.player-rail__team-logo-fallback {
+  color: rgba(255, 244, 234, 0.82);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.player-rail__team-copy {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.player-rail__team-name {
+  overflow: hidden;
+  color: rgba(255, 243, 232, 0.88);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-rail__team-seed {
+  color: rgba(255, 156, 130, 0.72);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.player-rail__team-price {
+  color: #f1e6dc;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.94rem;
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.player-rail__empty-copy {
+  margin: 0;
+  color: rgba(245, 236, 227, 0.72);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.96rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.player-rail__empty-copy--panel {
+  padding: 4px 4px 0;
+}
+
+.team-rail {
+  position: relative;
+  --team-rail-sticky-offset: 0px;
+  min-height: 320px;
+  max-height: 760px;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  padding: 16px 8px 14px;
+  border: 1px solid rgba(255, 243, 232, 0.08);
+  border-radius: 22px;
+  background: rgba(6, 8, 11, 0.94);
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.28);
+}
+
+.team-rail::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.team-rail::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("../images/cracked_texture.png") center / cover no-repeat;
+  opacity: 0.06;
+  pointer-events: none;
+}
+
+.team-rail__sticky {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  margin: -16px -8px 0;
+  padding: 12px 8px 0;
+  overflow: hidden;
+}
+
+.team-rail__sticky::before,
+.team-rail__sticky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.team-rail__sticky::before {
+  background: rgba(6, 8, 11, 0.94);
+  z-index: -2;
+}
+
+.team-rail__sticky::after {
+  background: url("../images/cracked_texture.png") center / cover no-repeat;
+  opacity: 0.06;
+  z-index: -1;
+}
+
+.team-rail__header {
+  position: relative;
+  z-index: 1;
+  padding: 2px 0 14px;
+  border-bottom: 1px solid rgba(255, 243, 232, 0.08);
+}
+
+.team-rail__title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.team-rail__title {
+  margin: 0;
+  color: #fff3e8;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 0.95;
+}
+
+.team-rail__summary-row {
+  display: flex;
+  gap: 8px;
+  padding-top: 10px;
+  flex-wrap: wrap;
+}
+
+.team-rail__summary-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 108px;
+  padding: 7px 10px 6px;
+  border: 1px solid rgba(255, 243, 232, 0.1);
+  background: rgba(12, 15, 21, 0.94);
+  color: #fff4ea;
+}
+
+.team-rail__summary-pill--sold {
+  border-color: rgba(116, 186, 255, 0.18);
+  background: rgba(9, 21, 36, 0.96);
+}
+
+.team-rail__summary-label {
+  color: rgba(255, 243, 232, 0.72);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.team-rail__summary-value {
+  color: #fff7f0;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.06rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.team-rail__spotlight-shell {
+  position: relative;
+  z-index: 1;
+  padding-top: 10px;
+}
+
+.team-rail__spotlight {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 11px 11px;
+  border: 1px solid rgba(255, 108, 90, 0.18);
+  background:
+    linear-gradient(180deg, rgba(38, 14, 15, 0.98), rgba(18, 11, 12, 0.96)),
+    rgba(18, 11, 12, 0.96);
+  box-shadow:
+    0 12px 22px rgba(0, 0, 0, 0.24),
+    inset 0 0 0 1px rgba(255, 130, 96, 0.05);
+  color: #fff4ea;
+  text-align: left;
+  cursor: pointer;
+}
+
+.team-rail__spotlight--idle {
+  cursor: default;
+}
+
+.team-rail__spotlight--inspected {
+  border-color: rgba(128, 224, 145, 0.26);
+  box-shadow:
+    0 14px 24px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 1px rgba(128, 224, 145, 0.08),
+    0 0 18px rgba(74, 214, 116, 0.08);
+}
+
+.team-rail__spotlight-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.team-rail__spotlight-tag,
+.team-rail__spotlight-region {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.team-rail__spotlight-tag {
+  padding: 4px 7px 3px;
+  border: 1px solid rgba(255, 214, 112, 0.24);
+  background: rgba(78, 56, 10, 0.94);
+  color: #ffe4a3;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.team-rail__spotlight-region {
+  color: rgba(255, 193, 174, 0.88);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.team-rail__spotlight-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.team-rail__team-logo-shell--spotlight {
+  width: 36px;
+  height: 36px;
+}
+
+.team-rail__spotlight-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.team-rail__spotlight-name {
+  color: #fff7f0;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.team-rail__spotlight-seed,
+.team-rail__spotlight-empty {
+  color: rgba(255, 214, 198, 0.78);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.team-rail__controls {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0 4px;
+}
+
+.team-rail__filter-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.team-rail__filter-button,
+.team-rail__filter-chip,
+.team-rail__search-clear {
+  border: 1px solid rgba(255, 243, 232, 0.12);
+  background: rgba(11, 14, 19, 0.96);
+  color: rgba(255, 243, 232, 0.74);
+  cursor: pointer;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease, transform 150ms ease;
+}
+
+.team-rail__filter-button,
+.team-rail__filter-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+  padding: 6px 7px 5px;
+  white-space: nowrap;
+}
+
+.team-rail__filter-button:hover,
+.team-rail__filter-button--active,
+.team-rail__filter-chip:hover,
+.team-rail__filter-chip--active {
+  border-color: rgba(255, 120, 88, 0.28);
+  color: #fff4ea;
+  background: rgba(47, 17, 17, 0.98);
+}
+
+.team-rail__filter-button--active {
+  box-shadow: inset 0 0 0 1px rgba(255, 120, 88, 0.08);
+}
+
+.team-rail__filter-count {
+  color: rgba(255, 243, 232, 0.92);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.team-rail__search-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.team-rail__search-label {
+  color: rgba(255, 243, 232, 0.72);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.team-rail__search-input-shell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  border: 1px solid rgba(255, 243, 232, 0.1);
+  background: rgba(11, 14, 19, 0.96);
+  overflow: hidden;
+}
+
+.team-rail__search-input-shell:focus-within {
+  border-color: rgba(255, 120, 88, 0.24);
+  box-shadow: inset 0 0 0 1px rgba(255, 120, 88, 0.06);
+}
+
+.team-rail__search-input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #fff4ea;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.98rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.team-rail__search-input::placeholder {
+  color: rgba(255, 243, 232, 0.38);
+}
+
+.team-rail__search-clear {
+  padding: 5px 7px 4px;
+  flex: 0 0 auto;
+}
+
+.team-rail__sections {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 12px;
+}
+
+.team-rail__section {
+  position: relative;
+  background: transparent;
+}
+
+.team-rail__section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 10px 8px;
+  border: 1px solid rgba(255, 243, 232, 0.08);
+  background: rgba(11, 14, 19, 0.96);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.team-rail__section-toggle--expanded {
+  position: sticky;
+  top: calc(var(--team-rail-sticky-offset) + 8px);
+  z-index: 2;
+  border-color: rgba(255, 243, 232, 0.12);
+  box-shadow:
+    0 8px 14px rgba(0, 0, 0, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.team-rail__section-copy {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.team-rail__section-title {
+  color: #fff4ea;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.team-rail__section-count,
+.team-rail__section-caret {
+  color: rgba(255, 156, 130, 0.78);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.team-rail__section-grid {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: 1fr;
+  padding: 6px 0 0;
+}
+
+.team-rail__team-card {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.team-rail__team-card-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 7px 8px 6px;
+  border: 1px solid rgba(255, 243, 232, 0.1);
+  background: rgba(10, 13, 18, 0.96);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.24);
+  transition: border-color 150ms ease, background-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+}
+
+.team-rail__team-card-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("../images/cracked_texture.png") center / cover no-repeat;
+  opacity: 0.06;
+  pointer-events: none;
+}
+
+.team-rail__team-card:hover .team-rail__team-card-shell,
+.team-rail__team-card:focus-visible .team-rail__team-card-shell {
+  border-color: rgba(255, 243, 232, 0.2);
+  transform: translateY(-1px);
+}
+
+.team-rail__team-card:focus-visible {
+  outline: none;
+}
+
+.team-rail__team-card--available .team-rail__team-card-shell {
+  background: rgba(11, 14, 19, 0.96);
+}
+
+.team-rail__team-card--live .team-rail__team-card-shell {
+  border-color: rgba(255, 107, 78, 0.24);
+  background: rgba(28, 11, 12, 0.96);
+}
+
+.team-rail__team-card--sold .team-rail__team-card-shell {
+  border-color: rgba(150, 161, 173, 0.12);
+  background: rgba(12, 15, 18, 0.94);
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.22);
+}
+
+.team-rail__team-card--inspected.team-rail__team-card--available .team-rail__team-card-shell,
+.team-rail__team-card--inspected.team-rail__team-card--live .team-rail__team-card-shell {
+  border-color: rgba(94, 220, 124, 0.28);
+  box-shadow:
+    0 12px 20px rgba(0, 0, 0, 0.28),
+    0 0 18px rgba(74, 214, 116, 0.08);
+}
+
+.team-rail__team-card--inspected.team-rail__team-card--sold .team-rail__team-card-shell {
+  border-color: rgba(127, 202, 255, 0.34);
+  box-shadow:
+    0 12px 20px rgba(0, 0, 0, 0.28),
+    0 0 18px rgba(74, 163, 255, 0.12);
+}
+
+.team-rail__team-card-topline {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.team-rail__team-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.team-rail__team-state-badge,
+.team-rail__team-seed-tag,
+.team-rail__team-region-tag,
+.team-rail__team-price-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.team-rail__team-state-badge,
+.team-rail__team-seed-tag,
+.team-rail__team-region-tag {
+  color: rgba(255, 243, 232, 0.74);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+}
+
+.team-rail__team-price-badge {
+  color: #fff7f0;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.team-rail__team-card-main {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.team-rail__team-logo-shell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(255, 243, 232, 0.12);
+  border-radius: 50%;
+  background: rgba(17, 22, 28, 0.96);
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.team-rail__team-logo {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.team-rail__team-logo-fallback {
+  color: rgba(255, 244, 234, 0.82);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.team-rail__team-card-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.team-rail__team-card-name {
+  color: #fff4ea;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  line-height: 0.96;
+  text-transform: uppercase;
+}
+
+.team-rail__team-owner {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  color: #c7d3df;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: max-height 160ms ease, opacity 120ms ease, margin-top 160ms ease;
+}
+
+.team-rail__team-card--sold:hover .team-rail__team-owner,
+.team-rail__team-card--sold:focus-visible .team-rail__team-owner,
+.team-rail__team-card--expanded .team-rail__team-owner {
+  max-height: 32px;
+  margin-top: -2px;
+  opacity: 1;
+}
+
+.team-rail__team-card--sold .team-rail__team-card-name,
+.team-rail__team-card--sold .team-rail__team-seed-tag,
+.team-rail__team-card--sold .team-rail__team-region-tag,
+.team-rail__team-card--sold .team-rail__team-price-badge {
+  color: rgba(219, 225, 231, 0.72);
+}
+
+.team-rail__team-card--sold .team-rail__team-logo {
+  filter: grayscale(1) brightness(0.72);
+  opacity: 0.76;
+}
+
+.team-rail__team-card--sold .team-rail__team-logo-shell {
+  border-color: rgba(171, 181, 191, 0.12);
+  background: rgba(18, 21, 25, 0.96);
+}
+
+.team-rail__empty-copy {
+  margin: 0;
+  padding: 8px 4px 2px;
+  color: rgba(245, 236, 227, 0.72);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.96rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 1200px) {
+  .game-page__top-rail .graveyard-bracket__brand-main {
+    font-size: clamp(1.9rem, 3vw, 2.55rem);
+  }
+}
+
+@media (max-width: 900px) {
+  .game-page__top-rail {
+    margin-bottom: 14px;
+  }
+
+  .player-rail {
+    max-height: none;
+  }
+
+  .team-rail {
+    max-height: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .player-rail__summary {
+    flex-direction: column;
+  }
+
+  .player-rail__actions {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .player-rail__name-line,
+  .player-rail__meta-line {
+    flex-wrap: wrap;
+  }
+
+  .team-rail__summary-row {
+    flex-direction: column;
+  }
+
+  .team-rail__section-grid {
+    grid-template-columns: 1fr;
+  }
+}

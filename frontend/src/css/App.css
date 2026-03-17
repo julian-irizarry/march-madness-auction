@@ -38,8 +38,9 @@
 }
 
 #outer-container {
-  background-image: url("../images/background2.png");
-  background-size: 100% 100%;
+  background-image: url("../images/background3.png");
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
   padding: 30px;
   overflow: hidden;
@@ -47,6 +48,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.game-page-shell {
+  min-height: 100vh;
+  overflow: auto;
+  align-items: flex-start !important;
+  padding-top: 22px;
+  padding-bottom: 22px;
+  box-sizing: border-box;
 }
 
 :root {

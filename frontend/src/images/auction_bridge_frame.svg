@@ -1,0 +1,24 @@
+<svg width="1000" height="184" viewBox="0 0 1000 184" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M28 88L78 40H288L322 58H442L500 16L558 58H680L714 40H922L972 88L948 120L972 152L922 176H714L680 160H558L500 106L442 160H322L288 176H78L28 152L52 120L28 88Z" fill="url(#fill)" fill-opacity="0.94"/>
+  <path d="M28 88L78 40H288L322 58H442L500 16L558 58H680L714 40H922L972 88L948 120L972 152L922 176H714L680 160H558L500 106L442 160H322L288 176H78L28 152L52 120L28 88Z" stroke="url(#stroke)" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M52 92L94 56H280L316 74H434L500 30L566 74H684L720 56H906L948 92L928 120L948 148L906 160H720L684 145H566L500 92L434 145H316L280 160H94L52 148L72 120L52 92Z" stroke="rgba(255,255,255,0.11)" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="3 7"/>
+  <path d="M158 59L282 59" stroke="rgba(255,255,255,0.08)" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M718 59L842 59" stroke="rgba(255,255,255,0.08)" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M420 146L458 118L500 130L542 118L580 146" stroke="url(#ember)" stroke-width="2.4" stroke-linecap="round" stroke-opacity="0.3"/>
+  <defs>
+    <linearGradient id="fill" x1="500" y1="16" x2="500" y2="176" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#05070B"/>
+      <stop offset="1" stop-color="#020408"/>
+    </linearGradient>
+    <linearGradient id="stroke" x1="28" y1="16" x2="972" y2="176" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6B5C58"/>
+      <stop offset="0.5" stop-color="#A9937D"/>
+      <stop offset="1" stop-color="#6B5C58"/>
+    </linearGradient>
+    <linearGradient id="ember" x1="420" y1="132" x2="580" y2="132" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF784D"/>
+      <stop offset="0.5" stop-color="#FFD95E"/>
+      <stop offset="1" stop-color="#FF784D"/>
+    </linearGradient>
+  </defs>
+</svg>

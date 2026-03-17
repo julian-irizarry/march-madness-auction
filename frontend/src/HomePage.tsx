@@ -1,24 +1,52 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, IconButton } from "@mui/joy";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Alert, Box } from "@mui/material";
-import VolumeUpIcon from '@mui/icons-material/VolumeUp';
-import VolumeOffIcon from '@mui/icons-material/VolumeOff';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
-import { BACKEND_URL } from "./Utils"
+import { BACKEND_HTTP_URL } from "./Utils";
 import imageSrc from "./images/march_madness_logo_auction.png";
 import "./css/Fonts.css";
+import "./css/Bracket.css";
+import "./css/BloodbathPages.css";
 
 const DIALOG_MODE = {
   CREATE: "CREATE",
   JOIN: "JOIN",
-  VIEW: "VIEW"
+  VIEW: "VIEW",
+} as const;
+
+type DialogMode = typeof DIALOG_MODE[keyof typeof DIALOG_MODE];
+
+const DIALOG_DETAILS: Record<
+  DialogMode,
+  {
+    title: string;
+    submitLabel: string;
+    showPlayerField: boolean;
+    showGameIdField: boolean;
+  }
+> = {
+  CREATE: {
+    title: "Create Game",
+    submitLabel: "Create",
+    showPlayerField: true,
+    showGameIdField: false,
+  },
+  JOIN: {
+    title: "Join Game",
+    submitLabel: "Join",
+    showPlayerField: true,
+    showGameIdField: true,
+  },
+  VIEW: {
+    title: "View Game",
+    submitLabel: "View",
+    showPlayerField: false,
+    showGameIdField: true,
+  },
 };
 
 function HomePage() {
   const navigate = useNavigate();
-  const [dialogMode, setDialogMode] = useState(DIALOG_MODE.VIEW);
+  const [dialogMode, setDialogMode] = useState<DialogMode>(DIALOG_MODE.VIEW);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [playerName, setPlayerName] = useState("");
   const [gameId, setGameId] = useState("");
@@ -27,114 +55,85 @@ function HomePage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const hasInteractedRef = useRef(false);
+  const shouldEnableAudio = import.meta.env.MODE !== "test";
 
-  // Setup audio element only once when component mounts
   useEffect(() => {
-    console.log('Creating audio element');
-    audioRef.current = new Audio('/audio/metal.mp3');
-    audioRef.current.loop = true;
-    audioRef.current.volume = 1.0; // Set volume to maximum
+    if (!shouldEnableAudio) {
+      return undefined;
+    }
 
-    // Log when audio is loaded
-    audioRef.current.addEventListener('loadeddata', () => {
-      console.log('Audio file loaded successfully');
-    });
+    const audio = new Audio("/audio/metal.mp3");
+    audio.loop = true;
+    audio.volume = 1.0;
+    audioRef.current = audio;
 
-    // Log audio errors
-    audioRef.current.addEventListener('error', (e) => {
-      console.error('Audio loading error:', {
-        error: e,
-        src: audioRef.current?.src,
-        networkState: audioRef.current?.networkState,
-        readyState: audioRef.current?.readyState
-      });
-    });
-
-    // Cleanup on unmount
     return () => {
-      console.log('Cleaning up audio resources');
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
       }
     };
-  }, []); // Empty dependency array as this should only run once
+  }, [shouldEnableAudio]);
 
-  // Handle user interactions and playback
   useEffect(() => {
-    console.log('Setting up audio with current state:', { isPlaying, isMuted });
+    if (!shouldEnableAudio || !audioRef.current) {
+      return;
+    }
 
-    if (!audioRef.current) return;
-
-    // Update muted state
     audioRef.current.muted = isMuted;
 
-    // Function to start audio
     const startAudio = async () => {
-      console.log('Attempting to start audio...');
+      if (!audioRef.current || isPlaying) {
+        return;
+      }
+
       try {
-        if (audioRef.current && !isPlaying) {
-          console.log('Audio element state before play:', {
-            currentTime: audioRef.current.currentTime,
-            paused: audioRef.current.paused,
-            muted: audioRef.current.muted,
-            volume: audioRef.current.volume,
-            src: audioRef.current.src
-          });
-
-          await audioRef.current.play();
-          console.log('Audio playback started successfully');
-          setIsPlaying(true);
-
-          // Remove the event listeners after successful playback
-          document.removeEventListener('click', handleFirstInteraction);
-          document.removeEventListener('keypress', handleFirstInteraction);
-          document.removeEventListener('scroll', handleFirstInteraction);
-        }
+        await audioRef.current.play();
+        setIsPlaying(true);
+        document.removeEventListener("click", handleFirstInteraction);
+        document.removeEventListener("keypress", handleFirstInteraction);
+        document.removeEventListener("scroll", handleFirstInteraction);
       } catch (error) {
-        console.error('Audio playback failed:', {
-          error,
-          audioElement: {
-            src: audioRef.current?.src,
-            readyState: audioRef.current?.readyState,
-            networkState: audioRef.current?.networkState,
-            paused: audioRef.current?.paused,
-            muted: audioRef.current?.muted
-          }
-        });
+        console.error("Audio playback failed:", error);
       }
     };
 
-    // Handler for first interaction
-    const handleFirstInteraction = (e: Event) => {
-      console.log('User interaction detected:', {
-        type: e.type,
-        hasInteracted: hasInteractedRef.current,
-        target: e.target
-      });
-
+    const handleFirstInteraction = () => {
       if (!hasInteractedRef.current) {
         hasInteractedRef.current = true;
-        startAudio();
+        void startAudio();
       }
     };
 
-    // Add event listeners for various user interactions
-    document.addEventListener('click', handleFirstInteraction);
-    document.addEventListener('keypress', handleFirstInteraction);
-    document.addEventListener('scroll', handleFirstInteraction);
+    document.addEventListener("click", handleFirstInteraction);
+    document.addEventListener("keypress", handleFirstInteraction);
+    document.addEventListener("scroll", handleFirstInteraction);
 
-    // Cleanup event listeners
     return () => {
-      document.removeEventListener('click', handleFirstInteraction);
-      document.removeEventListener('keypress', handleFirstInteraction);
-      document.removeEventListener('scroll', handleFirstInteraction);
+      document.removeEventListener("click", handleFirstInteraction);
+      document.removeEventListener("keypress", handleFirstInteraction);
+      document.removeEventListener("scroll", handleFirstInteraction);
     };
-  }, [isPlaying, isMuted]); // Add both isPlaying and isMuted as dependencies
+  }, [isMuted, isPlaying, shouldEnableAudio]);
+
+  useEffect(() => {
+    if (!isDialogOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsDialogOpen(false);
+        setDialogError("");
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isDialogOpen]);
 
   const toggleMute = () => {
-    console.log('Toggle mute clicked. Current state:', { isMuted, isPlaying });
-    setIsMuted(!isMuted);
+    setIsMuted((currentValue) => !currentValue);
   };
 
   const handleCloseDialog = () => {
@@ -142,39 +141,54 @@ function HomePage() {
     setDialogError("");
   };
 
-  const handleCreateGameClick = () => {
-    setDialogMode(DIALOG_MODE.CREATE);
+  const handleOpenDialog = (mode: DialogMode) => {
+    setDialogMode(mode);
+    setDialogError("");
     setIsDialogOpen(true);
   };
 
-  const handleJoinGameClick = () => {
-    setDialogMode(DIALOG_MODE.JOIN);
-    setIsDialogOpen(true);
-  };
+  // Check for existing session on mount
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch(`${BACKEND_HTTP_URL}/rejoin/`, {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const routeState = { gameId: data.gameId, isCreator: data.isCreator, playerName: data.playerName };
+          if (data.phase === "ended") {
+            navigate("/view", { state: { gameId: data.gameId } });
+          } else if (data.phase === "auction") {
+            navigate("/game", { state: routeState });
+          } else {
+            navigate("/lobby", { state: routeState });
+          }
+        }
+      } catch (error) {
+        // No session or server down — stay on home page
+      }
+    };
+    checkSession();
+  }, [navigate]);
 
-  const handleViewGameClick = () => {
-    setDialogMode(DIALOG_MODE.VIEW);
-    setIsDialogOpen(true);
-  };
-
-  const handleCreateGame = async (event: React.FormEvent) => {
+  const handleCreateGame = async () => {
     setDialogError("");
     try {
-      const response = await fetch(`http://${BACKEND_URL}/create-game/`, {
+      const response = await fetch(`${BACKEND_HTTP_URL}/create-game/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ player: playerName }),
       });
 
       if (response.ok) {
         const data = await response.json();
         const createdGameId = data.id;
-        navigate("/lobby", { state: { gameId: createdGameId, isCreator: true, playerName: playerName } });
-      }
-      // Handle error response
-      else {
+        navigate("/lobby", { state: { gameId: createdGameId, isCreator: true, playerName } });
+      } else {
         console.error("Failed to create game:", response.statusText);
       }
     } catch (error) {
@@ -182,23 +196,22 @@ function HomePage() {
     }
   };
 
-  const handleJoinGame = async (event: React.FormEvent) => {
+  const handleJoinGame = async () => {
     setDialogError("");
     try {
-      const response = await fetch(`http://${BACKEND_URL}/join-game/`, {
+      const response = await fetch(`${BACKEND_HTTP_URL}/join-game/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ gameId: gameId, player: playerName }),
+        credentials: "include",
+        body: JSON.stringify({ gameId, player: playerName }),
       });
 
       if (response.ok) {
-        navigate("/lobby", { state: { gameId: gameId, isCreator: false, playerName: playerName } });
+        navigate("/lobby", { state: { gameId, isCreator: false, playerName } });
         setIsDialogOpen(false);
-      }
-      // Handle error response
-      else {
+      } else {
         const responseData = await response.json();
         console.error("Error joining game:", responseData.detail);
         setDialogError(responseData.detail);
@@ -208,23 +221,22 @@ function HomePage() {
     }
   };
 
-  const handleViewGame = async (event: React.FormEvent) => {
+  const handleViewGame = async () => {
     setDialogError("");
     try {
-      const response = await fetch(`http://${BACKEND_URL}/view-game/`, {
+      const response = await fetch(`${BACKEND_HTTP_URL}/view-game/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ gameId: gameId }),
+        credentials: "include",
+        body: JSON.stringify({ gameId }),
       });
 
       if (response.ok) {
-        navigate("/view", { state: { gameId: gameId } });
+        navigate("/view", { state: { gameId } });
         setIsDialogOpen(false);
-      }
-      // Handle error response
-      else {
+      } else {
         const responseData = await response.json();
         console.error("Error viewing game:", responseData.detail);
         setDialogError(responseData.detail);
@@ -234,145 +246,135 @@ function HomePage() {
     }
   };
 
+  const handleSubmitDialog = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (dialogMode === DIALOG_MODE.CREATE) {
+      await handleCreateGame();
+      return;
+    }
+
+    if (dialogMode === DIALOG_MODE.JOIN) {
+      await handleJoinGame();
+      return;
+    }
+
+    await handleViewGame();
+  };
+
+  const activeDialog = DIALOG_DETAILS[dialogMode];
+
   return (
-    <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", height: "calc(100vh - 170px)", minHeight: "100%", padding: 0, margin: 0 }}>
-      <Grid container spacing={2} sx={{ justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
+    <div className="bloodbath-page bloodbath-page--home">
+      <div className="bloodbath-page__inner">
+        <div className="bloodbath-simple-home">
+          <div className="bloodbath-simple-home__brand">
+            <div className="graveyard-bracket__brand">
+              <div className="graveyard-bracket__brand-main">Auction</div>
+              <div className="graveyard-bracket__brand-accent">Bloodbath</div>
+            </div>
+          </div>
 
-        {/* Create game button */}
-        <Grid item xs={4} sx={{ display: "flex", justifyContent: "right", alignItems: "right" }}>
-          <Button sx={{ backgroundColor: "var(--primary-color)", color: "white", width: "150px" }} onClick={handleCreateGameClick}>Create Game</Button>
-        </Grid>
+          <div className="bloodbath-panel bloodbath-simple-home__stage">
+            <div className="bloodbath-panel__inner">
+              <div className="bloodbath-simple-home__row">
+                <div className="bloodbath-simple-home__action bloodbath-simple-home__action--left">
+                  <button type="button" className="bloodbath-button bloodbath-button--primary bloodbath-button--large" onClick={() => handleOpenDialog(DIALOG_MODE.CREATE)}>
+                    Create Game
+                  </button>
+                </div>
 
-        {/* March Madness logo */}
-        <Grid item xs={4} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <img src={imageSrc} alt="Central Game" style={{ maxWidth: "450px", margin: "20px 0" }} />
-        </Grid>
+                <div className="bloodbath-simple-home__logo-block">
+                  <div className="bloodbath-home__logo-shell bloodbath-home__logo-shell--simple">
+                    <img src={imageSrc} alt="March Madness Auction logo" className="bloodbath-home__logo" />
+                  </div>
+                </div>
 
-        {/* Join game button */}
-        <Grid item xs={4} sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}>
-          <Button sx={{ backgroundColor: "var(--primary-color)", color: "white", width: "150px" }} onClick={handleJoinGameClick}>Join Game</Button>
-        </Grid>
-      </Grid>
+                <div className="bloodbath-simple-home__action bloodbath-simple-home__action--right">
+                  <button type="button" className="bloodbath-button bloodbath-button--primary bloodbath-button--large" onClick={() => handleOpenDialog(DIALOG_MODE.JOIN)}>
+                    Join Game
+                  </button>
+                </div>
+              </div>
 
-      {/* View game button */}
-      <Grid item>
-        <Button sx={{ backgroundColor: "var(--primary-color)", color: "white", width: "150px" }} onClick={handleViewGameClick}>View Game</Button>
-      </Grid>
+              <div className="bloodbath-simple-home__footer">
+                <button type="button" className="bloodbath-button bloodbath-button--secondary bloodbath-button--large" onClick={() => handleOpenDialog(DIALOG_MODE.VIEW)}>
+                  View Game
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      {/* Audio control button - positioned absolutely in bottom right */}
-      <IconButton
-        onClick={toggleMute}
-        sx={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          backgroundColor: 'var(--primary-color)',
-          color: 'white',
-          '&:hover': {
-            backgroundColor: 'var(--primary-color)',
-            opacity: 0.8,
-          }
-        }}
-      >
-        {!isPlaying ? <PlayArrowIcon /> : (isMuted ? <VolumeOffIcon /> : <VolumeUpIcon />)}
-      </IconButton>
+      <button type="button" className="bloodbath-audio-toggle" onClick={toggleMute}>
+        <span className="bloodbath-audio-toggle__label">Soundtrack</span>
+        <span className="bloodbath-audio-toggle__value">{!isPlaying ? "Arm Audio" : isMuted ? "Muted" : "Live"}</span>
+      </button>
 
-      {/* Dialog to prompt user*/}
-      <Dialog
-        maxWidth="lg"
-        open={isDialogOpen}
-        onClose={handleCloseDialog}
-        sx={{
-          overflow: "visible",
-          zIndex: 1300,
-        }}
-        BackdropProps={{
-          style: {
-            backgroundColor: "rgba(255, 255, 255, 0.64)", // Pale white background with 30% opacity
-          }
-        }}
-      >
-        {/* Container for content to ensure spacing */}
-        <Box sx={{ position: "relative", overflow: "visible" }}>
-
-          {/* Dialog Title positioned outside the box */}
-          <DialogTitle
-            sx={{
-              position: "fixed",
-              top: "250px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              textAlign: "center",
-              fontFamily: "doubleFeature",
-              fontSize: "3rem",
-              backgroundImage: "linear-gradient(to bottom,rgb(218, 4, 4) 10%, rgb(175, 2, 2) 40%, rgb(48, 1, 1) 90%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              whiteSpace: "nowrap",
-              zIndex: 1301, // Keeps it above other elements
-            }}
+      {isDialogOpen ? (
+        <div className="bloodbath-overlay" onClick={handleCloseDialog}>
+          <div
+            className="bloodbath-dialog bloodbath-dialog--simple"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="bloodbath-dialog-title"
+            onClick={(event) => event.stopPropagation()}
           >
-            <b>{`${dialogMode} GAME`}</b>
-          </DialogTitle>
+            <div className="bloodbath-dialog__shell">
+              <div className="bloodbath-dialog__header bloodbath-dialog__header--simple">
+                <h2 className="bloodbath-dialog__title" id="bloodbath-dialog-title">
+                  {activeDialog.title}
+                </h2>
+              </div>
 
-          <DialogContent sx={{ overflow: "visible", display: "flex", flexDirection: "column", marginTop: "20px" }}> 
-            {/* Display game error if any */}
-            {dialogError ? <Alert severity="error">{dialogError}</Alert> : null}
+              <form className="bloodbath-dialog__form" onSubmit={handleSubmitDialog}>
+                {dialogError ? (
+                  <div className="bloodbath-dialog__error" role="alert">
+                    {dialogError}
+                  </div>
+                ) : null}
 
-            {/* Enter user name to create or join game */}
-            {(dialogMode === DIALOG_MODE.CREATE || dialogMode === DIALOG_MODE.JOIN) && (
-              <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <TextField
-                  label="Your Name"
-                  value={playerName}
-                  onChange={(e) => setPlayerName(e.target.value)}
-                  margin="dense"
-                  sx={{ width: 200 }}
-                />
-              </Grid>
-            )}
+                {activeDialog.showPlayerField ? (
+                  <label className="bloodbath-field" htmlFor="player-name-input">
+                    <span className="bloodbath-field__label">Your Name</span>
+                    <input
+                      id="player-name-input"
+                      className="bloodbath-field__input"
+                      type="text"
+                      value={playerName}
+                      onChange={(event) => setPlayerName(event.currentTarget.value)}
+                    />
+                  </label>
+                ) : null}
 
-            {/* Enter game ID to join */}
-            {(dialogMode === DIALOG_MODE.JOIN || dialogMode === DIALOG_MODE.VIEW) && (
-              <Grid item sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <TextField
-                  label="Game ID"
-                  value={gameId}
-                  onChange={(e) => setGameId(e.target.value)}
-                  margin="dense"
-                  sx={{ width: 200 }}
-                />
-              </Grid>
-            )}
-          </DialogContent>
+                {activeDialog.showGameIdField ? (
+                  <label className="bloodbath-field" htmlFor="game-id-input">
+                    <span className="bloodbath-field__label">Game ID</span>
+                    <input
+                      id="game-id-input"
+                      className="bloodbath-field__input"
+                      type="text"
+                      value={gameId}
+                      onChange={(event) => setGameId(event.currentTarget.value)}
+                    />
+                  </label>
+                ) : null}
 
-
-          <DialogActions sx={{ justifyContent: "center" }}>
-            <Button sx={{ backgroundColor: "var(--primary-color)", color: "white", width: "100px" }} onClick={handleCloseDialog}>
-              Cancel
-            </Button>
-
-            {dialogMode === DIALOG_MODE.CREATE && (
-              <Button sx={{ backgroundColor: "var(--primary-color)", color: "white", width: "100px" }} onClick={handleCreateGame}>
-                Create
-              </Button>
-            )}
-            {dialogMode === DIALOG_MODE.JOIN && (
-              <Button sx={{ backgroundColor: "var(--primary-color)", color: "white", width: "100px" }} onClick={handleJoinGame}>
-                Join
-              </Button>
-            )}
-            {dialogMode === DIALOG_MODE.VIEW && (
-              <Button sx={{ backgroundColor: "var(--primary-color)", color: "white", width: "100px" }} onClick={handleViewGame}>
-                View
-              </Button>
-            )}
-          </DialogActions>
-
-        </Box>
-      </Dialog>
-
-    </Grid>
+                <div className="bloodbath-dialog__actions">
+                  <button type="button" className="bloodbath-button bloodbath-button--secondary" onClick={handleCloseDialog}>
+                    Close
+                  </button>
+                  <button type="submit" className="bloodbath-button bloodbath-button--primary">
+                    {activeDialog.submitLabel}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
