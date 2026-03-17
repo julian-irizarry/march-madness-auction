@@ -1,0 +1,612 @@
+{
+    "games": [
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Siena",
+                        "seo": "siena"
+                    },
+                    "seed": "16"
+                },
+                "home": {
+                    "names": {
+                        "short": "Duke",
+                        "seo": "duke"
+                    },
+                    "seed": "1"
+                },
+                "bracketRegion": "East"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "TCU",
+                        "seo": "tcu"
+                    },
+                    "seed": "9"
+                },
+                "home": {
+                    "names": {
+                        "short": "Ohio St.",
+                        "seo": "ohio-st"
+                    },
+                    "seed": "8"
+                },
+                "bracketRegion": "East"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Northern Iowa",
+                        "seo": "uni"
+                    },
+                    "seed": "12"
+                },
+                "home": {
+                    "names": {
+                        "short": "St. John's",
+                        "seo": "st-johns-ny"
+                    },
+                    "seed": "5"
+                },
+                "bracketRegion": "East"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Cal Baptist",
+                        "seo": "california-baptist"
+                    },
+                    "seed": "13"
+                },
+                "home": {
+                    "names": {
+                        "short": "Kansas",
+                        "seo": "kansas"
+                    },
+                    "seed": "4"
+                },
+                "bracketRegion": "East"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "South Florida",
+                        "seo": "south-fla"
+                    },
+                    "seed": "11"
+                },
+                "home": {
+                    "names": {
+                        "short": "Louisville",
+                        "seo": "louisville"
+                    },
+                    "seed": "6"
+                },
+                "bracketRegion": "East"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "North Dakota St.",
+                        "seo": "north-dakota-st"
+                    },
+                    "seed": "14"
+                },
+                "home": {
+                    "names": {
+                        "short": "Michigan St.",
+                        "seo": "michigan-st"
+                    },
+                    "seed": "3"
+                },
+                "bracketRegion": "East"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "UCF",
+                        "seo": "ucf"
+                    },
+                    "seed": "10"
+                },
+                "home": {
+                    "names": {
+                        "short": "UCLA",
+                        "seo": "ucla"
+                    },
+                    "seed": "7"
+                },
+                "bracketRegion": "East"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Furman",
+                        "seo": "furman"
+                    },
+                    "seed": "15"
+                },
+                "home": {
+                    "names": {
+                        "short": "UConn",
+                        "seo": "uconn"
+                    },
+                    "seed": "2"
+                },
+                "bracketRegion": "East"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Lehigh / PVAMU",
+                        "seo": "lehigh"
+                    },
+                    "seed": "16"
+                },
+                "home": {
+                    "names": {
+                        "short": "Florida",
+                        "seo": "florida"
+                    },
+                    "seed": "1"
+                },
+                "bracketRegion": "South"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Iowa",
+                        "seo": "iowa"
+                    },
+                    "seed": "9"
+                },
+                "home": {
+                    "names": {
+                        "short": "Clemson",
+                        "seo": "clemson"
+                    },
+                    "seed": "8"
+                },
+                "bracketRegion": "South"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "McNeese",
+                        "seo": "mcneese"
+                    },
+                    "seed": "12"
+                },
+                "home": {
+                    "names": {
+                        "short": "Vanderbilt",
+                        "seo": "vanderbilt"
+                    },
+                    "seed": "5"
+                },
+                "bracketRegion": "South"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Troy",
+                        "seo": "troy"
+                    },
+                    "seed": "13"
+                },
+                "home": {
+                    "names": {
+                        "short": "Nebraska",
+                        "seo": "nebraska"
+                    },
+                    "seed": "4"
+                },
+                "bracketRegion": "South"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "VCU",
+                        "seo": "vcu"
+                    },
+                    "seed": "11"
+                },
+                "home": {
+                    "names": {
+                        "short": "North Carolina",
+                        "seo": "north-carolina"
+                    },
+                    "seed": "6"
+                },
+                "bracketRegion": "South"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Penn",
+                        "seo": "penn"
+                    },
+                    "seed": "14"
+                },
+                "home": {
+                    "names": {
+                        "short": "Illinois",
+                        "seo": "illinois"
+                    },
+                    "seed": "3"
+                },
+                "bracketRegion": "South"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Texas A&M",
+                        "seo": "texas-am"
+                    },
+                    "seed": "10"
+                },
+                "home": {
+                    "names": {
+                        "short": "Saint Mary's",
+                        "seo": "st-marys-ca"
+                    },
+                    "seed": "7"
+                },
+                "bracketRegion": "South"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Idaho",
+                        "seo": "idaho"
+                    },
+                    "seed": "15"
+                },
+                "home": {
+                    "names": {
+                        "short": "Houston",
+                        "seo": "houston"
+                    },
+                    "seed": "2"
+                },
+                "bracketRegion": "South"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Long Island",
+                        "seo": "long-island"
+                    },
+                    "seed": "16"
+                },
+                "home": {
+                    "names": {
+                        "short": "Arizona",
+                        "seo": "arizona"
+                    },
+                    "seed": "1"
+                },
+                "bracketRegion": "West"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Utah St.",
+                        "seo": "utah-st"
+                    },
+                    "seed": "9"
+                },
+                "home": {
+                    "names": {
+                        "short": "Villanova",
+                        "seo": "villanova"
+                    },
+                    "seed": "8"
+                },
+                "bracketRegion": "West"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "High Point",
+                        "seo": "high-point"
+                    },
+                    "seed": "12"
+                },
+                "home": {
+                    "names": {
+                        "short": "Wisconsin",
+                        "seo": "wisconsin"
+                    },
+                    "seed": "5"
+                },
+                "bracketRegion": "West"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Hawaii",
+                        "seo": "hawaii"
+                    },
+                    "seed": "13"
+                },
+                "home": {
+                    "names": {
+                        "short": "Arkansas",
+                        "seo": "arkansas"
+                    },
+                    "seed": "4"
+                },
+                "bracketRegion": "West"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "NC State / Texas",
+                        "seo": "texas"
+                    },
+                    "seed": "11"
+                },
+                "home": {
+                    "names": {
+                        "short": "BYU",
+                        "seo": "byu"
+                    },
+                    "seed": "6"
+                },
+                "bracketRegion": "West"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Kennesaw St.",
+                        "seo": "kennesaw-st"
+                    },
+                    "seed": "14"
+                },
+                "home": {
+                    "names": {
+                        "short": "Gonzaga",
+                        "seo": "gonzaga"
+                    },
+                    "seed": "3"
+                },
+                "bracketRegion": "West"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Missouri",
+                        "seo": "missouri"
+                    },
+                    "seed": "10"
+                },
+                "home": {
+                    "names": {
+                        "short": "Miami (FL)",
+                        "seo": "miami-fl"
+                    },
+                    "seed": "7"
+                },
+                "bracketRegion": "West"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Queens (NC)",
+                        "seo": "queens-nc"
+                    },
+                    "seed": "15"
+                },
+                "home": {
+                    "names": {
+                        "short": "Purdue",
+                        "seo": "purdue"
+                    },
+                    "seed": "2"
+                },
+                "bracketRegion": "West"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Howard / UMBC",
+                        "seo": "howard"
+                    },
+                    "seed": "16"
+                },
+                "home": {
+                    "names": {
+                        "short": "Michigan",
+                        "seo": "michigan"
+                    },
+                    "seed": "1"
+                },
+                "bracketRegion": "Midwest"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Saint Louis",
+                        "seo": "saint-louis"
+                    },
+                    "seed": "9"
+                },
+                "home": {
+                    "names": {
+                        "short": "Georgia",
+                        "seo": "georgia"
+                    },
+                    "seed": "8"
+                },
+                "bracketRegion": "Midwest"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Akron",
+                        "seo": "akron"
+                    },
+                    "seed": "12"
+                },
+                "home": {
+                    "names": {
+                        "short": "Texas Tech",
+                        "seo": "texas-tech"
+                    },
+                    "seed": "5"
+                },
+                "bracketRegion": "Midwest"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Hofstra",
+                        "seo": "hofstra"
+                    },
+                    "seed": "13"
+                },
+                "home": {
+                    "names": {
+                        "short": "Alabama",
+                        "seo": "alabama"
+                    },
+                    "seed": "4"
+                },
+                "bracketRegion": "Midwest"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "SMU / Miami (OH)",
+                        "seo": "miami-oh"
+                    },
+                    "seed": "11"
+                },
+                "home": {
+                    "names": {
+                        "short": "Tennessee",
+                        "seo": "tennessee"
+                    },
+                    "seed": "6"
+                },
+                "bracketRegion": "Midwest"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Wright St.",
+                        "seo": "wright-st"
+                    },
+                    "seed": "14"
+                },
+                "home": {
+                    "names": {
+                        "short": "Virginia",
+                        "seo": "virginia"
+                    },
+                    "seed": "3"
+                },
+                "bracketRegion": "Midwest"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Santa Clara",
+                        "seo": "santa-clara"
+                    },
+                    "seed": "10"
+                },
+                "home": {
+                    "names": {
+                        "short": "Kentucky",
+                        "seo": "kentucky"
+                    },
+                    "seed": "7"
+                },
+                "bracketRegion": "Midwest"
+            }
+        },
+        {
+            "game": {
+                "away": {
+                    "names": {
+                        "short": "Tennessee St.",
+                        "seo": "tennessee-st"
+                    },
+                    "seed": "15"
+                },
+                "home": {
+                    "names": {
+                        "short": "Iowa St.",
+                        "seo": "iowa-st"
+                    },
+                    "seed": "2"
+                },
+                "bracketRegion": "Midwest"
+            }
+        }
+    ]
+}
