@@ -146,6 +146,8 @@
             pkgs.nodePackages.npm
             pkgs.awscli2
             pkgs.process-compose
+            pkgs.nodePackages.aws-cdk
+            pkgs.python312Packages.pip
           ];
 
           shellHook = ''

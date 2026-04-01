@@ -7,5 +7,16 @@ venv
 frontend_changelog.md
 AGENTS.md
 *playwright*
-docs/
 output/
+
+# Nix
+result
+result-*
+
+# CDK
+deployment/cdk.out/
+deployment/cdk.context.json
+deployment/.venv/
+
+# Node
+frontend/node_modules/
