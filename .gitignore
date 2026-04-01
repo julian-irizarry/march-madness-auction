@@ -8,6 +8,7 @@ frontend_changelog.md
 AGENTS.md
 *playwright*
 output/
+.pre-commit-config.yaml
 
 # Nix
 result
@@ -20,3 +21,6 @@ deployment/.venv/
 
 # Node
 frontend/node_modules/
+
+# CLAUDE
+docs/
