@@ -1,0 +1,75 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPO: march-madness-auction
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Extract tag
+        id: tag
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push backend image
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          TAG: ${{ steps.tag.outputs.VERSION }}
+        run: |
+          nix build .#backend-image
+          docker load < result
+          docker tag march-madness-backend:latest "$REGISTRY/$ECR_REPO:backend-$TAG"
+          docker push "$REGISTRY/$ECR_REPO:backend-$TAG"
+
+      - name: Build and push frontend image
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          TAG: ${{ steps.tag.outputs.VERSION }}
+        run: |
+          nix build .#frontend-image
+          docker load < result
+          docker tag march-madness-frontend:latest "$REGISTRY/$ECR_REPO:frontend-$TAG"
+          docker push "$REGISTRY/$ECR_REPO:frontend-$TAG"
+
+      - name: Install CDK dependencies
+        run: |
+          cd deployment
+          pip install -r requirements.txt
+
+      - name: CDK deploy
+        env:
+          TAG: ${{ steps.tag.outputs.VERSION }}
+        run: |
+          cd deployment
+          npx cdk deploy MarchMadnessInfra \
+            -c image-tag="$TAG" \
+            --require-approval never
