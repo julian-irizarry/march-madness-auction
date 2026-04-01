@@ -30,16 +30,20 @@ def load_state() -> None:
 
 load_dotenv()
 
-FRONTEND_HOST = os.getenv("FRONTEND_HOST", "127.0.0.1")
-FRONTEND_PORT = int(os.getenv("FRONTEND_PORT", 3000))
 BACKEND_HOST = os.getenv("VITE_BACKEND_HOST", "127.0.0.1")
 BACKEND_PORT = int(os.getenv("VITE_BACKEND_PORT", 8000))
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 
-origins = [
-    f"http://{FRONTEND_HOST}:{FRONTEND_PORT}",
-    f"http://localhost:{FRONTEND_PORT}",
-    f"http://127.0.0.1:{FRONTEND_PORT}",
-]
+if ENVIRONMENT == "production":
+    origins = [
+        "https://mmauctiongame.com",
+    ]
+else:
+    origins = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
