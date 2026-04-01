@@ -21,7 +21,7 @@
       let
         pkgs = import nixpkgs { inherit system; };
 
-        treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
+        treefmtEval = treefmt-nix.lib.evalModule pkgs ./nix/treefmt.nix;
 
         gitHooksCheck = git-hooks.lib.${system}.run {
           src = ./.;
