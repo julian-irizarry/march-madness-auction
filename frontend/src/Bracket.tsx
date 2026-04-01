@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useRef } from "react";
 
-import { GenerateRegionBracketData, Match, TeamInfo, normalizeTeamKey } from "./Utils";
+import {
+  GenerateRegionBracketData,
+  Match,
+  TeamInfo,
+  normalizeTeamKey,
+} from "./Utils";
 import "./css/Bracket.css";
 
 interface DisplayTeam {
@@ -94,7 +99,9 @@ function groupMatchesByRound(matches: Match[]) {
 
   return Array.from(rounds.entries())
     .sort(([left], [right]) => left - right)
-    .map(([, roundMatches]) => [...roundMatches].sort((left, right) => left.id - right.id));
+    .map(([, roundMatches]) =>
+      [...roundMatches].sort((left, right) => left.id - right.id),
+    );
 }
 
 function buildFramePath(width: number, height: number, inset = 0) {
@@ -108,7 +115,13 @@ function buildFramePath(width: number, height: number, inset = 0) {
   return `M ${left + notch} ${top} H ${right - cut} L ${right} ${top + cut} V ${bottom - cut} L ${right - cut} ${bottom} H ${left + notch} L ${left} ${bottom - cut} V ${top + cut} Z`;
 }
 
-function createConnector(id: string, startX: number, startY: number, endX: number, endY: number): ConnectorLayout {
+function createConnector(
+  id: string,
+  startX: number,
+  startY: number,
+  endX: number,
+  endY: number,
+): ConnectorLayout {
   const elbowX = startX + (endX - startX) / 2;
 
   return {
@@ -163,7 +176,10 @@ function getFocusedIndexes(teams: TeamInfo[], focusedTeam?: TeamInfo | null) {
   }, []);
 }
 
-function getBundleFocusedIndexes(teams: TeamInfo[], bundleSeed?: number | null) {
+function getBundleFocusedIndexes(
+  teams: TeamInfo[],
+  bundleSeed?: number | null,
+) {
   if (!bundleSeed) {
     return [];
   }
@@ -181,7 +197,10 @@ function getOwnedIndexes(teams: TeamInfo[], highlightedTeamKeys: Set<string>) {
     const normalizedKey = normalizeTeamKey(team);
     const bundleKey = team.seed > 0 ? `bundle:${team.seed}` : "";
 
-    if ((normalizedKey && highlightedTeamKeys.has(normalizedKey)) || (bundleKey && highlightedTeamKeys.has(bundleKey))) {
+    if (
+      (normalizedKey && highlightedTeamKeys.has(normalizedKey)) ||
+      (bundleKey && highlightedTeamKeys.has(bundleKey))
+    ) {
       indexes.push(index);
     }
 
@@ -199,69 +218,85 @@ function buildRegionLayout(
   inspectedTeam?: TeamInfo | null,
   inspectedTeamTone?: "available" | "sold" | null,
   inspectedBundleSeed?: number | null,
-  highlightedTeamKeys: Set<string> = new Set<string>()
+  highlightedTeamKeys: Set<string> = new Set<string>(),
 ): RegionLayout {
   const rounds = groupMatchesByRound(GenerateRegionBracketData(regionTeams));
-  const outerX = side === "left"
-    ? originX + REGION_PADDING_X
-    : originX + REGION_WIDTH - REGION_PADDING_X - ROUND_WIDTHS[0];
+  const outerX =
+    side === "left"
+      ? originX + REGION_PADDING_X
+      : originX + REGION_WIDTH - REGION_PADDING_X - ROUND_WIDTHS[0];
   const columnXs: number[] = [];
 
   columnXs[0] = outerX;
   for (let roundIndex = 1; roundIndex < ROUND_WIDTHS.length; roundIndex += 1) {
-    columnXs[roundIndex] = side === "left"
-      ? columnXs[roundIndex - 1] + ROUND_WIDTHS[roundIndex - 1] + COLUMN_GAP
-      : columnXs[roundIndex - 1] - COLUMN_GAP - ROUND_WIDTHS[roundIndex];
+    columnXs[roundIndex] =
+      side === "left"
+        ? columnXs[roundIndex - 1] + ROUND_WIDTHS[roundIndex - 1] + COLUMN_GAP
+        : columnXs[roundIndex - 1] - COLUMN_GAP - ROUND_WIDTHS[roundIndex];
   }
 
-  const cardsByRound: PositionedCard[][] = rounds.map((roundMatches, roundIndex) => {
-    const step = (MATCH_HEIGHT + MATCH_GAP) * Math.pow(2, roundIndex);
+  const cardsByRound: PositionedCard[][] = rounds.map(
+    (roundMatches, roundIndex) => {
+      const step = (MATCH_HEIGHT + MATCH_GAP) * Math.pow(2, roundIndex);
 
-    return roundMatches.map((match, matchIndex) => {
-      const teams = match.participants.filter(Boolean);
-      const selectedIndexes = getFocusedIndexes(teams, selectedTeam);
-      const inspectedIndexes = inspectedBundleSeed
-        ? getBundleFocusedIndexes(teams, inspectedBundleSeed)
-        : getFocusedIndexes(teams, inspectedTeam);
-      const hasSelectedRows = selectedIndexes.length > 0;
-      const hasInspectedRows = inspectedIndexes.length > 0 && !hasSelectedRows;
-      const ownedIndexes = getOwnedIndexes(teams, highlightedTeamKeys);
+      return roundMatches.map((match, matchIndex) => {
+        const teams = match.participants.filter(Boolean);
+        const selectedIndexes = getFocusedIndexes(teams, selectedTeam);
+        const inspectedIndexes = inspectedBundleSeed
+          ? getBundleFocusedIndexes(teams, inspectedBundleSeed)
+          : getFocusedIndexes(teams, inspectedTeam);
+        const hasSelectedRows = selectedIndexes.length > 0;
+        const hasInspectedRows =
+          inspectedIndexes.length > 0 && !hasSelectedRows;
+        const ownedIndexes = getOwnedIndexes(teams, highlightedTeamKeys);
 
-      return {
-        id: `${regionName}_${roundIndex}_${match.id}`,
-        x: columnXs[roundIndex],
-        y: originY + REGION_PADDING_TOP + step * matchIndex + (step - MATCH_HEIGHT) / 2,
-        width: ROUND_WIDTHS[roundIndex],
-        height: MATCH_HEIGHT,
-        rows: [
-          teams[0]
-            ? {
-                shortName: teams[0].shortName,
-                seed: teams[0].seed,
-                urlName: teams[0].urlName,
-              }
-            : createPlaceholderTeam(),
-          teams[1]
-            ? {
-                shortName: teams[1].shortName,
-                seed: teams[1].seed,
-                urlName: teams[1].urlName,
-              }
-            : createPlaceholderTeam(),
-        ],
-        highlight: hasSelectedRows,
-        ownerHighlight: ownedIndexes.length > 0 && !hasSelectedRows && !hasInspectedRows,
-        inspectedTone: hasInspectedRows ? inspectedTeamTone || undefined : undefined,
-        selectedRowIndexes: selectedIndexes,
-        inspectedRowIndexes: hasInspectedRows ? inspectedIndexes : [],
-        ownedRowIndexes: ownedIndexes,
-      };
-    });
-  });
+        return {
+          id: `${regionName}_${roundIndex}_${match.id}`,
+          x: columnXs[roundIndex],
+          y:
+            originY +
+            REGION_PADDING_TOP +
+            step * matchIndex +
+            (step - MATCH_HEIGHT) / 2,
+          width: ROUND_WIDTHS[roundIndex],
+          height: MATCH_HEIGHT,
+          rows: [
+            teams[0]
+              ? {
+                  shortName: teams[0].shortName,
+                  seed: teams[0].seed,
+                  urlName: teams[0].urlName,
+                }
+              : createPlaceholderTeam(),
+            teams[1]
+              ? {
+                  shortName: teams[1].shortName,
+                  seed: teams[1].seed,
+                  urlName: teams[1].urlName,
+                }
+              : createPlaceholderTeam(),
+          ],
+          highlight: hasSelectedRows,
+          ownerHighlight:
+            ownedIndexes.length > 0 && !hasSelectedRows && !hasInspectedRows,
+          inspectedTone: hasInspectedRows
+            ? inspectedTeamTone || undefined
+            : undefined,
+          selectedRowIndexes: selectedIndexes,
+          inspectedRowIndexes: hasInspectedRows ? inspectedIndexes : [],
+          ownedRowIndexes: ownedIndexes,
+        };
+      });
+    },
+  );
 
   const connectors: ConnectorLayout[] = [];
 
-  for (let roundIndex = 0; roundIndex < cardsByRound.length - 1; roundIndex += 1) {
+  for (
+    let roundIndex = 0;
+    roundIndex < cardsByRound.length - 1;
+    roundIndex += 1
+  ) {
     cardsByRound[roundIndex].forEach((card, matchIndex) => {
       const nextCard = cardsByRound[roundIndex + 1][Math.floor(matchIndex / 2)];
 
@@ -278,24 +313,27 @@ function buildRegionLayout(
           startX,
           card.y + card.height / 2,
           endX,
-          nextCard.y + nextCard.height / 2
-        )
+          nextCard.y + nextCard.height / 2,
+        ),
       );
     });
   }
 
-  const regionAnchorX = side === "left"
-    ? columnXs[3] + ROUND_WIDTHS[3]
-    : columnXs[3];
+  const regionAnchorX =
+    side === "left" ? columnXs[3] + ROUND_WIDTHS[3] : columnXs[3];
   const eliteEightCard = cardsByRound[3]?.[0];
 
   return {
     cards: cardsByRound.flat(),
     connectors,
-    roundLabelPositions: columnXs.map((columnX, roundIndex) => columnX + ROUND_WIDTHS[roundIndex] / 2),
+    roundLabelPositions: columnXs.map(
+      (columnX, roundIndex) => columnX + ROUND_WIDTHS[roundIndex] / 2,
+    ),
     regionAnchor: {
       x: regionAnchorX,
-      y: eliteEightCard ? eliteEightCard.y + eliteEightCard.height / 2 : originY + REGION_HEIGHT / 2,
+      y: eliteEightCard
+        ? eliteEightCard.y + eliteEightCard.height / 2
+        : originY + REGION_HEIGHT / 2,
     },
   };
 }
@@ -310,8 +348,12 @@ function MatchCard(props: PositionedCard) {
         props.tone === "path" ? "graveyard-bracket__card--path" : "",
         props.tone === "center" ? "graveyard-bracket__card--center" : "",
         props.highlight ? "graveyard-bracket__card--highlight" : "",
-        props.inspectedTone === "available" ? "graveyard-bracket__card--inspected-available" : "",
-        props.inspectedTone === "sold" ? "graveyard-bracket__card--inspected-sold" : "",
+        props.inspectedTone === "available"
+          ? "graveyard-bracket__card--inspected-available"
+          : "",
+        props.inspectedTone === "sold"
+          ? "graveyard-bracket__card--inspected-sold"
+          : "",
         props.ownerHighlight ? "graveyard-bracket__card--owner-highlight" : "",
       ]
         .filter(Boolean)
@@ -323,22 +365,36 @@ function MatchCard(props: PositionedCard) {
         height: `${props.height}px`,
       }}
     >
-      <svg className="graveyard-bracket__card-frame" viewBox={`0 0 ${props.width} ${props.height}`} aria-hidden="true">
+      <svg
+        className="graveyard-bracket__card-frame"
+        viewBox={`0 0 ${props.width} ${props.height}`}
+        aria-hidden="true"
+      >
         <path className="graveyard-bracket__card-frame-shadow" d={framePath} />
         <path className="graveyard-bracket__card-frame-stroke" d={framePath} />
         <path className="graveyard-bracket__card-frame-sketch" d={framePath} />
       </svg>
 
-      {props.title ? <div className="graveyard-bracket__card-title">{props.title}</div> : null}
+      {props.title ? (
+        <div className="graveyard-bracket__card-title">{props.title}</div>
+      ) : null}
 
       <div className="graveyard-bracket__card-body">
         {props.rows.map((row, index) => {
           const logoUrl = row.placeholder ? "" : getLogoUrl(row.urlName);
           const isPlaceholder = row.placeholder && !row.shortName;
           const isSelectedRow = props.selectedRowIndexes.includes(index);
-          const isInspectedAvailableRow = props.inspectedTone === "available" && props.inspectedRowIndexes.includes(index);
-          const isInspectedSoldRow = props.inspectedTone === "sold" && props.inspectedRowIndexes.includes(index);
-          const isOwnedRow = props.ownedRowIndexes.includes(index) && !isSelectedRow && !isInspectedAvailableRow && !isInspectedSoldRow;
+          const isInspectedAvailableRow =
+            props.inspectedTone === "available" &&
+            props.inspectedRowIndexes.includes(index);
+          const isInspectedSoldRow =
+            props.inspectedTone === "sold" &&
+            props.inspectedRowIndexes.includes(index);
+          const isOwnedRow =
+            props.ownedRowIndexes.includes(index) &&
+            !isSelectedRow &&
+            !isInspectedAvailableRow &&
+            !isInspectedSoldRow;
 
           return (
             <div
@@ -347,8 +403,12 @@ function MatchCard(props: PositionedCard) {
                 "graveyard-bracket__row",
                 isPlaceholder ? "graveyard-bracket__row--placeholder" : "",
                 isSelectedRow ? "graveyard-bracket__row--selected" : "",
-                isInspectedAvailableRow ? "graveyard-bracket__row--inspected-available" : "",
-                isInspectedSoldRow ? "graveyard-bracket__row--inspected-sold" : "",
+                isInspectedAvailableRow
+                  ? "graveyard-bracket__row--inspected-available"
+                  : "",
+                isInspectedSoldRow
+                  ? "graveyard-bracket__row--inspected-sold"
+                  : "",
                 isOwnedRow ? "graveyard-bracket__row--owned" : "",
               ]
                 .filter(Boolean)
@@ -372,7 +432,10 @@ function MatchCard(props: PositionedCard) {
                 ) : null}
               </div>
 
-              <div className="graveyard-bracket__team-name" title={row.shortName}>
+              <div
+                className="graveyard-bracket__team-name"
+                title={row.shortName}
+              >
                 {row.shortName}
               </div>
             </div>
@@ -504,12 +567,15 @@ function Bracket(props: BracketProps) {
       props.inspectedTeam,
       props.inspectedTeamTone,
       props.inspectedBundleSeed,
-      highlightedKeySet
+      highlightedKeySet,
     ),
   }));
   const focusTargets = useMemo(() => {
     const teamsByFocusRegion = new Map<string, TeamInfo[]>();
-    const nextTargets = new Map<string, { left: number; top: number; width: number; height: number }>();
+    const nextTargets = new Map<
+      string,
+      { left: number; top: number; width: number; height: number }
+    >();
 
     props.all_teams.forEach((team) => {
       if (!teamsByFocusRegion.has(team.region)) {
@@ -556,10 +622,18 @@ function Bracket(props: BracketProps) {
   const centerConnectors: ConnectorLayout[] = [];
   const centerLookup = new Map(centerCards.map((card) => [card.id, card]));
 
-  const southLayout = regionLayouts.find((region) => region.name === "South")?.layout;
-  const eastLayout = regionLayouts.find((region) => region.name === "East")?.layout;
-  const midwestLayout = regionLayouts.find((region) => region.name === "Midwest")?.layout;
-  const westLayout = regionLayouts.find((region) => region.name === "West")?.layout;
+  const southLayout = regionLayouts.find(
+    (region) => region.name === "South",
+  )?.layout;
+  const eastLayout = regionLayouts.find(
+    (region) => region.name === "East",
+  )?.layout;
+  const midwestLayout = regionLayouts.find(
+    (region) => region.name === "Midwest",
+  )?.layout;
+  const westLayout = regionLayouts.find(
+    (region) => region.name === "West",
+  )?.layout;
 
   if (southLayout && eastLayout && midwestLayout && westLayout) {
     centerConnectors.push(
@@ -568,57 +642,57 @@ function Bracket(props: BracketProps) {
         southLayout.regionAnchor.x,
         southLayout.regionAnchor.y,
         centerLookup.get("semifinal_left")!.x,
-        centerLookup.get("semifinal_left")!.y + CENTER_CARD_HEIGHT / 2
+        centerLookup.get("semifinal_left")!.y + CENTER_CARD_HEIGHT / 2,
       ),
       createConnector(
         "east_to_left_lower_semi",
         eastLayout.regionAnchor.x,
         eastLayout.regionAnchor.y,
         centerLookup.get("semifinal_left_lower")!.x,
-        centerLookup.get("semifinal_left_lower")!.y + CENTER_CARD_HEIGHT / 2
+        centerLookup.get("semifinal_left_lower")!.y + CENTER_CARD_HEIGHT / 2,
       ),
       createConnector(
         "midwest_to_right_semi",
         midwestLayout.regionAnchor.x,
         midwestLayout.regionAnchor.y,
         centerLookup.get("semifinal_right")!.x + SEMI_WIDTH,
-        centerLookup.get("semifinal_right")!.y + CENTER_CARD_HEIGHT / 2
+        centerLookup.get("semifinal_right")!.y + CENTER_CARD_HEIGHT / 2,
       ),
       createConnector(
         "west_to_right_lower_semi",
         westLayout.regionAnchor.x,
         westLayout.regionAnchor.y,
         centerLookup.get("semifinal_right_lower")!.x + SEMI_WIDTH,
-        centerLookup.get("semifinal_right_lower")!.y + CENTER_CARD_HEIGHT / 2
+        centerLookup.get("semifinal_right_lower")!.y + CENTER_CARD_HEIGHT / 2,
       ),
       createConnector(
         "left_semi_to_champ",
         centerLookup.get("semifinal_left")!.x + SEMI_WIDTH,
         centerLookup.get("semifinal_left")!.y + CENTER_CARD_HEIGHT / 2,
         centerLookup.get("championship")!.x,
-        centerLookup.get("championship")!.y + CENTER_CARD_HEIGHT / 2
+        centerLookup.get("championship")!.y + CENTER_CARD_HEIGHT / 2,
       ),
       createConnector(
         "left_lower_semi_to_champ",
         centerLookup.get("semifinal_left_lower")!.x + SEMI_WIDTH,
         centerLookup.get("semifinal_left_lower")!.y + CENTER_CARD_HEIGHT / 2,
         centerLookup.get("championship")!.x,
-        centerLookup.get("championship")!.y + CENTER_CARD_HEIGHT / 2
+        centerLookup.get("championship")!.y + CENTER_CARD_HEIGHT / 2,
       ),
       createConnector(
         "right_semi_to_champ",
         centerLookup.get("semifinal_right")!.x,
         centerLookup.get("semifinal_right")!.y + CENTER_CARD_HEIGHT / 2,
         centerLookup.get("championship")!.x + CHAMP_WIDTH,
-        centerLookup.get("championship")!.y + CENTER_CARD_HEIGHT / 2
+        centerLookup.get("championship")!.y + CENTER_CARD_HEIGHT / 2,
       ),
       createConnector(
         "right_lower_semi_to_champ",
         centerLookup.get("semifinal_right_lower")!.x,
         centerLookup.get("semifinal_right_lower")!.y + CENTER_CARD_HEIGHT / 2,
         centerLookup.get("championship")!.x + CHAMP_WIDTH,
-        centerLookup.get("championship")!.y + CENTER_CARD_HEIGHT / 2
-      )
+        centerLookup.get("championship")!.y + CENTER_CARD_HEIGHT / 2,
+      ),
     );
   }
 
@@ -633,8 +707,13 @@ function Bracket(props: BracketProps) {
       return;
     }
 
-    if (lastAutoScrolledRegion.current !== selectedRegion && regionRefs.current[selectedRegion]) {
-      const stage = regionRefs.current[selectedRegion]?.closest(".graveyard-bracket__stage-wrap");
+    if (
+      lastAutoScrolledRegion.current !== selectedRegion &&
+      regionRefs.current[selectedRegion]
+    ) {
+      const stage = regionRefs.current[selectedRegion]?.closest(
+        ".graveyard-bracket__stage-wrap",
+      );
       const regionElement = regionRefs.current[selectedRegion];
 
       if (stage instanceof HTMLElement && regionElement) {
@@ -656,17 +735,24 @@ function Bracket(props: BracketProps) {
       return;
     }
 
-    const focusKey = props.inspectedTeam.region === "bundle" && props.inspectedTeam.seed > 0
-      ? `bundle:${props.inspectedTeam.seed}`
-      : normalizeTeamKey(props.inspectedTeam);
+    const focusKey =
+      props.inspectedTeam.region === "bundle" && props.inspectedTeam.seed > 0
+        ? `bundle:${props.inspectedTeam.seed}`
+        : normalizeTeamKey(props.inspectedTeam);
 
     if (!focusKey || lastAutoFocusKey.current === focusKey) {
       return;
     }
 
     if (props.inspectedTeam.region === "bundle") {
-      const overviewLeft = Math.max(0, CANVAS_WIDTH / 2 - stage.clientWidth / 2);
-      const overviewTop = Math.max(0, CANVAS_HEIGHT / 2 - stage.clientHeight / 2 - 120);
+      const overviewLeft = Math.max(
+        0,
+        CANVAS_WIDTH / 2 - stage.clientWidth / 2,
+      );
+      const overviewTop = Math.max(
+        0,
+        CANVAS_HEIGHT / 2 - stage.clientHeight / 2 - 120,
+      );
 
       stage.scrollTo({
         behavior: "smooth",
@@ -685,8 +771,14 @@ function Bracket(props: BracketProps) {
 
     stage.scrollTo({
       behavior: "smooth",
-      left: Math.max(0, focusTarget.left - stage.clientWidth / 2 + focusTarget.width / 2),
-      top: Math.max(0, focusTarget.top - stage.clientHeight / 2 + focusTarget.height / 2),
+      left: Math.max(
+        0,
+        focusTarget.left - stage.clientWidth / 2 + focusTarget.width / 2,
+      ),
+      top: Math.max(
+        0,
+        focusTarget.top - stage.clientHeight / 2 + focusTarget.height / 2,
+      ),
     });
     lastAutoFocusKey.current = focusKey;
   }, [
@@ -734,17 +826,27 @@ function Bracket(props: BracketProps) {
     };
 
     const handlePointerMove = (event: PointerEvent) => {
-      if (!dragStateRef.current.active || dragStateRef.current.pointerId !== event.pointerId) {
+      if (
+        !dragStateRef.current.active ||
+        dragStateRef.current.pointerId !== event.pointerId
+      ) {
         return;
       }
 
       event.preventDefault();
-      stage.scrollLeft = dragStateRef.current.scrollLeft - (event.clientX - dragStateRef.current.startX);
-      stage.scrollTop = dragStateRef.current.scrollTop - (event.clientY - dragStateRef.current.startY);
+      stage.scrollLeft =
+        dragStateRef.current.scrollLeft -
+        (event.clientX - dragStateRef.current.startX);
+      stage.scrollTop =
+        dragStateRef.current.scrollTop -
+        (event.clientY - dragStateRef.current.startY);
     };
 
     const endDrag = (event: PointerEvent) => {
-      if (!dragStateRef.current.active || dragStateRef.current.pointerId !== event.pointerId) {
+      if (
+        !dragStateRef.current.active ||
+        dragStateRef.current.pointerId !== event.pointerId
+      ) {
         return;
       }
 
@@ -775,23 +877,50 @@ function Bracket(props: BracketProps) {
     <div className="graveyard-bracket">
       <div className="graveyard-bracket__stage-wrap" ref={stageWrapRef}>
         <div className="graveyard-bracket__canvas">
-          <div className="graveyard-bracket__center-badge graveyard-bracket__center-badge--top">Final Four</div>
-          <div className="graveyard-bracket__center-badge graveyard-bracket__center-badge--bottom">Championship</div>
+          <div className="graveyard-bracket__center-badge graveyard-bracket__center-badge--top">
+            Final Four
+          </div>
+          <div className="graveyard-bracket__center-badge graveyard-bracket__center-badge--bottom">
+            Championship
+          </div>
 
-          <svg className="graveyard-bracket__connectors" viewBox={`0 0 ${CANVAS_WIDTH} ${CANVAS_HEIGHT}`} aria-hidden="true">
-            {regionLayouts.flatMap((region) => region.layout.connectors).concat(centerConnectors).map((connector) => (
-              <g key={connector.id} className="graveyard-bracket__connector-group">
-                <path className="graveyard-bracket__connector-shadow" d={connector.d} />
-                <path className="graveyard-bracket__connector-base" d={connector.d} />
-                <path className="graveyard-bracket__connector-sketch" d={connector.d} />
-                {connector.joints.map((joint, index) => (
-                  <g key={`${connector.id}_${index}`} transform={`translate(${joint.x}, ${joint.y})`} className="graveyard-bracket__joint">
-                    <circle r="3.1" />
-                    <ellipse rx="4.6" ry="2" />
-                  </g>
-                ))}
-              </g>
-            ))}
+          <svg
+            className="graveyard-bracket__connectors"
+            viewBox={`0 0 ${CANVAS_WIDTH} ${CANVAS_HEIGHT}`}
+            aria-hidden="true"
+          >
+            {regionLayouts
+              .flatMap((region) => region.layout.connectors)
+              .concat(centerConnectors)
+              .map((connector) => (
+                <g
+                  key={connector.id}
+                  className="graveyard-bracket__connector-group"
+                >
+                  <path
+                    className="graveyard-bracket__connector-shadow"
+                    d={connector.d}
+                  />
+                  <path
+                    className="graveyard-bracket__connector-base"
+                    d={connector.d}
+                  />
+                  <path
+                    className="graveyard-bracket__connector-sketch"
+                    d={connector.d}
+                  />
+                  {connector.joints.map((joint, index) => (
+                    <g
+                      key={`${connector.id}_${index}`}
+                      transform={`translate(${joint.x}, ${joint.y})`}
+                      className="graveyard-bracket__joint"
+                    >
+                      <circle r="3.1" />
+                      <ellipse rx="4.6" ry="2" />
+                    </g>
+                  ))}
+                </g>
+              ))}
           </svg>
 
           {regionLayouts.map((region) => (
@@ -802,7 +931,9 @@ function Bracket(props: BracketProps) {
               }}
               className={[
                 "graveyard-bracket__region-anchor",
-                props.selected_team?.region === region.name ? "graveyard-bracket__region-anchor--current" : "",
+                props.selected_team?.region === region.name
+                  ? "graveyard-bracket__region-anchor--current"
+                  : "",
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -841,9 +972,11 @@ function Bracket(props: BracketProps) {
             </div>
           ))}
 
-          {regionLayouts.flatMap((region) => region.layout.cards).map((card) => (
-            <MatchCard key={card.id} {...card} />
-          ))}
+          {regionLayouts
+            .flatMap((region) => region.layout.cards)
+            .map((card) => (
+              <MatchCard key={card.id} {...card} />
+            ))}
 
           {centerCards.map((card) => (
             <MatchCard key={card.id} {...card} />

@@ -1,23 +1,19 @@
 import os
 import time
-import aws_cdk as cdk
-from aws_cdk import (
-    aws_ec2 as ec2,
-    aws_ecs as ecs,
-    aws_ecr as ecr,
-    aws_elasticloadbalancingv2 as elbv2,
-    aws_autoscaling as autoscaling,
-    aws_certificatemanager as acm,
-    aws_route53 as route53,
-    aws_route53_targets as targets,
-    aws_logs as logs,
-    aws_iam as iam,
-    CfnOutput,
-    Duration,
-    RemovalPolicy,
-)
-from constructs import Construct
 
+import aws_cdk as cdk
+from aws_cdk import CfnOutput, Duration, RemovalPolicy
+from aws_cdk import aws_autoscaling as autoscaling
+from aws_cdk import aws_certificatemanager as acm
+from aws_cdk import aws_ec2 as ec2
+from aws_cdk import aws_ecr as ecr
+from aws_cdk import aws_ecs as ecs
+from aws_cdk import aws_elasticloadbalancingv2 as elbv2
+from aws_cdk import aws_iam as iam
+from aws_cdk import aws_logs as logs
+from aws_cdk import aws_route53 as route53
+from aws_cdk import aws_route53_targets as targets
+from constructs import Construct
 
 DOMAIN_NAME = "mmauctiongame.com"
 
@@ -134,7 +130,9 @@ class InfraStack(cdk.Stack):
 
         # ---- Frontend Task + Service ----
         frontend_task = ecs.Ec2TaskDefinition(
-            self, "FrontendTask", execution_role=task_execution_role,
+            self,
+            "FrontendTask",
+            execution_role=task_execution_role,
             network_mode=ecs.NetworkMode.BRIDGE,
         )
         frontend_task.add_container(
@@ -148,9 +146,7 @@ class InfraStack(cdk.Stack):
                 log_retention=logs.RetentionDays.ONE_WEEK,
             ),
             environment={"DEPLOY_TIMESTAMP": deploy_timestamp},
-            port_mappings=[
-                ecs.PortMapping(container_port=3000, host_port=80)
-            ],
+            port_mappings=[ecs.PortMapping(container_port=3000, host_port=80)],
         )
 
         frontend_service = ecs.Ec2Service(
@@ -164,7 +160,9 @@ class InfraStack(cdk.Stack):
 
         # ---- Backend Task + Service ----
         backend_task = ecs.Ec2TaskDefinition(
-            self, "BackendTask", execution_role=task_execution_role,
+            self,
+            "BackendTask",
+            execution_role=task_execution_role,
             network_mode=ecs.NetworkMode.BRIDGE,
         )
         backend_task.add_container(
@@ -181,9 +179,7 @@ class InfraStack(cdk.Stack):
                 "ENVIRONMENT": "production",
                 "DEPLOY_TIMESTAMP": deploy_timestamp,
             },
-            port_mappings=[
-                ecs.PortMapping(container_port=8000, host_port=8000)
-            ],
+            port_mappings=[ecs.PortMapping(container_port=8000, host_port=8000)],
         )
 
         backend_service = ecs.Ec2Service(
@@ -213,9 +209,7 @@ class InfraStack(cdk.Stack):
             targets=[backend_service],
             priority=10,
             conditions=[elbv2.ListenerCondition.path_patterns(["/api/*", "/ws/*"])],
-            health_check=elbv2.HealthCheck(
-                path="/docs", healthy_http_codes="200"
-            ),
+            health_check=elbv2.HealthCheck(path="/docs", healthy_http_codes="200"),
         )
 
         CfnOutput(self, "AlbDns", value=alb.load_balancer_dns_name)

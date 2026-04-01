@@ -76,8 +76,12 @@ describe("LobbyPage", () => {
 
     render(<LobbyPage />);
 
-    expect(screen.queryByRole("button", { name: /start game/i })).not.toBeInTheDocument();
-    expect(screen.getByText(/waiting for the host to start the game/i)).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /start game/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/waiting for the host to start the game/i),
+    ).toBeInTheDocument();
 
     act(() => {
       MockWebSocket.instances[0].onmessage?.({ data: "gameStarted" });

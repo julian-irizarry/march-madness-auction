@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
   projectRootFile = "flake.nix";
 
@@ -7,7 +7,7 @@
   programs.isort.enable = true;
   programs.mypy = {
     enable = true;
-    directories = {
+    directories = lib.mkForce {
       "deployment" = {
         directory = "deployment";
         modules = [ "stacks" ];

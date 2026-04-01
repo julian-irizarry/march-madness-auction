@@ -1,9 +1,6 @@
 import aws_cdk as cdk
-from aws_cdk import (
-    aws_iam as iam,
-    Duration,
-    CfnOutput,
-)
+from aws_cdk import CfnOutput, Duration
+from aws_cdk import aws_iam as iam
 from constructs import Construct
 
 

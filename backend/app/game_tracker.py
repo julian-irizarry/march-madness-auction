@@ -1,16 +1,9 @@
 import random
 
-from app.types.types import (
-    PlayerInfo,
-    TeamInfo,
-    GameInfo,
-    GamePhase,
-    SaleRecord,
-    BidModel,
-    INITIAL_BID,
-    INITIAL_COUNTDOWN,
-)
-from app.bracket import get_teams, get_matches
+from app.bracket import get_matches, get_teams
+from app.types.types import (INITIAL_BID, INITIAL_COUNTDOWN, BidModel,
+                             GameInfo, GamePhase, PlayerInfo, SaleRecord,
+                             TeamInfo)
 
 
 class GameTracker:
@@ -113,14 +106,16 @@ class GameTracker:
             )
 
         # Record the sale
-        self.games[gameId].auctionHistory.append(SaleRecord(
-            team=current_team.shortName,
-            seed=current_team.seed,
-            region=current_team.region,
-            buyer=winner.player,
-            price=max(0, winner.bid),
-            numBids=num_bids,
-        ))
+        self.games[gameId].auctionHistory.append(
+            SaleRecord(
+                team=current_team.shortName,
+                seed=current_team.seed,
+                region=current_team.region,
+                buyer=winner.player,
+                price=max(0, winner.bid),
+                numBids=num_bids,
+            )
+        )
 
         self.games[gameId].log = []  # reset log
 

@@ -1,7 +1,7 @@
 import csv
-import requests
 
-from app.types.types import TeamInfo, MatchInfo
+import requests
+from app.types.types import MatchInfo, TeamInfo
 
 
 def get_teams(year: int, month: str, days: tuple[str, str]) -> dict[str, TeamInfo]:
@@ -20,15 +20,19 @@ def get_teams(year: int, month: str, days: tuple[str, str]) -> dict[str, TeamInf
 
     teams: dict[str, TeamInfo] = {}
     for day in days:
-        url: str = f"https://data.ncaa.com/casablanca/scoreboard/basketball-men/d1/{year}/{month}/{day}/scoreboard.json"
+        url: str = (
+            f"https://data.ncaa.com/casablanca/scoreboard/basketball-men/d1/{year}/{month}/{day}/scoreboard.json"
+        )
         response = requests.get(url)
 
         if response.status_code == 200:
             data = response.json()
 
-            for game in data.get("games", []):  # Adjust the path based on the actual data structure
-                away_team:dict = game.get("game").get("away")
-                home_team:dict = game.get("game").get("home")
+            for game in data.get(
+                "games", []
+            ):  # Adjust the path based on the actual data structure
+                away_team: dict = game.get("game").get("away")
+                home_team: dict = game.get("game").get("home")
                 region = game.get("game").get("bracketRegion")
 
                 if away_team.get("seed"):
@@ -36,7 +40,7 @@ def get_teams(year: int, month: str, days: tuple[str, str]) -> dict[str, TeamInf
                         shortName=away_team.get("names").get("short"),
                         urlName=away_team.get("names").get("seo"),
                         seed=away_team.get("seed"),
-                        region=region
+                        region=region,
                     )
                     teams[away_team_info.shortName] = away_team_info
 
@@ -45,7 +49,7 @@ def get_teams(year: int, month: str, days: tuple[str, str]) -> dict[str, TeamInf
                         shortName=home_team.get("names").get("short"),
                         urlName=home_team.get("names").get("seo"),
                         seed=home_team.get("seed"),
-                        region=region
+                        region=region,
                     )
                     teams[home_team_info.shortName] = home_team_info
         else:
@@ -70,13 +74,17 @@ def get_matches(year: int, month: str, days: tuple[str, str]) -> list[MatchInfo]
     matches: list[MatchInfo] = []
     id = 0
     for day in days:
-        url: str = f"https://data.ncaa.com/casablanca/scoreboard/basketball-men/d1/{year}/{month}/{day}/scoreboard.json"
+        url: str = (
+            f"https://data.ncaa.com/casablanca/scoreboard/basketball-men/d1/{year}/{month}/{day}/scoreboard.json"
+        )
         response = requests.get(url)
 
         if response.status_code == 200:
             data = response.json()
 
-            for game in data.get("games", []):  # Adjust the path based on the actual data structure
+            for game in data.get(
+                "games", []
+            ):  # Adjust the path based on the actual data structure
                 away_team = game.get("game").get("away")
                 home_team = game.get("game").get("home")
                 region = game.get("game").get("bracketRegion")
@@ -87,27 +95,28 @@ def get_matches(year: int, month: str, days: tuple[str, str]) -> list[MatchInfo]
                     shortName=away_team.get("names").get("short"),
                     urlName=away_team.get("names").get("seo"),
                     seed=away_team.get("seed"),
-                    region=region
+                    region=region,
                 )
                 home_team_info = TeamInfo(
                     shortName=home_team.get("names").get("short"),
                     urlName=home_team.get("names").get("seo"),
                     seed=home_team.get("seed"),
-                    region=region
+                    region=region,
                 )
-                winner_name = away_team_info.shortName if away_team.get("winner") else home_team_info.shortName
+                winner_name = (
+                    away_team_info.shortName
+                    if away_team.get("winner")
+                    else home_team_info.shortName
+                )
 
                 matches.append(
                     MatchInfo(
                         id=id,
                         nextMatchId=-1,
                         roundName=bracket_round,
-                        participants=[
-                            away_team_info,
-                            home_team_info
-                        ],
+                        participants=[away_team_info, home_team_info],
                         winner=winner_name,
-                        startDate=start_date
+                        startDate=start_date,
                     )
                 )
         else:
@@ -140,13 +149,27 @@ def generate_bracket_csv(year: int, month: str, days: tuple[str, str]):
             if response.status_code == 200:
                 data = response.json()
 
-                for game in data.get("games", []):  # Adjust the path based on the actual data structure
+                for game in data.get(
+                    "games", []
+                ):  # Adjust the path based on the actual data structure
                     away_team = game.get("game").get("away")
                     home_team = game.get("game").get("home")
                     region = game.get("game").get("bracketRegion")
 
-                    writer.writerow([away_team.get("names").get("short"), away_team.get("seed"), region])
-                    writer.writerow([home_team.get("names").get("short"), home_team.get("seed"), region])
+                    writer.writerow(
+                        [
+                            away_team.get("names").get("short"),
+                            away_team.get("seed"),
+                            region,
+                        ]
+                    )
+                    writer.writerow(
+                        [
+                            home_team.get("names").get("short"),
+                            home_team.get("seed"),
+                            region,
+                        ]
+                    )
             else:
                 print(f"ERROR READING URL: {url}: {response.status_code}")
 

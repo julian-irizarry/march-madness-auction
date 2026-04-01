@@ -66,17 +66,22 @@ describe("HomePage", () => {
     render(<HomePage />);
 
     fireEvent.click(screen.getByRole("button", { name: /create game/i }));
-    fireEvent.change(screen.getByLabelText(/your name/i), { target: { value: "Ryan" } });
+    fireEvent.change(screen.getByLabelText(/your name/i), {
+      target: { value: "Ryan" },
+    });
     fireEvent.click(screen.getByRole("button", { name: /^create$/i }));
 
     await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalledWith("http://127.0.0.1:8000/create-game/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        "http://127.0.0.1:8000/create-game/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ player: "Ryan" }),
         },
-        body: JSON.stringify({ player: "Ryan" }),
-      });
+      );
     });
 
     expect(mockNavigate).toHaveBeenCalledWith("/lobby", {
@@ -93,8 +98,12 @@ describe("HomePage", () => {
     render(<HomePage />);
 
     fireEvent.click(screen.getByRole("button", { name: /join game/i }));
-    fireEvent.change(screen.getByLabelText(/your name/i), { target: { value: "Ryan" } });
-    fireEvent.change(screen.getByLabelText(/game id/i), { target: { value: "BAD123" } });
+    fireEvent.change(screen.getByLabelText(/your name/i), {
+      target: { value: "Ryan" },
+    });
+    fireEvent.change(screen.getByLabelText(/game id/i), {
+      target: { value: "BAD123" },
+    });
     fireEvent.click(screen.getByRole("button", { name: /^join$/i }));
 
     await waitFor(() => {

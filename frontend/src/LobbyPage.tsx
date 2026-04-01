@@ -9,28 +9,47 @@ import "./css/Fonts.css";
 import "./css/Bracket.css";
 import "./css/BloodbathPages.css";
 
-const ROSTER_ICON_COLORS = ["#ff6b4a", "#49a7ff", "#ffd46f", "#69dd8f", "#ff8a57", "#7cc6ff"];
+const ROSTER_ICON_COLORS = [
+  "#ff6b4a",
+  "#49a7ff",
+  "#ffd46f",
+  "#69dd8f",
+  "#ff8a57",
+  "#7cc6ff",
+];
 
 function LobbyPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [gameId, setGameId] = useState<string>(location.state?.gameId || "");
-  const [isCreator, setIsCreator] = useState<boolean>(location.state?.isCreator || false);
-  const [playerName, setPlayerName] = useState<string>(location.state?.playerName || "");
+  const [isCreator, setIsCreator] = useState<boolean>(
+    location.state?.isCreator || false,
+  );
+  const [playerName, setPlayerName] = useState<string>(
+    location.state?.playerName || "",
+  );
 
   const [players, setPlayers] = useState<string[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
-  const [sessionLoaded, setSessionLoaded] = useState<boolean>(!!location.state?.gameId);
+  const [sessionLoaded, setSessionLoaded] = useState<boolean>(
+    !!location.state?.gameId,
+  );
 
   // If no state from navigation, try to recover from session cookie
   useEffect(() => {
     if (location.state?.gameId) return;
     const recover = async () => {
       try {
-        const response = await fetch(`${BACKEND_HTTP_URL}/rejoin/`, { credentials: "include" });
+        const response = await fetch(`${BACKEND_HTTP_URL}/rejoin/`, {
+          credentials: "include",
+        });
         if (response.ok) {
           const data = await response.json();
-          const routeState = { gameId: data.gameId, isCreator: data.isCreator, playerName: data.playerName };
+          const routeState = {
+            gameId: data.gameId,
+            isCreator: data.isCreator,
+            playerName: data.playerName,
+          };
           if (data.phase === "ended") {
             navigate("/view", { state: { gameId: data.gameId } });
             return;
@@ -96,56 +115,98 @@ function LobbyPage() {
               <div className="bloodbath-simple-lobby__grid">
                 <section className="bloodbath-simple-lobby__column bloodbath-simple-lobby__column--players">
                   <div className="bloodbath-simple-lobby__welcome">
-                    <h1 className="bloodbath-simple-lobby__title">{playerName ? `Welcome ${playerName}!` : "Welcome!"}</h1>
-                    <p className="bloodbath-simple-lobby__subtitle">You are {isCreator ? "the game creator" : "a participant"}.</p>
+                    <h1 className="bloodbath-simple-lobby__title">
+                      {playerName ? `Welcome ${playerName}!` : "Welcome!"}
+                    </h1>
+                    <p className="bloodbath-simple-lobby__subtitle">
+                      You are {isCreator ? "the game creator" : "a participant"}
+                      .
+                    </p>
                   </div>
 
                   <div className="bloodbath-simple-lobby__player-list">
                     {players.length > 0 ? (
                       players.map((participant, index) => {
                         const isHost = index === 0;
-                        const iconColor = ROSTER_ICON_COLORS[index % ROSTER_ICON_COLORS.length];
+                        const iconColor =
+                          ROSTER_ICON_COLORS[index % ROSTER_ICON_COLORS.length];
 
                         return (
-                          <div className="bloodbath-simple-lobby__player-card" key={`${participant}_${index}`}>
+                          <div
+                            className="bloodbath-simple-lobby__player-card"
+                            key={`${participant}_${index}`}
+                          >
                             <div className="bloodbath-simple-lobby__player-main">
-                              <span className="bloodbath-simple-lobby__player-icon" aria-hidden="true">
+                              <span
+                                className="bloodbath-simple-lobby__player-icon"
+                                aria-hidden="true"
+                              >
                                 {isHost ? (
-                                  <CrownIcon fill="#ffd989" width="20px" height="20px" />
+                                  <CrownIcon
+                                    fill="#ffd989"
+                                    width="20px"
+                                    height="20px"
+                                  />
                                 ) : (
-                                  <UserIcon fill={iconColor} width="16px" height="16px" />
+                                  <UserIcon
+                                    fill={iconColor}
+                                    width="16px"
+                                    height="16px"
+                                  />
                                 )}
                               </span>
-                              <span className="bloodbath-simple-lobby__player-name">{participant}</span>
+                              <span className="bloodbath-simple-lobby__player-name">
+                                {participant}
+                              </span>
                             </div>
 
-                            {isHost ? <span className="bloodbath-simple-lobby__player-badge">Host</span> : null}
+                            {isHost ? (
+                              <span className="bloodbath-simple-lobby__player-badge">
+                                Host
+                              </span>
+                            ) : null}
                           </div>
                         );
                       })
                     ) : (
-                      <div className="bloodbath-simple-lobby__empty">No players</div>
+                      <div className="bloodbath-simple-lobby__empty">
+                        No players
+                      </div>
                     )}
                   </div>
                 </section>
 
                 <section className="bloodbath-simple-lobby__column bloodbath-simple-lobby__column--room">
                   <div className="bloodbath-home__logo-shell bloodbath-home__logo-shell--simple">
-                    <img src={imageSrc} alt="March Madness Auction logo" className="bloodbath-home__logo" />
+                    <img
+                      src={imageSrc}
+                      alt="March Madness Auction logo"
+                      className="bloodbath-home__logo"
+                    />
                   </div>
 
                   <div className="bloodbath-simple-lobby__room-code">
-                    <span className="bloodbath-simple-lobby__room-label">Your Room Code</span>
-                    <strong className="bloodbath-simple-lobby__room-value">{gameId || "------"}</strong>
+                    <span className="bloodbath-simple-lobby__room-label">
+                      Your Room Code
+                    </span>
+                    <strong className="bloodbath-simple-lobby__room-value">
+                      {gameId || "------"}
+                    </strong>
                   </div>
 
                   <div className="bloodbath-simple-lobby__action">
                     {isCreator ? (
-                      <button type="button" className="bloodbath-button bloodbath-button--primary bloodbath-button--large" onClick={handleStartGameClick}>
+                      <button
+                        type="button"
+                        className="bloodbath-button bloodbath-button--primary bloodbath-button--large"
+                        onClick={handleStartGameClick}
+                      >
                         Start Game
                       </button>
                     ) : (
-                      <div className="bloodbath-simple-lobby__waiting">Waiting for the host to start the game...</div>
+                      <div className="bloodbath-simple-lobby__waiting">
+                        Waiting for the host to start the game...
+                      </div>
                     )}
                   </div>
                 </section>

@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
-import { BACKEND_HTTP_URL } from "./Utils"
+import { BACKEND_HTTP_URL } from "./Utils";
 
 interface BidProps {
-  gameId: string
-  player: string
-  currentHighestBid: number
-  team: string
-  balance: number
-  disabled?: boolean
+  gameId: string;
+  player: string;
+  currentHighestBid: number;
+  team: string;
+  balance: number;
+  disabled?: boolean;
 }
 
 function Bid(props: BidProps) {
-  const [bid, setBid] = useState('');
+  const [bid, setBid] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const minimumBid = props.currentHighestBid + 1;
   const auctionDisabled = Boolean(props.disabled);
@@ -26,21 +26,25 @@ function Bid(props: BidProps) {
     setBid(Math.max(0, props.currentHighestBid + 1).toString());
   }, [props.currentHighestBid]);
 
-  const formatCurrency = (value: number) => `$${Math.max(0, Math.round(value)).toLocaleString()}`;
+  const formatCurrency = (value: number) =>
+    `$${Math.max(0, Math.round(value)).toLocaleString()}`;
 
   const handleBidChange = (value: string) => {
-    if (value === '') {
-      setBid('');
+    if (value === "") {
+      setBid("");
       return;
     }
 
-    const nextValue = value.replace(/[^\d]/g, '');
+    const nextValue = value.replace(/[^\d]/g, "");
     setBid(nextValue);
   };
 
   const handleQuickRaise = (amount: number) => {
     const startingPoint = hasBidValue ? parsedBid : props.currentHighestBid;
-    const nextBid = Math.min(props.balance, Math.max(props.currentHighestBid + 1, startingPoint + amount));
+    const nextBid = Math.min(
+      props.balance,
+      Math.max(props.currentHighestBid + 1, startingPoint + amount),
+    );
     setBid(nextBid.toString());
   };
 
@@ -55,37 +59,42 @@ function Bid(props: BidProps) {
     const bidNumber = parseInt(bid, 10);
     // Validate bid
     if (isNaN(bidNumber)) {
-      alert('Please enter a valid number for your bid.');
+      alert("Please enter a valid number for your bid.");
       return;
     }
-    
+
     if (bidNumber <= props.currentHighestBid) {
-      alert('Your bid must be higher than the current highest bid.');
+      alert("Your bid must be higher than the current highest bid.");
       return;
     }
 
     if (bidNumber > props.balance) {
-      alert('Your bid cannot exceed your available balance.');
+      alert("Your bid cannot exceed your available balance.");
       return;
     }
 
     setIsSubmitting(true);
     try {
       const response = await fetch(`${BACKEND_HTTP_URL}/bid/`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
-        body: JSON.stringify({ gameId: props.gameId, player: props.player, bid: bidNumber, team: props.team }),
+        credentials: "include",
+        body: JSON.stringify({
+          gameId: props.gameId,
+          player: props.player,
+          bid: bidNumber,
+          team: props.team,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Bid submission failed');
+        throw new Error("Bid submission failed");
       }
     } catch (error) {
-      console.error('Error posting bid:', error);
-      alert('Failed to submit bid. Please try again.');
+      console.error("Error posting bid:", error);
+      alert("Failed to submit bid. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -95,7 +104,10 @@ function Bid(props: BidProps) {
     <form className="bid-panel-controls" onSubmit={handleSubmit}>
       <div className="bid-panel-controls__steps">
         {quickRaiseOptions.map((amount) => {
-          const isDisabled = props.balance < props.currentHighestBid + 1 || Math.max(props.currentHighestBid + 1, effectiveBid + amount) > props.balance;
+          const isDisabled =
+            props.balance < props.currentHighestBid + 1 ||
+            Math.max(props.currentHighestBid + 1, effectiveBid + amount) >
+              props.balance;
 
           return (
             <button
@@ -103,7 +115,12 @@ function Bid(props: BidProps) {
               type="button"
               className="bid-panel-controls__step"
               onClick={() => handleQuickRaise(amount)}
-              disabled={isSubmitting || auctionDisabled || insufficientBalance || isDisabled}
+              disabled={
+                isSubmitting ||
+                auctionDisabled ||
+                insufficientBalance ||
+                isDisabled
+              }
             >
               +${amount}
             </button>
@@ -143,11 +160,11 @@ function Bid(props: BidProps) {
           disabled={isSubmitting || auctionDisabled || insufficientBalance}
         >
           {isSubmitting
-            ? 'Submitting...'
+            ? "Submitting..."
             : auctionDisabled
-              ? 'Awaiting team'
+              ? "Awaiting team"
               : insufficientBalance
-                ? 'Insufficient funds'
+                ? "Insufficient funds"
                 : `Bid ${formatCurrency(effectiveBid || minimumBid)}`}
         </button>
       </div>
@@ -163,7 +180,9 @@ function Bid(props: BidProps) {
 
         <span className="bid-panel-controls__balance">
           <span className="bid-panel-controls__balance-label">Balance:</span>
-          <strong className="bid-panel-controls__balance-value">{formatCurrency(props.balance)}</strong>
+          <strong className="bid-panel-controls__balance-value">
+            {formatCurrency(props.balance)}
+          </strong>
         </span>
       </div>
     </form>

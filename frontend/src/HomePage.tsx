@@ -13,7 +13,7 @@ const DIALOG_MODE = {
   VIEW: "VIEW",
 } as const;
 
-type DialogMode = typeof DIALOG_MODE[keyof typeof DIALOG_MODE];
+type DialogMode = (typeof DIALOG_MODE)[keyof typeof DIALOG_MODE];
 
 const DIALOG_DETAILS: Record<
   DialogMode,
@@ -156,7 +156,11 @@ function HomePage() {
         });
         if (response.ok) {
           const data = await response.json();
-          const routeState = { gameId: data.gameId, isCreator: data.isCreator, playerName: data.playerName };
+          const routeState = {
+            gameId: data.gameId,
+            isCreator: data.isCreator,
+            playerName: data.playerName,
+          };
           if (data.phase === "ended") {
             navigate("/view", { state: { gameId: data.gameId } });
           } else if (data.phase === "auction") {
@@ -187,7 +191,9 @@ function HomePage() {
       if (response.ok) {
         const data = await response.json();
         const createdGameId = data.id;
-        navigate("/lobby", { state: { gameId: createdGameId, isCreator: true, playerName } });
+        navigate("/lobby", {
+          state: { gameId: createdGameId, isCreator: true, playerName },
+        });
       } else {
         console.error("Failed to create game:", response.statusText);
       }
@@ -246,7 +252,9 @@ function HomePage() {
     }
   };
 
-  const handleSubmitDialog = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmitDialog = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
 
     if (dialogMode === DIALOG_MODE.CREATE) {
@@ -279,26 +287,42 @@ function HomePage() {
             <div className="bloodbath-panel__inner">
               <div className="bloodbath-simple-home__row">
                 <div className="bloodbath-simple-home__action bloodbath-simple-home__action--left">
-                  <button type="button" className="bloodbath-button bloodbath-button--primary bloodbath-button--large" onClick={() => handleOpenDialog(DIALOG_MODE.CREATE)}>
+                  <button
+                    type="button"
+                    className="bloodbath-button bloodbath-button--primary bloodbath-button--large"
+                    onClick={() => handleOpenDialog(DIALOG_MODE.CREATE)}
+                  >
                     Create Game
                   </button>
                 </div>
 
                 <div className="bloodbath-simple-home__logo-block">
                   <div className="bloodbath-home__logo-shell bloodbath-home__logo-shell--simple">
-                    <img src={imageSrc} alt="March Madness Auction logo" className="bloodbath-home__logo" />
+                    <img
+                      src={imageSrc}
+                      alt="March Madness Auction logo"
+                      className="bloodbath-home__logo"
+                    />
                   </div>
                 </div>
 
                 <div className="bloodbath-simple-home__action bloodbath-simple-home__action--right">
-                  <button type="button" className="bloodbath-button bloodbath-button--primary bloodbath-button--large" onClick={() => handleOpenDialog(DIALOG_MODE.JOIN)}>
+                  <button
+                    type="button"
+                    className="bloodbath-button bloodbath-button--primary bloodbath-button--large"
+                    onClick={() => handleOpenDialog(DIALOG_MODE.JOIN)}
+                  >
                     Join Game
                   </button>
                 </div>
               </div>
 
               <div className="bloodbath-simple-home__footer">
-                <button type="button" className="bloodbath-button bloodbath-button--secondary bloodbath-button--large" onClick={() => handleOpenDialog(DIALOG_MODE.VIEW)}>
+                <button
+                  type="button"
+                  className="bloodbath-button bloodbath-button--secondary bloodbath-button--large"
+                  onClick={() => handleOpenDialog(DIALOG_MODE.VIEW)}
+                >
                   View Game
                 </button>
               </div>
@@ -307,9 +331,15 @@ function HomePage() {
         </div>
       </div>
 
-      <button type="button" className="bloodbath-audio-toggle" onClick={toggleMute}>
+      <button
+        type="button"
+        className="bloodbath-audio-toggle"
+        onClick={toggleMute}
+      >
         <span className="bloodbath-audio-toggle__label">Soundtrack</span>
-        <span className="bloodbath-audio-toggle__value">{!isPlaying ? "Arm Audio" : isMuted ? "Muted" : "Live"}</span>
+        <span className="bloodbath-audio-toggle__value">
+          {!isPlaying ? "Arm Audio" : isMuted ? "Muted" : "Live"}
+        </span>
       </button>
 
       {isDialogOpen ? (
@@ -323,12 +353,18 @@ function HomePage() {
           >
             <div className="bloodbath-dialog__shell">
               <div className="bloodbath-dialog__header bloodbath-dialog__header--simple">
-                <h2 className="bloodbath-dialog__title" id="bloodbath-dialog-title">
+                <h2
+                  className="bloodbath-dialog__title"
+                  id="bloodbath-dialog-title"
+                >
                   {activeDialog.title}
                 </h2>
               </div>
 
-              <form className="bloodbath-dialog__form" onSubmit={handleSubmitDialog}>
+              <form
+                className="bloodbath-dialog__form"
+                onSubmit={handleSubmitDialog}
+              >
                 {dialogError ? (
                   <div className="bloodbath-dialog__error" role="alert">
                     {dialogError}
@@ -336,14 +372,19 @@ function HomePage() {
                 ) : null}
 
                 {activeDialog.showPlayerField ? (
-                  <label className="bloodbath-field" htmlFor="player-name-input">
+                  <label
+                    className="bloodbath-field"
+                    htmlFor="player-name-input"
+                  >
                     <span className="bloodbath-field__label">Your Name</span>
                     <input
                       id="player-name-input"
                       className="bloodbath-field__input"
                       type="text"
                       value={playerName}
-                      onChange={(event) => setPlayerName(event.currentTarget.value)}
+                      onChange={(event) =>
+                        setPlayerName(event.currentTarget.value)
+                      }
                     />
                   </label>
                 ) : null}
@@ -362,10 +403,17 @@ function HomePage() {
                 ) : null}
 
                 <div className="bloodbath-dialog__actions">
-                  <button type="button" className="bloodbath-button bloodbath-button--secondary" onClick={handleCloseDialog}>
+                  <button
+                    type="button"
+                    className="bloodbath-button bloodbath-button--secondary"
+                    onClick={handleCloseDialog}
+                  >
                     Close
                   </button>
-                  <button type="submit" className="bloodbath-button bloodbath-button--primary">
+                  <button
+                    type="submit"
+                    className="bloodbath-button bloodbath-button--primary"
+                  >
                     {activeDialog.submitLabel}
                   </button>
                 </div>

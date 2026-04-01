@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import os
-import aws_cdk as cdk
 
-from stacks import OidcStack, InfraStack
+import aws_cdk as cdk
+from stacks import InfraStack, OidcStack
 
 app = cdk.App()
 
