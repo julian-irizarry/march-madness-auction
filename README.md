@@ -2,14 +2,6 @@
 
 A real-time auction game for March Madness brackets. Players join a game, bid on NCAA tournament teams, and track their portfolio's performance as the tournament progresses.
 
-## Tech Stack
-
-- **Frontend:** React, TypeScript, Vite, Material UI
-- **Backend:** Python, FastAPI, WebSockets, Uvicorn
-- **Infrastructure:** AWS CDK (Python), ECS, ALB, Route 53, ACM
-- **CI/CD:** GitHub Actions with OIDC authentication
-- **Build:** Nix flakes for reproducible builds and Docker images
-
 ## Prerequisites
 
 - [Nix](https://nixos.org/download/) with flakes enabled
@@ -47,17 +39,14 @@ Install frontend dependencies (only needed once, or when `package.json` changes)
 cd frontend && npm install
 ```
 
-### Pre-commit hooks
+### Formatting and linting
+
+Formatting is managed by [treefmt-nix](https://github.com/numtide/treefmt-nix) (black, isort, mypy, prettier, nixfmt). Pre-commit hooks are installed automatically when you enter the dev shell via `nix develop`.
+
+To format the entire project manually:
 
 ```bash
-pip install -r requirements-dev.txt
-pre-commit install
-```
-
-Pre-commit runs against staged files on `git commit`. To run manually:
-
-```bash
-pre-commit run --all-files
+nix fmt
 ```
 
 ## Building Docker Images
@@ -88,10 +77,6 @@ The app is deployed to AWS (ECS behind an ALB) at `mmauctiongame.com`.
 
 Authentication uses OIDC -- no AWS credentials stored in GitHub.
 
-### First deploy
-
-See [FIRST_DEPLOY.md](FIRST_DEPLOY.md) for initial setup steps.
-
 ### Infrastructure
 
 The CDK stacks live in `deployment/`:
@@ -114,11 +99,3 @@ deployment/                # AWS CDK (Python)
 .github/workflows/
   deploy.yml               # CI/CD: build, push, deploy on tag
 ```
-
-## Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `ENVIRONMENT` | `development` | `production` or `development` -- controls CORS origins |
-| `VITE_BACKEND_HOST` | `127.0.0.1` | Backend host for API calls |
-| `VITE_BACKEND_PORT` | `8000` | Backend port for API calls |

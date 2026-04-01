@@ -37,6 +37,7 @@ nix run .#frontend       # Start frontend only
 nix run .#backend        # Start backend only
 nix build .#backend-image   # Build backend Docker image
 nix build .#frontend-image  # Build frontend Docker image
+nix fmt                     # Format all code (treefmt)
 cd deployment && npx cdk synth   # Synthesize CloudFormation
 cd deployment && npx cdk deploy MarchMadnessInfra -c image-tag=v1.0.0  # Deploy
 ```
@@ -50,3 +51,4 @@ cd deployment && npx cdk deploy MarchMadnessInfra -c image-tag=v1.0.0  # Deploy
 - The backend is planned to migrate to Rust. When that happens, swap `pythonEnv` / `dockerTools.buildImage` in `flake.nix` to use `crane` or `buildRustPackage`.
 - ECS uses bridge networking with `minHealthyPercent=0` (brief downtime during deploys is acceptable).
 - Domain is `mmauctiongame.com` managed via Route 53.
+- Formatting uses treefmt-nix (black, isort, mypy, prettier, nixfmt). Pre-commit hooks install automatically via `nix develop`.

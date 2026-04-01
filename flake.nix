@@ -4,12 +4,26 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    treefmt-nix.url = "github:numtide/treefmt-nix";
+    git-hooks.url = "github:cachix/git-hooks.nix";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, treefmt-nix, git-hooks }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
+
+        treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
+
+        gitHooksCheck = git-hooks.lib.${system}.run {
+          src = ./.;
+          hooks = {
+            treefmt = {
+              enable = true;
+              package = treefmtEval.config.build.wrapper;
+            };
+          };
+        };
 
         pythonEnv = pkgs.python312.withPackages (ps: with ps; [
           fastapi
@@ -140,6 +154,7 @@
       in
       {
         devShells.default = pkgs.mkShell {
+          inherit (gitHooksCheck) shellHook;
           buildInputs = [
             pythonEnv
             pkgs.nodejs_20
@@ -148,14 +163,15 @@
             pkgs.process-compose
             pkgs.nodePackages.aws-cdk
             pkgs.python312Packages.pip
-          ];
+            treefmtEval.config.build.wrapper
+          ] ++ gitHooksCheck.enabledPackages;
+        };
 
-          shellHook = ''
-            echo "March Madness Auction dev shell"
-            echo "  nix run .#dev       — start frontend + backend"
-            echo "  nix run .#frontend  — start frontend only"
-            echo "  nix run .#backend   — start backend only"
-          '';
+        formatter = treefmtEval.config.build.wrapper;
+
+        checks = {
+          formatting = treefmtEval.config.build.check self;
+          git-hooks = gitHooksCheck;
         };
 
         apps = {
