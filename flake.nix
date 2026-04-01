@@ -44,25 +44,9 @@
           ]
         );
 
-        frontendBuild = pkgs.buildNpmPackage {
-          pname = "march-madness-frontend";
-          version = "0.1.0";
-          src = ./frontend;
-          npmDepsHash = "sha256-fRPYGR0dgs9LRx5zyriya06LEXtlAXt5EI5mNzekAOw=";
-          npmDepsFetcherVersion = 2;
-          makeCacheWritable = true;
-          npmFlags = [ "--legacy-peer-deps" ];
-          VITE_BACKEND_HOST = "mmauctiongame.com";
-          VITE_BACKEND_PORT = "443";
-          installPhase = ''
-            runHook preInstall
-            cp -r dist $out
-            runHook postInstall
-          '';
-        };
-
         images = import ./nix/images.nix {
-          inherit pkgs pythonEnv frontendBuild;
+          inherit pkgs pythonEnv;
+          frontendSrc = ./frontend;
           backendSrc = ./backend;
         };
 

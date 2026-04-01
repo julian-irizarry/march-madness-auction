@@ -1,10 +1,28 @@
 {
   pkgs,
   pythonEnv,
-  frontendBuild,
+  frontendSrc,
   backendSrc,
 }:
 let
+  # Frontend: build static assets with Vite
+  frontendBuild = pkgs.buildNpmPackage {
+    pname = "march-madness-frontend";
+    version = "0.1.0";
+    src = frontendSrc;
+    npmDepsHash = "sha256-fRPYGR0dgs9LRx5zyriya06LEXtlAXt5EI5mNzekAOw=";
+    npmDepsFetcherVersion = 2;
+    makeCacheWritable = true;
+    npmFlags = [ "--legacy-peer-deps" ];
+    VITE_BACKEND_HOST = "mmauctiongame.com";
+    VITE_BACKEND_PORT = "443";
+    installPhase = ''
+      runHook preInstall
+      cp -r dist $out
+      runHook postInstall
+    '';
+  };
+
   # Nginx config for serving the SPA
   nginxConf = pkgs.writeText "nginx.conf" ''
     user root root;
