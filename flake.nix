@@ -19,6 +19,21 @@
           python-dotenv
           sqlalchemy
         ]);
+
+        frontendApp = pkgs.writeShellScriptBin "run-frontend" ''
+          cd ${toString ./.}/frontend
+          ${pkgs.nodejs_20}/bin/npm run dev
+        '';
+
+        backendApp = pkgs.writeShellScriptBin "run-backend" ''
+          cd ${toString ./.}/backend
+          ${pythonEnv}/bin/python main.py
+        '';
+
+        devApp = pkgs.writeShellScriptBin "run-dev" ''
+          cd ${toString ./.}
+          ${pkgs.process-compose}/bin/process-compose up -f process-compose.yaml
+        '';
       in
       {
         devShells.default = pkgs.mkShell {
@@ -36,6 +51,25 @@
             echo "  nix run .#frontend  — start frontend only"
             echo "  nix run .#backend   — start backend only"
           '';
+        };
+
+        apps = {
+          frontend = {
+            type = "app";
+            program = "${frontendApp}/bin/run-frontend";
+          };
+          backend = {
+            type = "app";
+            program = "${backendApp}/bin/run-backend";
+          };
+          dev = {
+            type = "app";
+            program = "${devApp}/bin/run-dev";
+          };
+          default = {
+            type = "app";
+            program = "${devApp}/bin/run-dev";
+          };
         };
       }
     );
