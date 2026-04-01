@@ -16,7 +16,7 @@ processes:
       period_seconds: 5
 
   frontend:
-    command: npm run dev
+    command: npm install && npm run dev
     working_dir: ./frontend
     environment:
       - "VITE_BACKEND_HOST=127.0.0.1"
