@@ -31,17 +31,9 @@ nix run .#frontend   # Vite dev server on port 3000
 nix run .#backend    # Uvicorn on port 8000
 ```
 
-### First time setup
-
-Install frontend dependencies (only needed once, or when `package.json` changes):
-
-```bash
-cd frontend && npm install
-```
-
 ### Formatting and linting
 
-Formatting is managed by [treefmt-nix](https://github.com/numtide/treefmt-nix) (black, isort, mypy, prettier, nixfmt). Pre-commit hooks are installed automatically when you enter the dev shell via `nix develop`.
+Formatting is managed by [treefmt-nix](https://github.com/numtide/treefmt-nix) (black, isort, prettier, nixfmt, rustfmt). Pre-commit hooks are installed automatically when you enter the dev shell via `nix develop`.
 
 To format the entire project manually:
 
@@ -87,8 +79,11 @@ The CDK stacks live in `deployment/`:
 ## Project Structure
 
 ```
-flake.nix                  # Nix: dev shell, run targets, Docker image builds
-process-compose.yaml       # Local dev: runs frontend + backend together
+flake.nix                  # Nix flake entry point
+nix/
+  apps.nix                 # Run targets + process-compose config
+  images.nix               # Docker image builds
+  treefmt.nix              # Formatter/linter config
 frontend/                  # React/TypeScript/Vite
 backend/                   # Python/FastAPI
 deployment/                # AWS CDK (Python)

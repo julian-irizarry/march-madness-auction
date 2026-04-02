@@ -65,6 +65,8 @@ let
   '';
 in
 {
+  inherit frontendBuild backendAppRoot;
+
   frontend = pkgs.dockerTools.buildImage {
     name = "march-madness-frontend";
     tag = "latest";

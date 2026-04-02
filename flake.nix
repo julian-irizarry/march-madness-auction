@@ -78,9 +78,17 @@
         inherit apps;
 
         packages = {
+          frontend = images.frontendBuild;
+          backend = images.backendAppRoot;
           frontend-image = images.frontend;
           backend-image = images.backend;
-          default = images.backend;
+          default = pkgs.symlinkJoin {
+            name = "march-madness-auction";
+            paths = [
+              images.frontendBuild
+              images.backendAppRoot
+            ];
+          };
         };
       }
     );
